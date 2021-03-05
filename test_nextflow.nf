@@ -76,12 +76,15 @@ process generate_seq_object{
 
     script:
     """
+    $data=$(head ${data_type})
+    $mani_fmt=$(head ${manifest_format})
+
     module load  QIIME2/2020.11
     qiime tools import \
-    --type ${data_type} \
+    --type $data\
     --input-path ${manifest} \
     --output-path demux.qza \
-    --input-format ${manifest_format}
+    --input-format $mani_fmt
     """
 
 }
