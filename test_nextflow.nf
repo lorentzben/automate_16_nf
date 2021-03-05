@@ -2,7 +2,6 @@
 
 params.manifest = "$baseDir/c5_litter_mapping.tsv"
 params.sequence = "$baseDir/seqs"
-params.inter="$baseDir/analysis"
 params.outdir = "$baseDir/C5_litter"
 
 if(params.manifest) {
@@ -86,11 +85,10 @@ process generate_seq_object{
     file 'demux.qza' into qiime_obj
     stdout into printer
 
+    publishDir "${params.outdir}/qiime", mode: 'copy'
+
     shell:
     '''
-    if(! !{params.inter}.isDirectory()){
-        $(mkdir !{params.inter})
-    }
     DAT=$(head !{data_type})
     MANI=$(head !{manifest_format})
     module load  QIIME2/2020.11
