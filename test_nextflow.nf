@@ -17,7 +17,7 @@ process check_single_paired {
 
     output: 
     file 'manifest_format.txt' into manifest_type
-    value data_type into dataType
+    file 'data_type.txt' into dataType
 
     script:
     """
@@ -27,22 +27,30 @@ process check_single_paired {
 
     if read_manifest.columns[0] == 'absolute-filepath':
         print("single end analysis")
-        format = "single"
+        format = "SingleEndFastqManifestPhred33V2"
+        data = "SampleData[SequencesWithQuality]"
         with open("manifest_format.txt", "w") as file:
             file.write(format)
+
+        with open("data_type.txt", "w") as file:
+            file.write(data)
 
         
     elif read_manifest.columns[0] == 'forward-absolute-filepath':
         print("paired end analsis")
-        format = 'paired'
+        format = "PairedEndFastqManifestPhred33V2"
+        data = "SampleData[PairedEndSequencesWithQuality]"
         with open("manifest_format.txt", "w") as file:
             file.write(format)
+
+         with open("data_type.txt", "w") as file:
+            file.write(data)
     else:
         print(
             "cannot determine if paired or single end, check manifest file")
         exit(1)
 
-    print(format)
+    print(format + " " + data)
     """
     
 }
