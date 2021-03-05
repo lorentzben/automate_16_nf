@@ -2,6 +2,8 @@
 
 params.manifest = "$baseDir/c5_litter_mapping.tsv"
 params.sequence = "$baseDir/seqs"
+params.inter="$baseDir/analysis"
+params.outdir = "$baseDir/C5_litter"
 
 if(params.manifest) {
     tsvFile = file(params.manifest).getName()
@@ -92,7 +94,7 @@ process generate_seq_object{
     qiime tools import \
     --type $DAT\
     --input-path !{manifest} \
-    --output-path demux.qza \
+    --output-path !{params.inter}/qiime/demux.qza \
     --input-format $MANI
     '''
 
