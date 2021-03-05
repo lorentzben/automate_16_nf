@@ -12,7 +12,6 @@ if(params.manifest) {
 }
 
 if(params.sequence){
-    sequences = path(params.sequence)
     Channel
         .fromPath(params.sequence)
         .ifEmpty {exit 1, log.info "Cannot find path file ${sequences}"}
