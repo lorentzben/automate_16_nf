@@ -1,6 +1,6 @@
 #!/usr/bin/env nextflow
 
-params.metadat = "$baseDir/EXAMPLE_MANIFEST.tsv"
+params.manifest = "$baseDir/EXAMPLE_MANIFEST.tsv"
 
 if(params.manifest) {
     tsvFile = file(params.manifest).getName()
