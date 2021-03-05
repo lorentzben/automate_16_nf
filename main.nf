@@ -93,7 +93,6 @@ process check_single_paired {
     """
     
 }
-result.subscribe { println it }
 
 process generate_seq_object{
 
