@@ -21,7 +21,7 @@ process check_single_paired {
 
     script:
     """
-    !#/usr/bin/env python3
+    #!/usr/bin/env python3
 
     import pandas as pd
     read_manifest = pd.read_table(${manifest}, index_col=0, sep='\t')
