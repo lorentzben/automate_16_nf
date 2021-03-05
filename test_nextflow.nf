@@ -72,7 +72,7 @@ process generate_seq_object{
 
     output: 
     file 'demux.qza' into qiime_obj
-    stdout into result
+    stdout into printer
 
     script:
     """
@@ -85,3 +85,4 @@ process generate_seq_object{
     """
 
 }
+printer.subscribe{ println it } 
