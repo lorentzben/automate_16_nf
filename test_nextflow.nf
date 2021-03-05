@@ -62,3 +62,26 @@ process check_single_paired {
     
 }
 result.subscribe { println it }
+
+process generate_seq_object{
+    input: 
+    file manifest from ch_single_pair
+    file manifest_format from manifest_type
+    file data_type from dataType
+    
+
+    output: 
+    file 'demux.qza' into qiime_obj
+    stdout into result
+
+    script:
+    """
+    module load  QIIME2/2020.11
+    qiime tools import \
+    --type ${data_type} \
+    --input-path ${manifest} \
+    --output-path demux.qza \
+    --input-format ${manifest_format}
+    """
+
+}
