@@ -92,8 +92,6 @@ process check_single_paired {
     value manifest_format into manifest_type
     value data_type into dataType
 
-    script: 
-
     """
     !#/usr/bin/python3
     import pandas as pd
@@ -113,4 +111,3 @@ process check_single_paired {
     print($manifest_format)
     """
 }
-
