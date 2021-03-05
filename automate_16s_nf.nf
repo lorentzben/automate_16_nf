@@ -82,7 +82,7 @@ if(params.metadata) {
     .into { ch_feature_visualization }
 }
 
-//Determine Single or Paired analysis 
+// Determine Single or Paired analysis 
 
 process check_single_paired { 
     input: 
@@ -114,9 +114,3 @@ process check_single_paired {
     """
 }
 
-
-//Channel for manifest type
-
-//Channel for Datatype
-
-//Generate sequence object and output it
