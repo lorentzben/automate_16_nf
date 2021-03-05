@@ -47,7 +47,7 @@ process check_single_paired {
         with open("manifest_format.txt", "w") as file:
             file.write(format)
 
-         with open("data_type.txt", "w") as d_file:
+        with open("data_type.txt", "w") as d_file:
             d_file.write(data)
     else:
         print(
