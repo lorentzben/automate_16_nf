@@ -15,7 +15,7 @@ if(params.sequence){
     Channel
         .fromPath(params.sequence)
         .ifEmpty {exit 1, log.info "Cannot find path file ${sequences}"}
-        .into{ ch_make_qiime }
+        .into{ ch_make_qiime_seq }
 
 }
 
@@ -77,7 +77,7 @@ process generate_seq_object{
     file manifest from ch_make_qiime
     file manifest_format from manifest_type
     file data_type from dataType
-    path seqs from ch_make_qiime
+    path seqs from ch_make_qiime_seq
     
 
     output: 
