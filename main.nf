@@ -41,9 +41,6 @@ if(params.input){
         .into{ ch_make_qiime_seq }
 }
 
-if(params.itemOfInterest){
-    .from
-}
 
 process check_single_paired { 
     
