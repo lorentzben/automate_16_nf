@@ -74,16 +74,16 @@ process generate_seq_object{
     file 'demux.qza' into qiime_obj
     stdout into printer
 
-    script:
+    shell:
     """
-  
-
+    $DAT=$(head !{data_type})
+    $MANI=$(head !{manifest_format})
     module load  QIIME2/2020.11
     qiime tools import \
-    --type ${(head ${data_type})}\
-    --input-path ${manifest} \
+    --type head $DAT\
+    --input-path !{manifest} \
     --output-path demux.qza \
-    --input-format ${(head ${manifest_format})}
+    --input-format head $MANI
     """
 
 }
