@@ -1,6 +1,6 @@
 #!/usr/bin/env nextflow
 
-params.manifest = "$baseDir/EXAMPLE_MANIFEST.tsv"
+params.manifest = "$baseDir/c5_litter_mapping.tsv"
 
 if(params.manifest) {
     tsvFile = file(params.manifest).getName()
