@@ -18,6 +18,7 @@ process check_single_paired {
     output: 
     file 'manifest_format.txt' into manifest_type
     file 'data_type.txt' into dataType
+    stdout into result
 
     script:
     """
@@ -58,3 +59,4 @@ process check_single_paired {
     """
     
 }
+result.subscribe { println it }
