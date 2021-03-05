@@ -33,8 +33,8 @@ process check_single_paired {
         with open("manifest_format.txt", "w") as file:
             file.write(format)
 
-        with open("data_type.txt", "w") as file:
-            file.write(data)
+        with open("data_type.txt", "w") as d_file:
+            d_file.write(data)
 
         
     elif read_manifest.columns[0] == 'forward-absolute-filepath':
@@ -45,7 +45,7 @@ process check_single_paired {
             file.write(format)
 
          with open("data_type.txt", "w") as file:
-            file.write(data)
+            d_file.write(data)
     else:
         print(
             "cannot determine if paired or single end, check manifest file")
