@@ -39,10 +39,11 @@ process check_single_paired {
 
         with open("data_type.txt", "w") as d_file:
             d_file.write(data)
+        print(format + " " + data)
 
         
     elif read_manifest.columns[0] == 'forward-absolute-filepath':
-        print("paired end analsis")
+        print("paired end analysis")
         format = "PairedEndFastqManifestPhred33V2"
         data = "SampleData[PairedEndSequencesWithQuality]"
         with open("manifest_format.txt", "w") as file:
@@ -50,12 +51,13 @@ process check_single_paired {
 
         with open("data_type.txt", "w") as d_file:
             d_file.write(data)
+        print(format + " " + data)
     else:
         print(
             "cannot determine if paired or single end, check manifest file")
         exit(1)
 
-    print(format + " " + data)
+    
     """
     
 }
