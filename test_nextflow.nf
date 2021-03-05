@@ -74,6 +74,9 @@ process check_single_paired {
 result.subscribe { println it }
 
 process generate_seq_object{
+    
+    publishDir "${params.outdir}/qiime", mode: 'copy'
+
     input: 
     file manifest from ch_make_qiime
     file manifest_format from manifest_type
@@ -85,7 +88,7 @@ process generate_seq_object{
     file 'demux.qza' into qiime_obj
     stdout into printer
 
-    publishDir "${params.outdir}/qiime", mode: 'copy'
+    
 
     shell:
     '''
@@ -95,7 +98,7 @@ process generate_seq_object{
     qiime tools import \
     --type $DAT\
     --input-path !{manifest} \
-    --output-path !{params.inter}/qiime/demux.qza \
+    --output-path demux.qza \
     --input-format $MANI
     '''
 
