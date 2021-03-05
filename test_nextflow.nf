@@ -88,6 +88,9 @@ process generate_seq_object{
 
     shell:
     '''
+    if not !{params.inter}.isDirectory{
+        $(mkdir !{params.inter})
+    }
     DAT=$(head !{data_type})
     MANI=$(head !{manifest_format})
     module load  QIIME2/2020.11
