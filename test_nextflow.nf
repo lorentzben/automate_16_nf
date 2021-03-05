@@ -1,6 +1,7 @@
 #!/usr/bin/env nextflow
 
 params.manifest = "$baseDir/c5_litter_mapping.tsv"
+params.sequence = "$baseDir/seqs"
 
 if(params.manifest) {
     tsvFile = file(params.manifest).getName()
@@ -8,6 +9,15 @@ if(params.manifest) {
         .fromPath(params.manifest)
         .ifEmpty {exit 1, log.info "Cannot find path file ${tsvFile}"}
         .into{ ch_single_pair ; ch_make_qiime }
+}
+
+if(params.sequence){
+    sequences = path(params.sequence)
+    Channel
+        .fromPath(params.sequence)
+        .ifEmpty {exit 1, log.info "Cannot find path file ${sequences}"}
+        .into{ ch_make_qiime }
+
 }
 
 process check_single_paired { 
@@ -68,6 +78,7 @@ process generate_seq_object{
     file manifest from ch_make_qiime
     file manifest_format from manifest_type
     file data_type from dataType
+    path seqs from ch_make_qiime
     
 
     output: 
