@@ -7,7 +7,7 @@ if(params.manifest) {
     Channel
         .fromPath(params.manifest)
         .ifEmpty {exit 1, log.info "Cannot find path file ${tsvFile}"}
-        .into{ ch_single_pair }
+        .into{ ch_single_pair ; ch_make_qiime }
 }
 
 process check_single_paired { 
