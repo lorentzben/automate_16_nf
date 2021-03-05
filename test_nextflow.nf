@@ -16,7 +16,7 @@ process check_single_paired {
     file manifest from ch_single_pair
 
     output: 
-    value manifest_format into manifest_type
+    file 'manifest_format.txt' into manifest_type
     value data_type into dataType
 
     script:
@@ -27,16 +27,22 @@ process check_single_paired {
 
     if read_manifest.columns[0] == 'absolute-filepath':
         print("single end analysis")
-        ${manifest_format} = "single"
+        format = "single"
+        with open("manifest_format.txt", "w") as file:
+            file.write(format)
+
+        
     elif read_manifest.columns[0] == 'forward-absolute-filepath':
         print("paired end analsis")
-        ${manifest_format} = 'paired'
+        format = 'paired'
+        with open("manifest_format.txt", "w") as file:
+            file.write(format)
     else:
         print(
             "cannot determine if paired or single end, check manifest file")
         exit(1)
 
-    print(${manifest_format})
+    print(format)
     """
     
 }
