@@ -65,7 +65,7 @@ result.subscribe { println it }
 
 process generate_seq_object{
     input: 
-    file manifest from ch_single_pair
+    file manifest from ch_make_qiime
     file manifest_format from manifest_type
     file data_type from dataType
     
