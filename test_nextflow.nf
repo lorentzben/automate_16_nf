@@ -27,16 +27,16 @@ process check_single_paired {
 
     if read_manifest.columns[0] == 'absolute-filepath':
         print("single end analysis")
-        $manifest_format = "single"
+        ${manifest_format} = "single"
     elif read_manifest.columns[0] == 'forward-absolute-filepath':
         print("paired end analsis")
-        $manifest_format = 'paired'
+        ${manifest_format} = 'paired'
     else:
         print(
             "cannot determine if paired or single end, check manifest file")
         exit(1)
 
-    print($manifest_format)
+    print(${manifest_format})
     """
     
 }
