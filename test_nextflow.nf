@@ -24,6 +24,7 @@ process check_single_paired {
     #!/usr/bin/env python3
 
     import pandas as pd
+    import os 
     read_manifest = pd.read_table(${manifest}, index_col=0, sep='\t')
 
     if read_manifest.columns[0] == 'absolute-filepath':
