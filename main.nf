@@ -51,7 +51,7 @@ process check_single_paired {
     file 'manifest_format.txt' into manifest_type
     file 'data_type.txt' into dataType
     
-    conda 'pandas'
+    conda 'env create -f environment.yml'
 
     script:
     """
