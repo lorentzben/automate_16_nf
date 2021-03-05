@@ -11,7 +11,7 @@ def helpMessage(){
         --input [path/to/folder]      Folder containing demultiplexed fastq.gz files
         --metadata [path/to/file]     Path to metadata sheet in tsv format see EXAMPLE_METADATA.tsv
         --manifest [path/to/file]     Path to mapping file in tsv format see EXAMPLE_MAPPING.tsv 
-        --item_of_interest [str]      Item of interest, group defining treatment vs control or longitudinal variable
+        --itemOfInterest [str]      Item of interest, group defining treatment vs control or longitudinal variable
         --email [email]               Set this parameter to your e-mail address to get a summary e-mail with details of the run sent to you when the workflow exits
 	    --email_on_fail [email]       Same as --email, except only send mail if the workflow is not successful
         -name [str]                   Name for the analysis run, if not provided nextflow will generate one 
@@ -39,7 +39,10 @@ if(params.input){
         .fromPath(params.input)
         .ifEmpty {exit 1, log.info "Cannot find path file ${input}"}
         .into{ ch_make_qiime_seq }
+}
 
+if(params.itemOfInterest){
+    .from
 }
 
 process check_single_paired { 
@@ -51,6 +54,8 @@ process check_single_paired {
     file 'manifest_format.txt' into manifest_type
     file 'data_type.txt' into dataType
     
+    conda 'pandas'
+
     script:
     """
     #!/usr/bin/env python3
