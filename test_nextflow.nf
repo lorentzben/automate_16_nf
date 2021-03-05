@@ -88,7 +88,7 @@ process generate_seq_object{
 
     shell:
     '''
-    if not !{params.inter}.isDirectory{
+    if(! !{params.inter}.isDirectory()){
         $(mkdir !{params.inter})
     }
     DAT=$(head !{data_type})
