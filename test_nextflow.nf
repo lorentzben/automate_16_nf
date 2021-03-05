@@ -26,7 +26,7 @@ process check_single_paired {
     import pandas as pd
     import os 
 
-    read_manifest = pd.read_table(${manifest}, index_col=0, sep="'\t'")
+    read_manifest = pd.read_table('${manifest}', index_col=0, sep="'\t'")
 
     if read_manifest.columns[0] == 'absolute-filepath':
         print("single end analysis")
