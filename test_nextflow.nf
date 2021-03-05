@@ -76,8 +76,8 @@ process generate_seq_object{
 
     script:
     """
-    $DAT=head ${data_type}
-    $MANI_FMT=head ${manifest_format}
+    ${DAT}=head ${data_type}
+    ${MANI_FMT}=head ${manifest_format}
 
     module load  QIIME2/2020.11
     qiime tools import \
