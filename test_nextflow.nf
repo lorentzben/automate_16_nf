@@ -25,12 +25,14 @@ process check_single_paired {
 
     import pandas as pd
     import os 
+
     read_manifest = pd.read_table(${manifest}, index_col=0, sep='\t')
 
     if read_manifest.columns[0] == 'absolute-filepath':
         print("single end analysis")
         format = "SingleEndFastqManifestPhred33V2"
         data = "SampleData[SequencesWithQuality]"
+
         with open("manifest_format.txt", "w") as file:
             file.write(format)
 
@@ -45,7 +47,7 @@ process check_single_paired {
         with open("manifest_format.txt", "w") as file:
             file.write(format)
 
-         with open("data_type.txt", "w") as file:
+         with open("data_type.txt", "w") as d_file:
             d_file.write(data)
     else:
         print(
