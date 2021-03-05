@@ -1,7 +1,6 @@
 #!/usr/bin/env nextflow
 
 def helpMessage(){
-    log.info nfcoreHeader()
 	log.info"""
 	Usage:
 
