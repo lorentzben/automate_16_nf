@@ -80,10 +80,10 @@ process generate_seq_object{
     $MANI=$(head !{manifest_format})
     module load  QIIME2/2020.11
     qiime tools import \
-    --type $DAT\
+    --type $(echo $DAT)\
     --input-path !{manifest} \
     --output-path demux.qza \
-    --input-format $MANI
+    --input-format $(echo $MANI)
     '''
 
 }
