@@ -452,47 +452,47 @@ process Denoise {
 
     script:
     """
-        #!/usr/bin/env python3
-        import pandas as pd 
-        from pathlib import Path
-        import numpy as np 
-        import csv 
-        import subprocess
+    #!/usr/bin/env python3
+    import pandas as pd 
+    from pathlib import Path
+    import numpy as np 
+    import csv 
+    import subprocess
 
-        wd = Path.cwd()
+    wd = Path.cwd()
 
-        seq_file = pd.read_table("manifest_format.txt")
-        if seq_file.columns[0] == "SingleEndFastqManifestPhred33V2":
-            seq_format = "single"
-        else:
-            seq_format = "paired"
+    seq_file = pd.read_table("manifest_format.txt")
+    if seq_file.columns[0] == "SingleEndFastqManifestPhred33V2":
+        seq_format = "single"
+    else:
+        seq_format = "paired"
         
-        if seq_format == 'single':
-            left = cutoff['value'][0]
-            right = cutoff['value'][0]
-            command = "qiime dada2 denoise-single \
-                --i-demultiplexed-seqs demux.qza \
-                --p-trim-left " + str(left)+" \
-                --p-trunc-len " + str(right) + " \
-                --o-representative-sequences rep-seqs-dada2.qza \
-                --o-table table-dada2.qza \
-                --o-denoising-stats stats-dada2.qza"
-        elif seq_format == 'paired':
-            forward_left = cutoff['value'][0]
-            forward_right = cutoff['value'][1]
-            rev_left = cutoff['value'][2]
-            rev_right = cutoff['value'][3]
-            command = "qiime dada2 denoise-paired \
-                --i-demultiplexed-seqs demux.qza \
-                --p-trunc-len-f " + str(forward_right)+" \
-                --p-trunc-len-r " + str(rev_right) + " \
-                --p-trim-left-f " + str(forward_left)+" \
-                --p-trim-left-r " + str(rev_left) + " \
-                --o-representative-sequences rep-seqs-dada2.qza \
-                --o-table table-dada2.qza \
-                --o-denoising-stats stats-dada2.qza"
+    if seq_format == 'single':
+        left = cutoff['value'][0]
+        right = cutoff['value'][0]
+        command = "qiime dada2 denoise-single \
+            --i-demultiplexed-seqs demux.qza \
+            --p-trim-left " + str(left)+" \
+            --p-trunc-len " + str(right) + " \
+            --o-representative-sequences rep-seqs-dada2.qza \
+            --o-table table-dada2.qza \
+            --o-denoising-stats stats-dada2.qza"
+    elif seq_format == 'paired':
+        forward_left = cutoff['value'][0]
+        forward_right = cutoff['value'][1]
+        rev_left = cutoff['value'][2]
+        rev_right = cutoff['value'][3]
+        command = "qiime dada2 denoise-paired \
+            --i-demultiplexed-seqs demux.qza \
+            --p-trunc-len-f " + str(forward_right)+" \
+            --p-trunc-len-r " + str(rev_right) + " \
+            --p-trim-left-f " + str(forward_left)+" \
+            --p-trim-left-r " + str(rev_left) + " \
+            --o-representative-sequences rep-seqs-dada2.qza \
+            --o-table table-dada2.qza \
+            --o-denoising-stats stats-dada2.qza"
 
-        subprocess.run([command], shell=True)
+    subprocess.run([command], shell=True)
     
     """
 }
