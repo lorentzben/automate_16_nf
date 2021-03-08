@@ -79,7 +79,6 @@ process SetupPy2CondaEnv{
 }
 
 process VerifyManifest{
-    
 
     input:
     file manifest from ch_mani_veri
@@ -263,7 +262,8 @@ process GenerateSeqObject{
     path seqs from ch_make_qiime_seq
 
     output: 
-    file 'demux.qza' into qiime_obj
+    file 'demux.qza' into ch_qiime_obj
+    
 
     shell:
     '''
@@ -278,3 +278,28 @@ process GenerateSeqObject{
     '''
 }
 
+process QualControl{
+    publishDir "${params.outdir}/qiime", mode: 'copy'
+
+    input:
+    file seq_obj from ch_qiime_obj
+    
+    output: 
+    path quality_visualizatin into ch_qiime_qual
+
+    conda 'environment.yml'
+
+    script:
+    """
+    #!/usr/bin/env bash
+
+    qiime demux summarize \
+    --i-data ${seq_obj} \
+    --o-visualization demux_summary.qzv
+
+    qiime tools export \
+    --input-path demux_summary.qzv \
+    --output-path demux_summary/
+    """
+
+}
