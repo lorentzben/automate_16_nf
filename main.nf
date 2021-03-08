@@ -95,6 +95,7 @@ process VerifyManifest{
     import pandas as pd 
     import csv 
 
+    seq_dir = '${seqs_dir}'
     try:
         read_manifest = pd.read_table('${manifest}', index_col=0, sep='\t')
     except FileNotFoundError:
