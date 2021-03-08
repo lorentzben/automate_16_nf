@@ -83,9 +83,11 @@ process PipInstall{
 
     script:
     """
-    pip install pandas
-    pip install numpy
-    pip install subprocess
+    #!/usr/bin/env bash
+
+    python3 -m pip install pandas
+    python3 -m pip install numpy
+    python3 -m pip install subprocess
     """
 }
 
