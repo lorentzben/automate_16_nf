@@ -466,7 +466,7 @@ process Denoise {
         seq_format = "single"
     else:
         seq_format = "paired"
-    cutoff = pd.read_table("cutoffs.csv")    
+    cutoff = pd.read_table("cutoffs.csv", sep=",")    
     if seq_format == 'single':
         left = cutoff['value'][0]
         right = cutoff['value'][0]
