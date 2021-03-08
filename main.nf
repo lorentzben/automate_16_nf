@@ -79,14 +79,11 @@ process SetupPy2CondaEnv{
 }
 
 process VerifyManifest{
-    publishDir "${params.outdir}/qiime", mode: 'copy'
+    
 
     input:
     file manifest from ch_mani_veri
     path seqs_dir from ch_seqs_veri
-
-    output:
-    file missing into missing_seqs
 
     conda 'environment.yml'
 
@@ -194,15 +191,6 @@ process VerifyManifest{
                 writer.writerow({'filename': filename})
 
         exit(0)
-
-    if missing == []:
-        with open('missing.csv', 'w', newline='') as csvfile:
-            fieldnames = ['filename']
-            writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
-
-            writer.writeheader()
-
-            writer.writerow({'filename': 'none'})
 
 
     print("the manifest called: " + '${manifest}' +
