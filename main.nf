@@ -263,6 +263,7 @@ process GenerateSeqObject{
 
     output: 
     file 'demux.qza' into ch_qiime_obj
+    file manifest_format into ch_manifest_type
     
 
     shell:
@@ -309,7 +310,7 @@ process FindCutoffs{
     publishDir "${params.outdir}/qiime", mode: 'copy'
 
     input:
-    file 'manifest_format.txt' from manifest_type
+    file 'manifest_format.txt' from ch_manifest_type
     file('demux_summary/*') from ch_qiime_qual
     
     output: 
