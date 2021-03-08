@@ -190,7 +190,7 @@ process VerifyManifest{
 
         exit(0)
 
-    print("the manifest called: " + manifest +
+    print("the manifest called: " + '${manifest}' +
                  " is valid and ready to go")
     """
 
