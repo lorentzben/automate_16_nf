@@ -354,3 +354,4 @@ dependencies:
 - pip:
   - Path
   - pandas
+  - numpy
