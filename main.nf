@@ -263,7 +263,7 @@ process GenerateSeqObject{
 
     output: 
     file 'demux.qza' into ch_qiime_obj
-    file manifest_format into ch_manifest_type
+    file manifest_format into ch_manifest_type_denoise
     
 
     shell:
