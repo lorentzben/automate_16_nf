@@ -299,7 +299,7 @@ process QualControl{
 
     qiime tools export \
     --input-path demux_summary.qzv \
-    --output-path ${demux_summary}/
+    --output-path '${demux_summary}'/
     """
 
 }
