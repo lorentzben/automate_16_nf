@@ -355,3 +355,4 @@ dependencies:
   - Path
   - pandas
   - numpy
+  - subprocess

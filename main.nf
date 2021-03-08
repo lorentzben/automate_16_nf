@@ -287,6 +287,7 @@ process QualControl{
     
     output: 
     file('demux_summary/*') into ch_qiime_qual
+    file seq_obj into ch_qiime_denoise
 
     conda 'environment.yml'
 
@@ -315,6 +316,7 @@ process FindCutoffs{
     
     output: 
     file("cutoffs.csv") into ch_cutoff_vals
+    file("manifest_format.txt") ch_manifest_type_denoise
 
     conda 'environment.yml'
 
@@ -431,5 +433,66 @@ process FindCutoffs{
             writer.writerow({'cutoff': 'filename', 'value': reverse_file})
 
     """
+}
 
+
+process Denoise {
+    publishDir "${params.outdir}/qiime", mode: 'copy'
+    input:
+    file seq_object from ch_qiime_denoise
+    file("cutoffs.csv") from ch_cutoff_vals
+    file("manifest_format.txt") from ch_manifest_type_denoise
+    
+    output:
+    file "rep-seqs-dada2.qza" into ch_rep_seqs
+    file "table-dada2.qza" into ch_table
+    file "stats-dada2.qza" into ch_dada2_stats
+
+    conda 'environment.yml'
+
+    script:
+    """
+        #!/usr/bin/env python3
+        import pandas as pd 
+        from pathlib import Path
+        import numpy as np 
+        import csv 
+        import subprocess
+
+        wd = Path.cwd()
+
+        seq_file = pd.read_table("manifest_format.txt")
+        if seq_file.columns[0] == "SingleEndFastqManifestPhred33V2":
+            seq_format = "single"
+        else:
+            seq_format = "paired"
+        
+        if seq_format == 'single':
+            left = cutoff['value'][0]
+            right = cutoff['value'][0]
+            command = "qiime dada2 denoise-single \
+                --i-demultiplexed-seqs demux.qza \
+                --p-trim-left " + str(left)+" \
+                --p-trunc-len " + str(right) + " \
+                --o-representative-sequences rep-seqs-dada2.qza \
+                --o-table table-dada2.qza \
+                --o-denoising-stats stats-dada2.qza"
+        elif seq_format == 'paired':
+            forward_left = cutoff['value'][0]
+            forward_right = cutoff['value'][1]
+            rev_left = cutoff['value'][2]
+            rev_right = cutoff['value'][3]
+            command = "qiime dada2 denoise-paired \
+                --i-demultiplexed-seqs demux.qza \
+                --p-trunc-len-f " + str(forward_right)+" \
+                --p-trunc-len-r " + str(rev_right) + " \
+                --p-trim-left-f " + str(forward_left)+" \
+                --p-trim-left-r " + str(rev_left) + " \
+                --o-representative-sequences rep-seqs-dada2.qza \
+                --o-table table-dada2.qza \
+                --o-denoising-stats stats-dada2.qza"
+
+        subprocess.run([command], shell=True)
+    
+    """
 }
