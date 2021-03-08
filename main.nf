@@ -83,8 +83,12 @@ process VerifyManifest{
     file manifest from ch_mani_veri
     path seqs_dir from ch_seqs_veri
 
+    conda 'environment.yml'
+
     script:
     """
+    #!/usr/bin/env python3
+    
     import os 
     import Path
     import csv 
