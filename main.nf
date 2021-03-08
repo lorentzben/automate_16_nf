@@ -379,7 +379,7 @@ process FindCutoffs{
     if seq_format == "single":
         print("determining left and right cutoffs based on qual score")
 
-        input_file = "./demux_summary/forward-seven-number-summaries.tsv"
+        input_file = "${PWD}/demux_summary/forward-seven-number-summaries.tsv"
 
         summary = pd.read_table(input_file, index_col=0, sep='\t')
         left_cutoff, right_cutoff = find_cutoffs(summary)
@@ -400,12 +400,12 @@ process FindCutoffs{
 
     elif seq_format == "paired":
         print("determining forward and revese, left and right cutoffs based on qual score")
-        forward_file = "./demux_summary/forward-seven-number-summaries.tsv"
+        forward_file = "${PWD}/demux_summary/forward-seven-number-summaries.tsv"
         fr_summary = pd.read_table(forward_file, index_col=0, sep='\t')
 
         forward = find_cutoffs(fr_summary)
 
-        reverse_file = "./demux_summary/reverse-seven-number-summaries.tsv"
+        reverse_file = "${PWD}/demux_summary/reverse-seven-number-summaries.tsv"
         rev_summary = pd.read_table(reverse_file, index_col=0, sep='\t')
 
         reverse = find_rev_cutoffs(rev_summary)
