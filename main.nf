@@ -303,3 +303,127 @@ process QualControl{
     """
 
 }
+
+process FindCutoffs{
+    //TODO Remove this call after debugging
+    publishDir "${params.outdir}/qiime", mode: 'copy'
+
+    input:
+    file 'manifest_format.txt' from manifest_type
+    file('demux_summary/*') from ch_qiime_qual
+    
+    output: 
+    file("cutoffs.csv") into ch_cutoff_vals
+
+    conda 'environment.yml'
+
+    script:
+    """
+    #!/usr/bin/env python3
+    import pandas as pd 
+
+    seq_file = pd.read_table("manifest_format.txt")
+    if seq_file.columns[0] == "SingleEndFastqManifestPhred33V2":
+        seq_format = "single"
+    else:
+        seq_format = "paired"
+
+    def find_cutoffs(dataframe):
+        mean_qual = dataframe[4:5]
+
+        average_qual = np.round(mean_qual.mean(axis=1), 0)-1
+        mean_qual_vals = np.array(mean_qual)[0]
+
+        if int(average_qual) < 30:
+            print(
+                "The Average Quality of these sequences may be a concern would you like to continue?")
+            exit(0)
+
+        for i in range(0, len(mean_qual_vals)):
+            if mean_qual_vals[i] >= int(average_qual):
+                left_cutoff = i+1
+                break
+        for i in range(0, len(mean_qual_vals)):
+            if mean_qual_vals[len(mean_qual_vals)-1-i] >= int(average_qual):
+                right_cutoff = len(mean_qual_vals)-i
+                break
+        return(left_cutoff, right_cutoff)
+
+    def find_rev_cutoffs(dataframe):
+        mean_qual = dataframe[4:5]
+
+        average_qual = np.round(mean_qual.mean(axis=1), 0)+2
+        mean_qual_vals = np.array(mean_qual)[0]
+
+        if int(average_qual) < 30:
+            print(
+                "The Average Quality of these sequences may be a concern would you like to continue?")
+            exit(0)
+
+        left_cutoff = 0
+        right_cutoff = len(mean_qual_vals)-1
+
+        for i in range(0, len(mean_qual_vals)):
+            if mean_qual_vals[i] >= int(average_qual):
+                left_cutoff = i+1
+                break
+
+        for i in range(0, len(mean_qual_vals)):
+            if mean_qual_vals[len(mean_qual_vals)-1-i] >= int(average_qual):
+                right_cutoff = len(mean_qual_vals)-i
+                break
+
+        return(left_cutoff, right_cutoff)
+
+    if seq_format == "single":
+        print("determining left and right cutoffs based on qual score")
+
+        input_file = "demux_summary/forward-seven-number-summaries.tsv"
+
+        summary = pd.read_table(input_file, index_col=0, sep='\t')
+        left_cutoff, right_cutoff = find_cutoffs(summary)
+
+        print("right cutoff: "+str(right_cutoff))
+        print("left cutoff: " + str(left_cutoff))
+
+        with open('cutoffs.csv', 'w', newline='') as csvfile:
+            fieldnames = ['cutoff', 'value']
+            writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+
+            writer.writeheader()
+            writer.writerow({'cutoff': 'right', 'value': right_cutoff})
+            writer.writerow({'cutoff': 'left', 'value': left_cutoff})
+            writer.writerow({'cutoff': 'filename', 'value': input_file})
+
+        print(left_cutoff, right_cutoff)
+
+    elif seq_format == "paired":
+        print("determining forward and revese, left and right cutoffs based on qual score")
+        forward_file = "demux_summary/forward-seven-number-summaries.tsv"
+        fr_summary = pd.read_table(forward_file, index_col=0, sep='\t')
+
+        forward = find_cutoffs(fr_summary)
+
+        reverse_file = "demux_summary/reverse-seven-number-summaries.tsv"
+        rev_summary = pd.read_table(reverse_file, index_col=0, sep='\t')
+
+        reverse = find_rev_cutoffs(rev_summary)
+
+        print("forward cutoffs: "+str(forward))
+        print("reverse cutoffs: " + str(reverse))
+
+        with open('cutoffs.csv', 'w', newline='') as csvfile:
+            fieldnames = ['cutoff', 'value']
+            writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+
+            writer.writeheader()
+            writer.writerow({'cutoff': 'forward left', 'value': forward[0]})
+            writer.writerow({'cutoff': 'forward right', 'value': forward[1]})
+            writer.writerow({'cutoff': 'reverse left', 'value': reverse[0]})
+            writer.writerow({'cutoff': 'reverse right', 'value': reverse[1]})
+            writer.writerow({'cutoff': 'filename', 'value': forward_file})
+            writer.writerow({'cutoff': 'filename', 'value': reverse_file})
+
+    """
+
+}
