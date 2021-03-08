@@ -316,7 +316,7 @@ process FindCutoffs{
     
     output: 
     file("cutoffs.csv") into ch_cutoff_vals
-    file("manifest_format.txt") ch_manifest_type_denoise
+    file("manifest_format.txt") into ch_manifest_type_denoise
 
     conda 'environment.yml'
 
