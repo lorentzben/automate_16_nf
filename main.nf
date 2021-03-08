@@ -44,21 +44,6 @@ if(params.input){
         .into{ ch_make_qiime_seq }
 }
 
-process SetupAndDependencyCheck{
-
-    conda 'environment.yml'
-
-    shell:
-    '''
-    CODE=$(qiime info)
-    if [[ $CODE -eq 1 ]]
-    then
-        echo "the qiime installation seems to be incorrect, please review"
-        exit
-    fi
-    '''
-
-}
 
 process SetupPy2CondaEnv{
 
