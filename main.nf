@@ -79,9 +79,14 @@ process SetupPy2CondaEnv{
 }
 
 process VerifyManifest{
+    publishDir "${params.outdir}/qiime", mode: 'copy'
+    
     input:
     file manifest from ch_mani_veri
     path seqs_dir from ch_seqs_veri
+
+    output:
+    file missing into missing_seqs
 
     conda 'environment.yml'
 
