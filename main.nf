@@ -44,8 +44,19 @@ if(params.input){
         .into{ ch_make_qiime_seq }
 }
 
+Channel
+    .fromPath("${baseDir}/plot_cladogram.py")
+    .into{ ch_clado_file }
+
+Channel
+    .fromPath("${baseDir}/plot_res.py")
+    .into{ ch_plot_res}
 
 process SetupPy2CondaEnv{
+
+    input:
+    file plot_clado from ch_clado_file
+    file plot_res from ch_plot_res
 
     conda 'python2_env.yml'
 
