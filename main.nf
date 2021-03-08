@@ -49,14 +49,14 @@ process SetupAndDependencyCheck{
     conda 'environment.yml'
 
     shell:
-    """
+    '''
     CODE=$(qiime info)
     if [[ $CODE -eq 1 ]]
     then
         echo "the qiime installation seems to be incorrect, please review"
         exit
     fi
-    """
+    '''
 
 }
 
@@ -65,12 +65,12 @@ process SetupPy2CondaEnv{
     conda 'python2_env.yml'
 
     shell:
-    """
+    '''
     LEFSE=$(which lefse.py)
     LEFSE_DIR=${LEFSE::-8}
     cp plot_res.py $LEFSE_DIR
     cp plot_cladogram.py $LEFSE_DIR
-    """
+    '''
 
 }
 
