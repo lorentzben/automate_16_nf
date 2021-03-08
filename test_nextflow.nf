@@ -12,7 +12,7 @@ if(params.manifest) {
         .into{ ch_single_pair ; ch_make_qiime }
 }
 
-if(params.sequence){
+if(params.sequence){ 
     Channel
         .fromPath(params.sequence)
         .ifEmpty {exit 1, log.info "Cannot find path file ${sequences}"}
@@ -28,8 +28,7 @@ process check_single_paired {
     output: 
     file 'manifest_format.txt' into manifest_type
     file 'data_type.txt' into dataType
-    stdout into result
-
+    
     script:
     """
     #!/usr/bin/env python3
@@ -74,7 +73,7 @@ process check_single_paired {
 result.subscribe { println it }
 
 process generate_seq_object{
-    
+
     publishDir "${params.outdir}/qiime", mode: 'copy'
 
     input: 
@@ -82,13 +81,9 @@ process generate_seq_object{
     file manifest_format from manifest_type
     file data_type from dataType
     path seqs from ch_make_qiime_seq
-    
 
     output: 
     file 'demux.qza' into qiime_obj
-    stdout into printer
-
-    
 
     shell:
     '''
@@ -101,6 +96,4 @@ process generate_seq_object{
     --output-path demux.qza \
     --input-format $MANI
     '''
-
 }
-printer.subscribe{ println it } 

@@ -44,8 +44,44 @@ if(params.input){
         .into{ ch_make_qiime_seq }
 }
 
+process SetupAndDependencyCheck{
 
-process check_single_paired { 
+    conda 'environment.yml'
+
+    shell:
+    """
+    CODE=qiime info
+    if [[ $CODE -eq 1 ]]
+    then
+        echo "the qiime installation seems to be incorrect, please review"
+        exit
+    fi
+  
+    
+
+    
+    """
+
+}
+
+process SetupPy2CondaEnv{
+
+    conda 'python2_env.yml'
+
+    shell:
+    """
+    LEFSE="$(which lefse.py)"
+    LEFSE_DIR="${LEFSE::-8}"
+    cp plot_res.py $LEFSE_DIR
+    cp plot_cladogram.py $LEFSE_DIR
+
+
+conda deactivate
+    """
+
+}
+
+process CheckSinglePaired { 
     
     input: 
     file manifest from ch_single_pair
@@ -98,7 +134,7 @@ process check_single_paired {
     
 }
 
-process generate_seq_object{
+process GenerateSeqObject{
 
     publishDir "${params.outdir}/qiime", mode: 'copy'
 
@@ -123,3 +159,4 @@ process generate_seq_object{
     --input-format $MANI
     '''
 }
+
