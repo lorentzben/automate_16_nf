@@ -285,7 +285,7 @@ process QualControl{
     file seq_obj from ch_qiime_obj
     
     output: 
-    path demux_summary into ch_qiime_qual
+    file('demux_summary/*') into ch_qiime_qual
 
     conda 'environment.yml'
 
@@ -299,7 +299,7 @@ process QualControl{
 
     qiime tools export \
     --input-path demux_summary.qzv \
-    --output-path '${demux_summary}'/
+    --output-path demux_summary/
     """
 
 }
