@@ -34,23 +34,31 @@ if(params.manifest) {
     Channel
         .fromPath(params.manifest)
         .ifEmpty {exit 1, log.info "Cannot find path file ${tsvFile}"}
-        .into{ ch_single_pair ; ch_make_qiime }
+        .into{ ch_single_pair ; ch_make_qiime ; ch_mani_veri }
 }
 
 if(params.input){
     Channel
         .fromPath(params.input)
         .ifEmpty {exit 1, log.info "Cannot find path file ${input}"}
-        .into{ ch_make_qiime_seq }
+        .into{ ch_make_qiime_seq ; ch_seqs_veri }
+}
+
+if(params.metadata) {
+    tsvFile = file(params.metadata).getName()
+    Channel
+        .fromPath(params.metadata)
+        .ifEmpty { exit 1, log.info "Cannot find path file ${tsvFile}"}
+        .into{ ch_placeholder }
 }
 
 Channel
     .fromPath("${baseDir}/plot_cladogram.py")
-    .into{ ch_clado_file }
+    .set{ ch_clado_file }
 
 Channel
     .fromPath("${baseDir}/plot_res.py")
-    .into{ ch_plot_res}
+    .set{ ch_plot_res }
 
 process SetupPy2CondaEnv{
 
@@ -67,6 +75,117 @@ process SetupPy2CondaEnv{
     cp plot_res.py $LEFSE_DIR
     cp plot_cladogram.py $LEFSE_DIR
     '''
+
+}
+
+process VerifyManifest{
+    input:
+    file manifest from ch_mani_veri
+    path seqs_dir from ch_seqs_veri
+
+    script:
+    """
+    import os 
+    import Path
+    import csv 
+    try:
+        read_manifest = pd.read_table(${manifest}, index_col=0, sep='\t')
+    except FileNotFoundError:
+        log.info("that manifest file does not exist")
+        exit(1)
+
+    # sets current dir and finds the fastq and fastq.gz files in the current directory
+    p = Path.cwd()
+    list_of_fastq = list(p.glob(seq_dir + '/*.fastq'))
+    list_of_gz = list(p.glob(seq_dir+'/*.fastq.gz'))
+
+    fastq_files = []
+    gz_files = []
+    found = []
+    missing = []
+
+    # pulls only the filename and saves to a list
+    for item in list_of_fastq:
+        filename = os.path.split(item)[1]
+        fastq_files.append(filename)
+
+    for item in list_of_gz:
+        filename = os.path.split(item)[1]
+        gz_files.append(filename)
+    if read_manifest.columns[0] == 'forward-absolute-filepath':
+        # iterates over the forward reads and then the reverse reads to check to make sure they are all accounted for
+        try:
+            for item in read_manifest['forward-absolute-filepath']:
+                filename = os.path.split(item)[1]
+                if filename in fastq_files:
+                    log.info(filename + ' found')
+                    found.append(filename)
+                else:
+                    if filename in gz_files:
+                        log.info(filename + ' found')
+                        found.append(filename)
+                    else:
+                        log.info(filename + ' missing')
+                        missing.append(filename)
+        except KeyError:
+            log.info('single read project')
+
+        # try except in the case that the user only has single end reads.
+        try:
+            for item in read_manifest['reverse-absolute-filepath']:
+                filename = os.path.split(item)[1]
+                if filename in fastq_files:
+                    log.info(filename + ' found')
+                    found.append(filename)
+                else:
+                    if filename in gz_files:
+                        log.info(filename + ' found')
+                        found.append(filename)
+                    else:
+                        log.info(filename + ' missing')
+                        missing.append(filename)
+
+        except KeyError:
+            log.info("looking for forward only reads")
+    else:
+        # this case is if there are only single reads and after which we can figure that the manifest file is wrong
+        try:
+            for item in read_manifest['absolute-filepath']:
+                filename = os.path.split(item)[1]
+                if filename in fastq_files:
+                    log.info(filename + ' found')
+                    found.append(filename)
+                else:
+                    if filename in gz_files:
+                        log.info(filename + ' found')
+                        found.append(filename)
+                    else:
+                        log.info(filename + ' missing')
+                        missing.append(filename)
+        except KeyError:
+            log.info("headings in the manifest appear to be incorrect")
+            exit(1)
+
+    # if missing is not an empty list, i.e. a file listed in the manifest is not detected, it raises an error and
+    # creates a list for the user
+    if missing != []:
+
+        log.info("files are missing, please see missing.csv to correct")
+
+        with open('missing.csv', 'w', newline='') as csvfile:
+            fieldnames = ['filename']
+            writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+
+            writer.writeheader()
+
+            for filename in missing:
+                writer.writerow({'filename': filename})
+
+        exit(0)
+
+    log.info("the manifest called: " + manifest +
+                 " is valid and ready to go")
+    """
 
 }
 
