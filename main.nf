@@ -49,9 +49,8 @@ process SetupAndDependencyCheck{
     conda 'environment.yml'
 
     shell:
-
     """
-    CODE=qiime info
+    CODE=$(qiime info)
     if [[ $CODE -eq 1 ]]
     then
         echo "the qiime installation seems to be incorrect, please review"
