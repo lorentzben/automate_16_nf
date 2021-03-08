@@ -92,7 +92,9 @@ process VerifyManifest{
     import os 
     from pathlib import Path
     from pathlib import PurePath
+    import pandas as pd 
     import csv 
+    
     try:
         read_manifest = pd.read_table(${manifest}, index_col=0, sep='\t')
     except FileNotFoundError:
