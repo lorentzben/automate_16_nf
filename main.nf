@@ -78,6 +78,17 @@ process SetupPy2CondaEnv{
 
 }
 
+process PipInstall{
+    conda 'environment.yml'
+
+    script:
+    """
+    pip install pandas
+    pip install numpy
+    pip install subprocess
+    """
+}
+
 process VerifyManifest{
 
     input:
@@ -469,7 +480,7 @@ process Denoise {
     cutoff = pd.read_table("cutoffs.csv", sep=",")    
     if seq_format == 'single':
         left = cutoff['value'][0]
-        right = cutoff['value'][0]
+        right = cutoff['value'][1]
         command = "qiime dada2 denoise-single \
             --i-demultiplexed-seqs demux.qza \
             --p-trim-left " + str(left)+" \
