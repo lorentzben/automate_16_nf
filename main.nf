@@ -70,7 +70,7 @@ process SetupPy2CondaEnv{
 
     shell:
     '''
-    LEFSE=$(which lefse.py)
+    LEFSE=$(which python2)
     LEFSE_DIR=${LEFSE::-8}
     cp plot_res.py $LEFSE_DIR
     cp plot_cladogram.py $LEFSE_DIR
@@ -466,7 +466,7 @@ process Denoise {
         seq_format = "single"
     else:
         seq_format = "paired"
-        
+    cutoff = pd.read_table("cutoffs.csv")    
     if seq_format == 'single':
         left = cutoff['value'][0]
         right = cutoff['value'][0]
