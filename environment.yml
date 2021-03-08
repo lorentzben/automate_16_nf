@@ -353,3 +353,4 @@ dependencies:
 - zstd=1.4.3
 - pip:
   - Path
+  - pandas
