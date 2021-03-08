@@ -400,7 +400,7 @@ process FindCutoffs{
 
     elif seq_format == "paired":
         print("determining forward and revese, left and right cutoffs based on qual score")
-        forward_file = "$./demux_summary/forward-seven-number-summaries.tsv"
+        forward_file = "./demux_summary/forward-seven-number-summaries.tsv"
         fr_summary = pd.read_table(forward_file, index_col=0, sep='\t')
 
         forward = find_cutoffs(fr_summary)
