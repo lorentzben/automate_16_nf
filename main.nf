@@ -70,10 +70,13 @@ process SetupPy2CondaEnv{
 
     shell:
     '''
+    echo "Hello World"
+    /*
     LEFSE=$(which python2)
     LEFSE_DIR=${LEFSE::-8}
     cp plot_res.py $LEFSE_DIR
     cp plot_cladogram.py $LEFSE_DIR
+    */
     '''
 
 }
@@ -102,7 +105,7 @@ process VerifyManifest{
     script:
     """
     #!/usr/bin/env python3
-
+    pip install pandas 
     import os 
     from pathlib import Path
     from pathlib import PurePath
