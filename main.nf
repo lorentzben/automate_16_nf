@@ -79,22 +79,6 @@ process SetupPy2CondaEnv{
 
 }
 
-/*
-TODO remove this block
-process PipInstall{
-    conda 'environment.yml'
-
-    script:
-    """
-    #!/usr/bin/env bash
-
-    python3 -m pip install pandas
-    python3 -m pip install numpy
-    python3 -m pip install subprocess
-    """
-}
-*/
-
 process VerifyManifest{
 
     input:
