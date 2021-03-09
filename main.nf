@@ -108,7 +108,6 @@ process VerifyManifest{
     script:
     """
     #!/usr/bin/env python3
-    pip install pandas 
     import os 
     from pathlib import Path
     from pathlib import PurePath
