@@ -49,7 +49,7 @@ if(params.metadata) {
     Channel
         .fromPath(params.metadata)
         .ifEmpty { exit 1, log.info "Cannot find path file ${tsvFile}"}
-        .into{ ch_placeholder }
+        .into{ ch_meta_feature_viz}
 }
 
 Channel
@@ -495,4 +495,39 @@ process Denoise {
     subprocess.run([command], shell=True)
     
     """
+}
+
+process FeatureVisualization{
+    publishDir "${params.outdir}/qiime", mode: 'copy'
+    input:
+    file "stats-dada2.qza" from ch_dada2_stats
+    file "table-dada2.qza" from ch_table
+    file metadata_file from ch_meta_feature_viz
+    file "rep-seqs-dada2.qza" from ch_rep_seqs
+
+    output:
+    file "stats-dada2.qzv" into ch_dada2_stats_viz
+    file "table.qzv" into ch_table_viz_obj
+    file "rep-seqs.qzv" into ch_req_seq_vis_obj
+
+    conda 'environment.yml'
+
+    script:
+    """
+    #!/usr/bin/env bash
+
+    qiime metadata tabulate \
+    --m-input-file stats-dada2.qza \
+    --o-visualization stats-dada2.qzv
+
+    qiime feature-table summarize \
+    --i-table table-dada2.qza \
+    --o-visualization table.qzv \
+    --m-sample-metadata-file ${metadata_file}
+
+    qiime feature-table tabulate-seqs \
+    --i-data rep-seqs-dada2.qza \
+    --o-visualization rep-seqs.qzv
+    """
+
 }
