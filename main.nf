@@ -65,7 +65,7 @@ process SetupPy2CondaEnv{
     input:
     file plot_clado from ch_clado_file
     file plot_res from ch_plot_res
-
+    //conda "${projectDir}/python2_env.yml"
     conda "python2_env.yml"
 
     shell:
@@ -85,6 +85,10 @@ process VerifyManifest{
     file manifest from ch_mani_veri
     path seqs_dir from ch_seqs_veri
 
+    /*this is in place for local deployment, but the server does not give access to the dir for some reason
+    The change is nessecary to do nextflow run -r main lorentzben/automate_16_nf
+    */
+    //conda "${projectDir}/environment.yml"
     conda "environment.yml"
 
     script:
@@ -206,7 +210,8 @@ process CheckSinglePaired {
     output: 
     file 'manifest_format.txt' into manifest_type
     file 'data_type.txt' into dataType
-    
+
+    //conda "${projectDir}/environment.yml"
     conda "environment.yml"
 
     script:
@@ -254,6 +259,8 @@ process CheckSinglePaired {
 process GenerateSeqObject{
 
     publishDir "${params.outdir}/qiime", mode: 'copy'
+    //conda "${projectDir}/environment.yml"
+    conda "environment.yml"
 
     input: 
     file manifest from ch_make_qiime
@@ -289,6 +296,7 @@ process QualControl{
     file('demux_summary/*') into ch_qiime_qual
     file seq_obj into ch_qiime_denoise
 
+    //conda "${projectDir}/environment.yml"
     conda "environment.yml"
 
     script:
@@ -318,6 +326,7 @@ process FindCutoffs{
     file("cutoffs.csv") into ch_cutoff_vals
     file("manifest_format.txt") into ch_manifest_type_denoise
 
+    //conda "${projectDir}/environment.yml"
     conda "environment.yml"
 
     script:
@@ -448,6 +457,7 @@ process Denoise {
     file "table-dada2.qza" into ch_table
     file "stats-dada2.qza" into ch_dada2_stats
 
+    //conda "${projectDir}/environment.yml"
     conda "environment.yml"
 
     script:
@@ -511,6 +521,7 @@ process FeatureVisualization{
     file "rep-seqs.qzv" into ch_req_seq_vis_obj
     file "rep-seqs-dada2.qza" into ch_rep_seq_tree_gen
 
+    //conda "${projectDir}/environment.yml"
     conda "environment.yml"
 
     script:
@@ -534,7 +545,10 @@ process FeatureVisualization{
 
 process TreeConstruction{
     publishDir "${params.outdir}/qiime", mode: 'copy'
+
+    //conda "${projectDir}/environment.yml"
     conda "environment.yml"
+    
     input:
     file "rep-seqs-dada2.qza" from ch_rep_seq_tree_gen
 
