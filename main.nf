@@ -70,13 +70,11 @@ process SetupPy2CondaEnv{
 
     shell:
     '''
-    echo "Hello World"
-    /*
-    LEFSE=$(which python2)
+    #!/usr/bin/env bash
+    LEFSE=$(which lefse.py)
     LEFSE_DIR=${LEFSE::-8}
     cp plot_res.py $LEFSE_DIR
     cp plot_cladogram.py $LEFSE_DIR
-    */
     '''
 
 }
