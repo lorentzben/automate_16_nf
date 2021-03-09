@@ -66,7 +66,7 @@ process SetupPy2CondaEnv{
     file plot_clado from ch_clado_file
     file plot_res from ch_plot_res
 
-    conda '$baseDir/python2_env.yml'
+    conda './python2_env.yml'
 
     shell:
     '''
@@ -85,7 +85,7 @@ process VerifyManifest{
     file manifest from ch_mani_veri
     path seqs_dir from ch_seqs_veri
 
-    conda '$baseDir/environment.yml'
+    conda './environment.yml'
 
     script:
     """
@@ -207,7 +207,7 @@ process CheckSinglePaired {
     file 'manifest_format.txt' into manifest_type
     file 'data_type.txt' into dataType
     
-    conda '$baseDir/environment.yml'
+    conda './environment.yml'
 
     script:
     """
@@ -289,7 +289,7 @@ process QualControl{
     file('demux_summary/*') into ch_qiime_qual
     file seq_obj into ch_qiime_denoise
 
-    conda '$baseDir/environment.yml'
+    conda './environment.yml'
 
     script:
     """
@@ -318,7 +318,7 @@ process FindCutoffs{
     file("cutoffs.csv") into ch_cutoff_vals
     file("manifest_format.txt") into ch_manifest_type_denoise
 
-    conda '$baseDir/environment.yml'
+    conda './environment.yml'
 
     script:
     """
@@ -448,7 +448,7 @@ process Denoise {
     file "table-dada2.qza" into ch_table
     file "stats-dada2.qza" into ch_dada2_stats
 
-    conda '$baseDir/environment.yml'
+    conda './environment.yml'
 
     script:
     """
@@ -511,7 +511,7 @@ process FeatureVisualization{
     file "rep-seqs.qzv" into ch_req_seq_vis_obj
     file "rep-seqs-dada2.qza" into ch_rep_seq_tree_gen
 
-    conda '$baseDir/environment.yml'
+    conda './environment.yml'
 
     script:
     """
@@ -534,7 +534,7 @@ process FeatureVisualization{
 
 process TreeConstruction{
     publishDir "${params.outdir}/qiime", mode: 'copy'
-    conda '$baseDir/environment.yml'
+    conda './environment.yml'
     input:
     file "rep-seqs-dada2.qza" from ch_rep_seq_tree_gen
 
