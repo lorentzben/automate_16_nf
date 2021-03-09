@@ -509,7 +509,7 @@ process FeatureVisualization{
     file "stats-dada2.qzv" into ch_dada2_stats_viz
     file "table.qzv" into ch_table_viz_obj
     file "rep-seqs.qzv" into ch_req_seq_vis_obj
-    file "rep-seqs.qza" into ch_rep_seq_tree_gen
+    file "rep-seqs-dada2.qza" into ch_rep_seq_tree_gen
 
     conda 'environment.yml'
 
