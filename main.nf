@@ -81,6 +81,8 @@ process SetupPy2CondaEnv{
 
 }
 
+/*
+TODO remove this block
 process PipInstall{
     conda 'environment.yml'
 
@@ -93,6 +95,7 @@ process PipInstall{
     python3 -m pip install subprocess
     """
 }
+*/
 
 process VerifyManifest{
 
