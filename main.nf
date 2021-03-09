@@ -547,7 +547,7 @@ process TreeConstruction{
     script:
     """
     qiime phylogeny align-to-tree-mafft-fasttree \
-    --i-sequences rep-sres-dada2.qza \
+    --i-sequences rep-seqs-dada2.qza \
     --o-alignment aligned-rep-seqs.qza \
     --o-masked-alignment masked-aligned-rep-seqs.qza \
     --o-tree unrooted-tree.qza \
