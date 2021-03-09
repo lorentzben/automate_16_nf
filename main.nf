@@ -509,6 +509,7 @@ process FeatureVisualization{
     file "stats-dada2.qzv" into ch_dada2_stats_viz
     file "table.qzv" into ch_table_viz_obj
     file "rep-seqs.qzv" into ch_req_seq_vis_obj
+    file "rep-seqs.qza" into ch_rep_seq_tree_gen
 
     conda 'environment.yml'
 
@@ -529,5 +530,27 @@ process FeatureVisualization{
     --i-data rep-seqs-dada2.qza \
     --o-visualization rep-seqs.qzv
     """
+}
 
+process TreeConstruction{
+    publishDir "${params.outdir}/qiime", mode: 'copy'
+    conda 'environment.yml'
+    input:
+    file "rep-seqs-dada2.qza" from ch_rep_seq_tree_gen
+
+    output:
+    file "aligned-rep-seqs.qza" into ch_aligned_rep_seqs
+    file "masked-aligned-rep-seqs.qza" into ch_mask_align_rep_seq
+    file "unrooted-tree.qza" into ch_unrooted_tree
+    file "rooted-tree.qza" into ch_rooted_tree
+
+    script:
+    """
+    qiime phylogeny align-to-tree-mafft-fasttree \
+    --i-sequences rep-sres-dada2.qza \
+    --o-alignment aligned-rep-seqs.qza \
+    --o-masked-alignment masked-aligned-rep-seqs.qza \
+    --o-tree unrooted-tree.qza \
+    --o-rooted-tree rooted-tree.qza 
+    """
 }
