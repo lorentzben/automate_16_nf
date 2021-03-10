@@ -675,12 +675,14 @@ process AlphaDiversityMeasure{
     script:
     '''
     #!/usr/bin/env bash
+
     !{samp_depth}=$(head samp_depth_simple.txt)
+    meta=!{metadata}
     qiime diversity core-metrics-phylogenetic \
     --i-phylogeny rooted-tree.qza \
     --i-table table-dada2.qza \
     --p-sampling-depth !{samp_depth} \
-    --m-metadata-file !{metadata} \
+    --m-metadata-file $meta \
     --output-dir core-metric-results 
     '''
 
