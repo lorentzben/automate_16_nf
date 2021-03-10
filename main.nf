@@ -607,7 +607,7 @@ process DetermineDepth{
 
     output:
     file "sampling_depth.csv" into ch_sampling_depth_csv
-    val samp_depth into ch_depth_val
+    val sampling_depth into ch_depth_val
 
     script:
 
@@ -650,7 +650,7 @@ process DetermineDepth{
 
     print("sampling_depth: "+str(sampling_depth))
     print("%_features_retained: " + str(perc_features_retain))
-    $samp_depth=sampling_depth
+    ${sampling_depth}
     """
 
 }
