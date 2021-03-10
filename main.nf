@@ -607,10 +607,9 @@ process DetermineDepth{
 
     output:
     file "sampling_depth.csv" into ch_sampling_depth_csv
-    val sampling_depth into ch_depth_val
+    file "samp_depth_simple.txt" into ch_depth
 
     script:
-    ${sampling_depth}=0.0
     """
     #!/usr/bin/env python3
     import pandas as pd
@@ -650,7 +649,9 @@ process DetermineDepth{
 
     print("sampling_depth: "+str(sampling_depth))
     print("%_features_retained: " + str(perc_features_retain))
-    $sampling_depth
+    
+    with open('samp_depth_simple.txt', 'w') as file:
+        file.write(sampling_depth)
     """
 
 }
@@ -666,22 +667,22 @@ process AlphaDiversityMeasure{
     file metadata from ch_alpha_metadata
     file "table-dada2.qza" from ch_alpha_div_table
     file "rooted-tree.qza" from ch_rooted_tree
-    val samp_depth from ch_depth_val
+    file "samp_depth_simple.txt" from ch_depth
 
     output:
     file "core-metric-results/*" into ch_core_div_res
 
     script:
-    """
+    '''
     #!/usr/bin/env bash
-    echo ${samp_depth}
+    !{samp_depth}=$(head samp_depth_simple.txt)
     qiime diversity core-metrics-phylogenetic \
     --i-phylogeny rooted-tree.qza \
     --i-table table-dada2.qza \
-    --p-sampling-depth ${samp_depth} \
-    --m-metadata-file ${metadata} \
+    --p-sampling-depth !{samp_depth} \
+    --m-metadata-file !{metadata} \
     --output-dir core-metric-results \
     --p-n-jobs-or-threads 'auto'
-    """
+    '''
 
 }
