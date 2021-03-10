@@ -617,7 +617,7 @@ process DetermineDepth{
     import numpy as np 
     import csv
 
-    input_file = "table_viz/sample-frequency-detail.csv"
+    input_file = "table_viz/sample-frequency-detail.csv*"
 
     features = pd.read_csv(input_file, index_col=0, header=None)
 
