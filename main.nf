@@ -558,6 +558,7 @@ process TreeConstruction{
     file "masked-aligned-rep-seqs.qza" into ch_mask_align_rep_seq
     file "unrooted-tree.qza" into ch_unrooted_tree
     file "rooted-tree.qza" into ch_rooted_tree
+    file "rep-seqs-dada2.qza" into ch_rep_seq_classify
 
     script:
     """
@@ -670,6 +671,14 @@ process AlphaDiversityMeasure{
 
     output:
     file "core-metric-results/*" into ch_core_div_res
+    file "shannon.qza" into ch_shannon_qza
+    file "simpson.qza" into ch_simpson qza 
+    file "chao1.qza" into ch_chao_qza
+    file "ace.qza" into ch_ace_qza
+    file "obs.qza" into ch_obs_qza
+    file "faith_pd.qza" into ch_faith_qza
+
+    
 
     shell:
     '''
@@ -681,6 +690,66 @@ process AlphaDiversityMeasure{
     --p-sampling-depth $(head samp_depth_simple.txt) \
     --m-metadata-file !{metadata} \
     --output-dir core-metric-results 
-    '''
 
+    qiime diversity alpha \
+    --i-table table-dada2.qza \
+    --p-metric shannon \
+    --o-alpha-diversity shannon.qza
+
+    qiime diversity alpha \
+    --i-table table-dada2.qza \
+    --p-metric simpson \
+    --o-alpha-diversity simpson.qza 
+
+    qiime diversity alpha \
+    --i-table table-dada2.qza \
+    --p-metric chao1
+    --o-alpha-diversity chao1.qza
+
+    qiime diversity alpha \
+    --i-table table-dada2.qza \
+    --p-metric ace \
+    --o-alpha ace.qza
+
+    qiime diversity alpha \
+    --i-table table-dada2.qza \
+    --p-metric observed_otus \
+    --o-alpha-diversity obs.qza 
+
+    qiime diversity alpha-phylogenetic \
+    --i-table table-dada2.qza \
+    --i-phylogeny rooted-tree.qza \
+    --p-metric faith_pd \
+    --o-alpha-diversity faith_pd.qza 
+    '''
+}
+
+process AssignTaxonomy{
+    publishDir "${params.outdir}/qiime", mode: 'copy'
+
+    //conda "${projectDir}/environment.yml"
+    conda "environment.yml"
+
+    input:
+    file "rep-seqs-dada2.qza" from ch_rep_seq_classify
+
+    output:
+    file "taxonomy.qza" into ch_classifed_taxa_qza
+    file "taxonomy.qzv" into ch_classified_qzv
+
+    script:
+    """
+    #!/usr/bin/env bash
+    wget https://data.qiime2.org/2021.2/common/silva-138-99-515-806-nb-classifier.qza -O silva-138-99-515-806-nb-classifier.qza
+
+    qiime feature-classifier classify-sklearn \
+    --i-classifier 'silva-138-99-515-806-nb-classifier.qza' \
+    --i-reads rep-seqs-dada2.qza \
+    --p-confidence 0.6 \
+    --o-classification taxonomy.qza
+
+    qiime metadata tabulate \
+    --m-input-file taxonomy.qza \
+    --o-visualization taxonomy.qzv
+    """
 }
