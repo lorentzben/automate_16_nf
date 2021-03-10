@@ -681,8 +681,7 @@ process AlphaDiversityMeasure{
     --i-table table-dada2.qza \
     --p-sampling-depth !{samp_depth} \
     --m-metadata-file !{metadata} \
-    --output-dir core-metric-results \
-    --p-n-jobs-or-threads 'auto'
+    --output-dir core-metric-results 
     '''
 
 }
