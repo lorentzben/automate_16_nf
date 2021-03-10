@@ -49,7 +49,7 @@ if(params.metadata) {
     Channel
         .fromPath(params.metadata)
         .ifEmpty { exit 1, log.info "Cannot find path file ${tsvFile}"}
-        .into{ ch_meta_feature_viz}
+        .into{ ch_meta_feature_viz; ch_alpha_metadata }
 }
 
 Channel
@@ -520,6 +520,7 @@ process FeatureVisualization{
     file "table.qzv" into ch_table_viz_obj
     file "rep-seqs.qzv" into ch_req_seq_vis_obj
     file "rep-seqs-dada2.qza" into ch_rep_seq_tree_gen
+    file "table-dada2.qza" into ch_alpha_div_table
 
     //conda "${projectDir}/environment.yml"
     conda "environment.yml"
@@ -567,4 +568,115 @@ process TreeConstruction{
     --o-tree unrooted-tree.qza \
     --o-rooted-tree rooted-tree.qza 
     """
+}
+
+process ExportTable{
+    publishDir "${params.outdir}/qiime", mode: 'copy'
+    
+    input:
+    file "table.qzv" from 
+
+    output:
+    file "table_viz/*" into ch_table_viz_dir
+
+    script:
+    """
+    #!/usr/bin/env bash
+
+    qiime tools export \
+    --input-path table.qzv \
+    --output-path table_viz
+    """
+
+}
+
+
+process DetermineDepth{
+    publishDir "${params.outdir}/qiime", mode: 'copy'
+
+    //conda "${projectDir}/environment.yml"
+    conda "environment.yml"
+
+    input:
+    file "table_viz/sample-frequency-detail.csv" from ch_table_viz_dir
+
+    output:
+    val samp_depth into ch_depth_val
+    file "sampling_depth.csv" into ch_sampling_depth_csv
+
+    script:
+
+    """
+    #!/usr/bin/env python3
+    import pandas as pd
+    import numpy as np 
+    import csv
+
+    input_file = "table_viz/sample-frequency-detail.csv"
+
+    features = pd.read_csv(input_file, index_col=0, header=None)
+
+    total_count = sum(features[1])
+    sampling_depth = 0
+    perc_features_retain = 0.0
+
+    print("total count: " + str(total_count))
+
+    feature_array = np.array(features)
+
+    for i in range(len(feature_array)-1, -1, -1):
+        sampling_depth = feature_array[i][0]
+        perc_features_retain = ((sampling_depth * (i+1))/total_count)
+        if perc_features_retain > .22:
+            sampling_depth = feature_array[i][0]
+            print("sampling depth: " + str(sampling_depth) + " % features retained: " +
+                  str(round(perc_features_retain, 3)) + " samples retained: " + str(i))
+            break
+    print("writing dept out to file")
+    with open('sampling_depth.csv', 'w', newline='') as csvfile:
+        fieldnames = ['stat', 'value']
+        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+
+        writer.writeheader()
+        writer.writerow({'stat': 'sampling_depth', 'value': sampling_depth})
+        writer.writerow({'stat': '%_features_retained',
+                         'value': perc_features_retain})
+        writer.writerow({'stat': 'filename', 'value': input_file})
+
+    print("sampling_depth: "+str(sampling_depth))
+    print("%_features_retained: " + str(perc_features_retain))
+
+    ${samp_depth} = sampling_depth
+    """
+
+}
+
+process AlphaDiversityMeasure{
+    publishDir "${params.outdir}/qiime", mode: 'copy'
+
+    //conda "${projectDir}/environment.yml"
+    conda "environment.yml"
+
+    input:
+    val samp_depth from ch_depth_val
+    file metadata from ch_alpha_metadata
+    file "table-dada2.qza" from ch_alpha_div_table
+    file "rooted-tree.qza" from ch_rooted_tree
+
+    output:
+    file "core-metric-results/*" into ch_core_div_res
+
+    script:
+    """
+    #!/usr/bin/env bash
+
+    qiime diversity core-metrics-phylogenetic \
+    --i-phylogeny rooted-tree.qza \
+    --i-table table-dada2.qza \
+    --p-sampling-depth ${samp_depth} \
+    --m-metadata-file ${metadata} \
+    --output-dir core-metric-results \
+    --p-n-jobs-or-threads 'auto'
+    """
+
 }
