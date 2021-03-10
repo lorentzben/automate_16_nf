@@ -650,8 +650,6 @@ process DetermineDepth{
 
     print("sampling_depth: "+str(sampling_depth))
     print("%_features_retained: " + str(perc_features_retain))
-
-    #${samp_depth} = sampling_depth
     """
 
 }
