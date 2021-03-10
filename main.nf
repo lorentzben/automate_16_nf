@@ -663,7 +663,6 @@ process AlphaDiversityMeasure{
     conda "environment.yml"
 
     input:
-    file "sampling_depth.csv" from ch_sampling_depth_csv
     file metadata from ch_alpha_metadata
     file "table-dada2.qza" from ch_alpha_div_table
     file "rooted-tree.qza" from ch_rooted_tree
