@@ -561,7 +561,7 @@ process TreeConstruction{
 
     script:
     """
-    !/usr/bin/env bash 
+    #!/usr/bin/env bash 
 
     qiime phylogeny align-to-tree-mafft-fasttree \
     --i-sequences rep-seqs-dada2.qza \
