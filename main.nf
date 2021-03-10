@@ -672,7 +672,7 @@ process AlphaDiversityMeasure{
     output:
     file "core-metric-results/*" into ch_core_div_res
     file "shannon.qza" into ch_shannon_qza
-    file "simpson.qza" into ch_simpson qza 
+    file "simpson.qza" into ch_simpson_qza 
     file "chao1.qza" into ch_chao_qza
     file "ace.qza" into ch_ace_qza
     file "obs.qza" into ch_obs_qza
