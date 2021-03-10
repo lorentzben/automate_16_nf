@@ -651,7 +651,7 @@ process DetermineDepth{
     print("%_features_retained: " + str(perc_features_retain))
     
     with open('samp_depth_simple.txt', 'w') as file:
-        file.write(sampling_depth)
+        file.write(str(sampling_depth))
     """
 
 }
