@@ -11,4 +11,4 @@
 #SBATCH --mail-user="bjl34716@uga.edu"
 #SBATCH --mail-type=BEGIN,END,FAIL
 
-bash denerate_sklearn_classifiers.sh
+bash generate_sklearn_classifiers.sh
