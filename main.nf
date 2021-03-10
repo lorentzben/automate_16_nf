@@ -606,7 +606,7 @@ process DetermineDepth{
     file "table_viz/sample-frequency-detail.csv" from ch_table_viz_dir
 
     output:
-    val samp_depth into ch_depth_val
+    //val samp_depth into ch_depth_val
     file "sampling_depth.csv" into ch_sampling_depth_csv
 
     script:
@@ -651,7 +651,7 @@ process DetermineDepth{
     print("sampling_depth: "+str(sampling_depth))
     print("%_features_retained: " + str(perc_features_retain))
 
-    ${samp_depth} = sampling_depth
+    #${samp_depth} = sampling_depth
     """
 
 }
