@@ -606,7 +606,6 @@ process DetermineDepth{
     file "table_viz/sample-frequency-detail.csv" from ch_table_viz_dir
 
     output:
-    //val samp_depth into ch_depth_val
     file "sampling_depth.csv" into ch_sampling_depth_csv
 
     script:
