@@ -610,7 +610,7 @@ process DetermineDepth{
     val sampling_depth into ch_depth_val
 
     script:
-
+    ${sampling_depth}=0.0
     """
     #!/usr/bin/env python3
     import pandas as pd
