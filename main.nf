@@ -607,7 +607,7 @@ process DetermineDepth{
 
     output:
     file "sampling_depth.csv" into ch_sampling_depth_csv
-    //val samp_depth into ch_depth_val
+    val samp_depth into ch_depth_val
 
     script:
 
@@ -665,6 +665,7 @@ process AlphaDiversityMeasure{
     file metadata from ch_alpha_metadata
     file "table-dada2.qza" from ch_alpha_div_table
     file "rooted-tree.qza" from ch_rooted_tree
+    val samp_depth from ch_depth_val
 
     output:
     file "core-metric-results/*" into ch_core_div_res
@@ -672,7 +673,7 @@ process AlphaDiversityMeasure{
     script:
     """
     #!/usr/bin/env bash
-    ${samp_depth}=69
+    echo ${samp_depth}
     qiime diversity core-metrics-phylogenetic \
     --i-phylogeny rooted-tree.qza \
     --i-table table-dada2.qza \
