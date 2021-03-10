@@ -603,7 +603,7 @@ process DetermineDepth{
     conda "environment.yml"
 
     input:
-    file "table_viz/sample-frequency-detail.csv" from ch_table_viz_dir
+    path "table_viz/*" from ch_table_viz_dir
 
     output:
     file "sampling_depth.csv" into ch_sampling_depth_csv
