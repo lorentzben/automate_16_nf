@@ -574,7 +574,7 @@ process ExportTable{
     publishDir "${params.outdir}/qiime", mode: 'copy'
     
     input:
-    file "table.qzv" from 
+    file "table.qzv" from ch_table_viz_obj
 
     output:
     file "table_viz/*" into ch_table_viz_dir
