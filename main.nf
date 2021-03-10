@@ -582,7 +582,7 @@ process ExportTable{
     file "table.qzv" from ch_table_viz_obj
 
     output:
-    file "table_viz/*" into ch_table_viz_dir
+    path "table_viz/*" into ch_table_viz_dir
 
     script:
     """
@@ -603,7 +603,7 @@ process DetermineDepth{
     conda "environment.yml"
 
     input:
-    file "table_viz/sample-frequency-detail.csv*" from ch_table_viz_dir
+    file "table_viz/sample-frequency-detail.csv" from ch_table_viz_dir
 
     output:
     file "sampling_depth.csv" into ch_sampling_depth_csv
@@ -617,7 +617,7 @@ process DetermineDepth{
     import numpy as np 
     import csv
 
-    input_file = "table_viz/sample-frequency-detail.csv*"
+    input_file = "table_viz/sample-frequency-detail.csv"
 
     features = pd.read_csv(input_file, index_col=0, header=None)
 
