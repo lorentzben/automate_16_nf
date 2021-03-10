@@ -561,6 +561,8 @@ process TreeConstruction{
 
     script:
     """
+    !/usr/bin/env bash 
+
     qiime phylogeny align-to-tree-mafft-fasttree \
     --i-sequences rep-seqs-dada2.qza \
     --o-alignment aligned-rep-seqs.qza \
@@ -572,6 +574,9 @@ process TreeConstruction{
 
 process ExportTable{
     publishDir "${params.outdir}/qiime", mode: 'copy'
+
+    //conda "${projectDir}/environment.yml"
+    conda "environment.yml"
     
     input:
     file "table.qzv" from ch_table_viz_obj
