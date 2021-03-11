@@ -5,7 +5,7 @@
 #SBATCH --nodes=2
 #SBATCH --ntasks=8
 #SBATCH --time=24:00:00
-#SBATCH --mem=20gb
+#SBATCH --mem=64gb
 
 #Replace this with your UGA email to get notified on completion
 #SBATCH --mail-user="bjl34716@uga.edu"
