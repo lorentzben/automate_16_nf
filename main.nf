@@ -34,7 +34,7 @@ if(params.manifest) {
     Channel
         .fromPath(params.manifest)
         .ifEmpty {exit 1, log.info "Cannot find path file ${tsvFile}"}
-        .into{ ch_single_pair ; ch_make_qiime ; ch_mani_veri ; ch_metadata_rare_curve }
+        .into{ ch_single_pair ; ch_make_qiime ; ch_mani_veri }
 }
 
 if(params.input){
@@ -49,7 +49,7 @@ if(params.metadata) {
     Channel
         .fromPath(params.metadata)
         .ifEmpty { exit 1, log.info "Cannot find path file ${tsvFile}"}
-        .into{ ch_meta_feature_viz; ch_alpha_metadata }
+        .into{ ch_meta_feature_viz; ch_alpha_metadata ; ch_metadata_rare_curve  }
 }
 
 Channel
@@ -832,7 +832,7 @@ process RareCurveCalc{
     #!/usr/bin/env bash
 
     DEPTH=$(head rare_depth.txt)
-    echo $DEPTH
+    
     qiime diversity alpha-rarefaction \
     --i-table table-dada2.qza \
     --i-phylogeny rooted-tree.qza \
