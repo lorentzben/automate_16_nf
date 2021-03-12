@@ -597,6 +597,7 @@ process ExportTable{
 
     output:
     path "table_viz/*" into ch_table_viz_dir
+    path "table_viz/*" into ch_table_viz_dir_rare
 
     script:
     """
@@ -622,7 +623,7 @@ process DetermineDepth{
     output:
     file "sampling_depth.csv" into ch_sampling_depth_csv
     file "samp_depth_simple.txt" into ch_depth
-    path "table_viz/*" into ch_table_viz_dir_rare
+
 
     script:
     """
