@@ -34,7 +34,7 @@ if(params.manifest) {
     Channel
         .fromPath(params.manifest)
         .ifEmpty {exit 1, log.info "Cannot find path file ${tsvFile}"}
-        .into{ ch_single_pair ; ch_make_qiime ; ch_mani_veri }
+        .into{ ch_single_pair ; ch_make_qiime ; ch_mani_veri ; ch_metadata_rare_curve }
 }
 
 if(params.input){
@@ -91,6 +91,7 @@ process SetupPy2CondaEnv{
 
 }
 
+//TODO write item of interest into csv/txt for r script
 process VerifyManifest{
 
     input:
@@ -621,6 +622,7 @@ process DetermineDepth{
     output:
     file "sampling_depth.csv" into ch_sampling_depth_csv
     file "samp_depth_simple.txt" into ch_depth
+    path "table_viz/*" into ch_table_viz_dir_rare
 
     script:
     """
@@ -689,6 +691,9 @@ process AlphaDiversityMeasure{
     file "ace.qza" into ch_ace_qza
     file "obs.qza" into ch_obs_qza
     file "faith_pd.qza" into ch_faith_qza
+    file "table-dada2.qza" into ch_table_rare_curve
+    file "rooted-tree.qza" into ch_tree_rare_curve
+    
 
     
 
@@ -774,4 +779,67 @@ process AssignTaxonomy{
     --m-input-file taxonomy.qza \
     --o-visualization taxonomy.qzv
     """
+}
+
+process CalcRareDeth{
+    publishDir "${params.outdir}/qiime", mode: 'copy'
+
+    //conda "${projectDir}/environment.yml"
+    conda "environment.yml"
+
+    input:
+    path "table_viz/*" from ch_table_viz_dir_rare
+
+    output:
+    file "rare_depth.txt" into ch_rare_curve_depth
+
+    script:
+    """
+    #!/usr/bin/env python3
+    import pandas as pd
+    import numpy as np 
+
+    sample_freq = pd.read_csv("table_viz/sample-frequency-detail.csv")
+    depth = sample_freq.median()[0]
+
+    with open("rare_depth.txt",'w') as file:
+        file.write(depth)
+    
+    """
+
+}
+
+process RareCurveCalc{
+    publishDir "${params.outdir}/qiime", mode: 'copy'
+
+    //conda "${projectDir}/environment.yml"
+    conda "environment.yml"
+
+    input:
+    file "rare_depth.txt" from ch_rare_curve_depth
+    file metadata from ch_metadata_rare_curve
+    file "table-dada2.qza" from ch_table_rare_curve
+    file "rooted-tree.qza" from ch_tree_rare_curve
+
+
+    output:
+    file "alpha-rarefaction.qzv" into ch_alpha_rare_obj
+    path "alpha-rareplot" into ch_alpha_rare_viz
+
+    shell:
+    '''
+    #!/usr/bin/env bash
+
+    qiime diversity alpha-rarefaction \
+    --i-table table-dada2.qza \
+    --i-phylogeny rooted-tree.qza \
+    --p-max-depth $(head rare_depth.txt) \
+    --m-metadata-file !{metadata} \
+    --o-visualization alpha-rarefaction.qzv 
+
+    qiime tools export \
+    --input-path alpha-rarefaction.qzv \
+    --output-path alpha-rareplot
+
+    '''
 }
