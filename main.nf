@@ -832,7 +832,7 @@ process RareCurveCalc{
     #!/usr/bin/env bash
 
     DEPTH=$(head rare_depth.txt)
-    echo($DEPTH)
+    echo $DEPTH
     qiime diversity alpha-rarefaction \
     --i-table table-dada2.qza \
     --i-phylogeny rooted-tree.qza \
