@@ -831,10 +831,12 @@ process RareCurveCalc{
     '''
     #!/usr/bin/env bash
 
+    DEPTH=$(head rare_depth.txt)
+
     qiime diversity alpha-rarefaction \
     --i-table table-dada2.qza \
     --i-phylogeny rooted-tree.qza \
-    --p-max-depth $(head rare_depth.txt) \
+    --p-max-depth $DEPTH \
     --m-metadata-file !{metadata} \
     --o-visualization alpha-rarefaction.qzv 
 
