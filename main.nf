@@ -710,12 +710,12 @@ process AlphaDiversityMeasure{
 
     qiime diversity alpha \
     --i-table table-dada2.qza \
-    --p-metric simpson_e \
+    --p-metric simpson \
     --o-alpha-diversity simpson.qza 
 
     qiime diversity alpha \
     --i-table table-dada2.qza \
-    --p-metric chao1
+    --p-metric chao1 \
     --o-alpha-diversity chao1.qza
 
     qiime diversity alpha \
