@@ -54,11 +54,23 @@ if(params.metadata) {
 
 Channel
     .fromPath("${baseDir}/plot_cladogram.py")
+    .ifEmpty {exit 1, log.info "Cannot find file plot_cladogram.py!"}
     .set{ ch_clado_file }
 
 Channel
     .fromPath("${baseDir}/plot_res.py")
+    .ifEmpty {exit 1, log.info "Cannot find file plot_res.py!"}
     .set{ ch_plot_res }
+
+Channel
+    .fromPath("${baseDir}/16s-whole-seq-classifier.qza")
+    .ifEmpty {exit 1, log.info "Cannot find the classifier!"}
+    .set{ ch_whole_classifier}
+Channel
+    .fromPath("${baseDir}/515-806-classifier.qza")
+    .ifEmpty {exit 1, log.info "Cannot find the classifier!"}
+    .set{ ch_515_classifier }
+    
 
 process SetupPy2CondaEnv{
 
@@ -732,6 +744,8 @@ process AssignTaxonomy{
 
     input:
     file "rep-seqs-dada2.qza" from ch_rep_seq_classify
+    file "16s-whole-seq-classifier.qza" from ch_whole_classifier
+    file "515-806-classifier.qza" from ch_515_classifier
 
     output:
     file "taxonomy.qza" into ch_classifed_taxa_qza
@@ -740,10 +754,18 @@ process AssignTaxonomy{
     script:
     """
     #!/usr/bin/env bash
-    wget https://data.qiime2.org/2021.2/common/silva-138-99-515-806-nb-classifier.qza -O silva-138-99-515-806-nb-classifier.qza
+
+    if [ ! -f "16s-whole-seq-classifier.qza" ]; then 
+    echo "Error, download the classifier from readme"
+    exit 1
+    fi
+    if [ ! -f "515-806-classifier.qza" ]; then 
+    echo "Error, download the classifier from readme"
+    exit 1
+    fi
 
     qiime feature-classifier classify-sklearn \
-    --i-classifier 'silva-138-99-515-806-nb-classifier.qza' \
+    --i-classifier '16s-whole-seq-classifer.qza' \
     --i-reads rep-seqs-dada2.qza \
     --p-confidence 0.6 \
     --o-classification taxonomy.qza
