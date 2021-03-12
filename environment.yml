@@ -12,11 +12,6 @@ dependencies:
 # nf-core
 - conda-forge::markdown=3.1.1
 - conda-forge::pymdown-extensions=6.0
-# Pipeline
-- r-rmarkdown=1.18
-- r-optparse=1.6.4 #for pacbio R scripts
-- ncurses=6.2
-- biopython=1.77 #for database conversion (UNITE)
 # QIIME2 2020/4
 - _libgcc_mutex=0.1
 - _openmp_mutex=4.5
