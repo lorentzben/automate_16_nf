@@ -11,4 +11,5 @@
 #SBATCH --mail-user="bjl34716@uga.edu"
 #SBATCH --mail-type=BEGIN,END,FAIL
 
+echo "this script will take approx 11:16:54 to generate 2 classifiers"
 bash generate_sklearn_classifiers.sh

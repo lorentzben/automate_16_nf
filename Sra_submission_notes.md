@@ -15,17 +15,19 @@ Navigate to the [Submission Portal](https://submit.ncbi.nlm.nih.gov/subs/sra/) a
     * cd uploads/<$STRING_SPECIFIC_TO_ACCT>
 
 4. Create a new directory to store sequences from this project
-    * mkdir PROJECT
+    * mkdir $PROJECT
 
 5. Change directory (cd) into that new folder
-    * cd PROJECT
+    * cd $PROJECT
 
 6. Copy sequences into that new directory
-    * put Files
+    * put $FILES
 
 # Ordering of steps
-
+* FTP preload
 * Create BioProject
+
 * Create BioSample 
+
 * SRA Submission Portal
 
