@@ -804,7 +804,7 @@ process CalcRareDeth{
     depth = sample_freq.median()[0]
 
     with open("rare_depth.txt",'w') as file:
-        file.write(depth)
+        file.write(str(int(depth)))
     
     """
 
