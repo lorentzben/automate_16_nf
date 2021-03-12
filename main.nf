@@ -721,7 +721,7 @@ process AlphaDiversityMeasure{
     qiime diversity alpha \
     --i-table table-dada2.qza \
     --p-metric ace \
-    --o-alpha ace.qza
+    --o-alpha-diversity ace.qza
 
     qiime diversity alpha \
     --i-table table-dada2.qza \
