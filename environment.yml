@@ -240,7 +240,7 @@ dependencies:
 - q2-vsearch=2019.10.0
 - q2cli=2019.10.0
 - q2templates=2019.10.0
-- qiime2=2019.10.0
+- qiime2=2020.11
 - qt=5.9.7
 - r-assertthat=0.2.1
 - r-backports=1.1.5
