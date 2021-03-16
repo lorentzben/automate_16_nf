@@ -986,6 +986,7 @@ process BetaDiversitySignificance{
 }
 
 process GeneratePhylogeneticTrees{
+    //TODO can move this to a different outdir
     publishDir "${params.outdir}/qiime", mode: 'copy'
 
     //conda "${projectDir}/environment.yml"
@@ -1017,69 +1018,69 @@ process GeneratePhylogeneticTrees{
     for item in ioi_set:
 
         # filters/splits the feature table based on the current ioi
-        filter_command = "qiime feature-table filter-samples \
+        filter_command = 'qiime feature-table filter-samples \
         --i-table table-dada2.qza \
         --m-metadata-file ${metadata} \
-        --p-where ${ioi} = "+ item +"
-        --o-filtered-table " +item+"-filtered-table.qza"
+        --p-where ${ioi} = '+item+'
+        --o-filtered-table '+item+'-filtered-table.qza'
 
         result = subprocess.run([filter_command], shell=True)
 
         # adds taxonomic info needed for plotting
-        collapse_command = " qiime taxa collapse \
-        --i-table "+item+"-filtered-table.qza \
-        --o-collapsed-table collapse-" +item+"-table.qza \
+        collapse_command = ' qiime taxa collapse \
+        --i-table '+item+'-filtered-table.qza \
+        --o-collapsed-table collapse-'+item+'-table.qza \
         --p-level 7 \
-        --i-taxonomy taxonomy.qza"
+        --i-taxonomy taxonomy.qza'
 
         result = subprocess.run([collapse_command], shell=True)
 
         # exports artifact so that the next step can collect it
-        export_command="qiime tools export \
-        --input-path collapse-"+item+"-table.qza \
-        --output-path collapse-"+item+"-frequency/"
+        export_command='qiime tools export \
+        --input-path collapse-'+item+'-table.qza \
+        --output-path collapse-'+item+'-frequency/'
         
         result = subprocess.run([export_commmand], shell=True)
 
         # turns feature table into a human-reable format
-        biom_command = "biom convert -i collapse-"+item+\
-        "-frequency/feature-table.biom -o out-"+item+\
-        "-table.tsv --to-tsv --header-key taxonomy"
+        biom_command = 'biom convert -i collapse-'+item+\
+        '-frequency/feature-table.biom -o out-'+item+\
+        '-table.tsv --to-tsv --header-key taxonomy'
 
         result = subprocess.run([biom_command], shell=True)
 
         # formatting the table so that it is in the correct order
-        table = pd.read_table("otu-"+str(item)+"-table.tsv", sep='\t', header=1)
+        table = pd.read_table('otu-'+str(item)+'-table.tsv', sep='\t', header=1)
         table = table.drop(columns=['taxonomy'])
-        table = table.rename(columns={"#OTU ID":"taxonomy"})
-        tax = table.pop("taxonomy")
+        table = table.rename(columns={'#OTU ID':'taxonomy'})
+        tax = table.pop('taxonomy')
         insertion_site = len(table.columns)
-        table.insert(insertion_site, "taxonomy", tax)
-        table.insert(0, "OTU_ID", np.arrange(len(table)))
-        table.to_csv("otu-"+str(item)+"-mod-table.tsv", sep="\t", index=False)
+        table.insert(insertion_site, 'taxonomy', tax)
+        table.insert(0, 'OTU_ID', np.arrange(len(table)))
+        table.to_csv('otu-'+str(item)+'-mod-table.tsv', sep='\t', index=False)
 
         # human readable table into compressed computer-readble format
-        biom_format_command="biom convert -i otu-"+str(item)+ \
-        "-mod-table.tsv -o otu-table-mod.biom --to-hdf5 --table-type=\'OTU table\' --process-obs-metadata taxonomy"
+        biom_format_command='biom convert -i otu-'+str(item)+ \
+        '-mod-table.tsv -o otu-table-mod.biom --to-hdf5 --table-type=\'OTU table\' --process-obs-metadata taxonomy'
 
         result = subprocess.run([biom_format_command], shell=True)
 
         # Outputs the current ioi so that it can be annotatted in the graphlan image
-        with open("current.txt", "w") as file:
+        with open('current.txt', 'w') as file:
             file.write(item)
 
         # bash script call to handle the steps within a conda python 2.7.17 envionment
-        generate_image_command = "bash graph.sh"
+        generate_image_command = 'bash graph.sh'
 
         result = subprocess.run([generate_image_command], shell=True)
 
         # renaming otu tables so they have meaning
-        rename_table = "cp otu-table-mod.biom otu-table-"+item+"-mod.biom"
+        rename_table = 'cp otu-table-mod.biom otu-table-'+item+'-mod.biom'
         
         result = subprocess.run([rename_table],shell=True)
 
         # renaming the output of the graping bash script so that it has meaning
-        rename_image = "cp image_graph.png image_"+item+"_graph.png"
+        rename_image = 'cp image_graph.png image_'+item+'_graph.png'
 
         result = subprocess.run([rename_image], shell=True)
         
