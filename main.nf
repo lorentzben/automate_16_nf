@@ -1040,7 +1040,7 @@ process GeneratePhylogeneticTrees{
         --input-path collapse-'+item+'-table.qza \
         --output-path collapse-'+item+'-frequency/'
         
-        result = subprocess.run([export_commmand], shell=True)
+        result = subprocess.run([export_command], shell=True)
 
         # turns feature table into a human-reable format
         biom_command = 'biom convert -i collapse-'+item+\
