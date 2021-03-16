@@ -1009,7 +1009,7 @@ process GeneratePhylogeneticTrees{
     import pandas as pd
     import numpy as np 
 
-    metadata_table= pd.read_table(${metadata}, sep='\t')
+    metadata_table= pd.read_table(\"${metadata}\", sep='\t')
     metadata_table = metadata_table.drop([0,1])
 
     ioi_set = set(metadata_table[${ioi}])
