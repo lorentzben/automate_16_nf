@@ -1057,7 +1057,7 @@ process GeneratePhylogeneticTrees{
         tax = table.pop('taxonomy')
         insertion_site = len(table.columns)
         table.insert(insertion_site, 'taxonomy', tax)
-        table.insert(0, 'OTU_ID', np.arrange(len(table)))
+        table.insert(0, 'OTU_ID', np.arange(len(table)))
         table.to_csv('otu-'+str(item)+'-mod-table.tsv', sep='\t', index=False)
 
         # human readable table into compressed computer-readble format
