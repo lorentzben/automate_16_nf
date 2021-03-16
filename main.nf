@@ -883,7 +883,7 @@ process AlphaDiversitySignificance{
     qiime diversity alpha-group-significance \
     --i-alpha-diversity shannon.qza \
     --m-metadata-file ${metadata} \
-    --o-visualization shanon.qzv 
+    --o-visualization shannon.qzv 
 
     qiime diversity alpha-group-significance \
     --i-alpha-diversity simpson.qza \
