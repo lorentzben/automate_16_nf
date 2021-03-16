@@ -969,7 +969,7 @@ process BetaDiversitySignificance{
     --p-pairwise
 
     qiime tools export \
-    --input-path unweighted-unifrac-${ioi}-significance.qzv
+    --input-path unweighted-unifrac-${ioi}-significance.qzv \
     --output-path unweighted-sig/
 
     qiime diversity beta-group-significance \
