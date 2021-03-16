@@ -1015,7 +1015,7 @@ process GeneratePhylogeneticTrees{
 
     ioi_set = set(metadata_table[\"${ioi}\"])
 
-    subprocess.run([mkdir phylo_trees], shell=True)
+    subprocess.run(['mkdir phylo_trees'], shell=True)
 
     # iterates over the items of interest to produce a circular phylogenetic tree per category e.g. CONTROL TREATMENT
     for item in ioi_set:
