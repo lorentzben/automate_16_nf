@@ -748,6 +748,7 @@ process AlphaDiversityMeasure{
 }
 
 process AssignTaxonomy{
+    //TODO change out the classifier for the 515 only one 
     publishDir "${params.outdir}/qiime", mode: 'copy'
 
     //conda "${projectDir}/environment.yml"
@@ -948,7 +949,8 @@ process BetaDiversitySignificance{
     path "core-metrics-results/*" from ch_core_beta_significance 
 
     output:
-    file "unweighted-unifrac-${ioi}-significance.qzv"
+    path "unweighted-sig/*" into ch_u_unifrac_beta_path
+    path "weighted-sig/*" into ch_w_unifrac_beta_path
 
     script:
     """
@@ -961,6 +963,37 @@ process BetaDiversitySignificance{
     --o-visualization unweighted-unifrac-${ioi}-significance.qzv \
     --p-pairwise
 
+    qiime tools export \
+    --input-path unweighted-unifrac-${ioi}-significance.qzv
+    --output-path unweighted-sig/
+
+    qiime diversity beta-group-significance \
+    --i-distance-matrix core-metrics-results/weighted_unifrac_distance_matrix.qza \
+    --m-metadata-file ${metadata} \
+    --m-metadata-column ${ioi} \
+    --o-visualization  weighted-unifrac-${ioi}-significance.qzv \
+    --p-pairwise
+
+    qiime tools export \
+    --input-path weighted-unifrac-${ioi}-significance.qzv \
+    --output-path weighted-sig/
+    """
+}
+
+process GeneratePhylogeneticTrees{
+    publishDir "${params.outdir}/qiime", mode: 'copy'
+
+    //conda "${projectDir}/environment.yml"
+    conda "environment.yml"
+
+    input:
+
+    output:
+
+    script:
+    """
+    #!/usr/bin/env bash
+    
     """
 
 }
