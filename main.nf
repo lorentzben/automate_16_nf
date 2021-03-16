@@ -74,7 +74,7 @@ Channel
 Channel
     .from(params.itemOfInterest)
     .ifEmpty {exit 1, log.info "Cannot find Item of interest"}
-    .into{ ch_ioi_beta_sig }
+    .into{ ch_ioi_beta_sig ; ch_ioi_phylo_tree }
 
 Channel
     .fromPath("${baseDir}/graph.sh")
