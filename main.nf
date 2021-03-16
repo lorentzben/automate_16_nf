@@ -1000,7 +1000,7 @@ process GeneratePhylogeneticTrees{
     file "graph.sh" from ch_graph_script
 
     output:
-    file "image_.*_graph.png" into ch_png_phylo_tree
+    path "phylo_trees/*" into ch_png_phylo_tree
     
 
     script:
@@ -1014,6 +1014,8 @@ process GeneratePhylogeneticTrees{
     metadata_table = metadata_table.drop([0,1])
 
     ioi_set = set(metadata_table[\"${ioi}\"])
+
+    subprocess.run([mkdir phylo_trees], shell=True)
 
     # iterates over the items of interest to produce a circular phylogenetic tree per category e.g. CONTROL TREATMENT
     for item in ioi_set:
@@ -1076,12 +1078,12 @@ process GeneratePhylogeneticTrees{
         result = subprocess.run([generate_image_command], shell=True)
 
         # renaming otu tables so they have meaning
-        rename_table = 'cp otu-table-mod.biom otu-table-'+item+'-mod.biom'
+        rename_table = 'cp otu-table-mod.biom phylo_trees/otu-table-'+item+'-mod.biom'
         
         result = subprocess.run([rename_table],shell=True)
 
         # renaming the output of the graping bash script so that it has meaning
-        rename_image = 'cp image_graph.png image_'+item+'_graph.png'
+        rename_image = 'cp image_graph.png phylo_trees/image_'+item+'_graph.png'
 
         result = subprocess.run([rename_image], shell=True)
         
