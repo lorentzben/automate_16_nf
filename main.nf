@@ -1012,7 +1012,7 @@ process GeneratePhylogeneticTrees{
     metadata_table= pd.read_table(\"${metadata}\", sep='\t')
     metadata_table = metadata_table.drop([0,1])
 
-    ioi_set = set(metadata_table[\"${ioi}\""])
+    ioi_set = set(metadata_table[\"${ioi}\"])
 
     # iterates over the items of interest to produce a circular phylogenetic tree per category e.g. CONTROL TREATMENT
     for item in ioi_set:
