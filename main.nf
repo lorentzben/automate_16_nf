@@ -836,6 +836,7 @@ process RareCurveCalc{
     output:
     file "alpha-rarefaction.qzv" into ch_alpha_rare_obj
     path "alpha-rareplot" into ch_alpha_rare_viz
+    file "table-dada2.qza" into ch_table_phylo_tree
     
 
     shell:
