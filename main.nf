@@ -1051,7 +1051,7 @@ process GeneratePhylogeneticTrees{
         result = subprocess.run([biom_command], shell=True)
 
         # formatting the table so that it is in the correct order
-        table = pd.read_table(\"otu-"+str(item)+"-table.tsv\", sep='\t', header=1)
+        table = pd.read_table(\'otu-"+str(item)+"-table.tsv\', sep='\t', header=1)
         table = table.drop(columns=['taxonomy'])
         table = table.rename(columns={'#OTU ID':'taxonomy'})
         tax = table.pop('taxonomy')
