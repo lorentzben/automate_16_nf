@@ -948,6 +948,7 @@ process BetaDiversitySignificance{
     path "core-metrics-results/*" from ch_core_beta_significance 
 
     output:
+    file "unweighted-unifrac-${ioi}-significance.qzv"
 
     script:
     """
