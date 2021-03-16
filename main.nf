@@ -863,7 +863,7 @@ process AlphaDiversitySignificance{
     file metadata from ch_metadata_alpha_sig
     file "shannon.qza" from ch_shannon_qza
     file "simpson.qza" from ch_simpson_qza
-    file "chao1.qza" form ch_chao_qza
+    file "chao1.qza" from ch_chao_qza
     file "ace.qza" from ch_ace_qza
     file "obs.qza" from ch_obs_qza
     file "faith_pd.qza" from ch_faith_qza
