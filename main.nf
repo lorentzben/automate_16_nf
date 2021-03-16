@@ -731,7 +731,7 @@ process AlphaDiversityMeasure{
 
     qiime diversity alpha \
     --i-table table-dada2.qza \
-    --p-metric observed_otus \
+    --p-metric observed_features \
     --o-alpha-diversity obs.qza 
 
     qiime diversity alpha-phylogenetic \
