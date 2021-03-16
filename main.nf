@@ -1001,6 +1001,7 @@ process GeneratePhylogeneticTrees{
 
     output:
     file "image_.*_graph.png" into ch_png_phylo_tree
+    file "*-filtered-table.qza" into ch_filter_table
 
     script:
     """
