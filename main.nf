@@ -16,6 +16,7 @@ def helpMessage(){
         --outdir [file]               The output directory where the results will be saved 
         --email [email]               Set this parameter to your e-mail address to get a summary e-mail with details of the run sent to you when the workflow exits
 	    --email_on_fail [email]       Same as --email, except only send mail if the workflow is not successful
+        --baseDir [path/to/folder]    Directory where the analysis will take place.
 
         
 
