@@ -49,7 +49,7 @@ if(params.metadata) {
     Channel
         .fromPath(params.metadata)
         .ifEmpty { exit 1, log.info "Cannot find path file ${tsvFile}"}
-        .into{ ch_meta_feature_viz; ch_alpha_metadata ; ch_metadata_rare_curve  }
+        .into{ ch_meta_feature_viz; ch_alpha_metadata ; ch_metadata_rare_curve ; ch_metadata_alpha_sig ; ch_metadata_beta_sig }
 }
 
 Channel
@@ -70,6 +70,11 @@ Channel
     .fromPath("${baseDir}/515-806-classifier.qza")
     .ifEmpty {exit 1, log.info "Cannot find the classifier!"}
     .set{ ch_515_classifier }
+
+Channel
+    .from(params.itemOfInterest)
+    .ifEmpty {exit 1, log.info "Cannot find Item of interest"}
+    .into{ ch_ioi_beta_sig }
     
 
 process SetupPy2CondaEnv{
@@ -685,7 +690,7 @@ process AlphaDiversityMeasure{
     file "samp_depth_simple.txt" from ch_depth
 
     output:
-    file "core-metric-results/*" into ch_core_div_res
+    file "core-metric-results/*" into ch_core_beta_significance
     file "shannon.qza" into ch_shannon_qza
     file "simpson.qza" into ch_simpson_qza 
     file "chao1.qza" into ch_chao_qza
@@ -826,6 +831,7 @@ process RareCurveCalc{
     output:
     file "alpha-rarefaction.qzv" into ch_alpha_rare_obj
     path "alpha-rareplot" into ch_alpha_rare_viz
+    
 
     shell:
     '''
@@ -845,4 +851,115 @@ process RareCurveCalc{
     --output-path alpha-rareplot
 
     '''
+}
+
+process AlphaDiversitySignificance{
+    publishDir "${params.outdir}/qiime", mode: 'copy'
+
+    //conda "${projectDir}/environment.yml"
+    conda "environment.yml"
+
+    input:
+    file metadata from ch_metadata_alpha_sig
+    file "shannon.qza" from ch_shannon_qza
+    file "simpson.qza" from ch_simpson_qza
+    file "chao1.qza" form ch_chao_qza
+    file "ace.qza" from ch_ace_qza
+    file "obs.qza" from ch_obs_qza
+    file "faith_pd.qza" from ch_faith_qza
+
+    output:
+    path "shannon/*" into ch_shannon_path
+    path "simpson/*" into ch_simpson_path
+    path "chao1/*" into ch_chao_path
+    path "ace/*" into ch_ace_path
+    path "obs/*" into ch_obs_path
+    path "faith_pd/*" into ch_faith_path
+
+    script:
+    """
+    #!/usr/bin/env bash
+
+    qiime diversity alpha-group-significance \
+    --i-alpha-diversity shannon.qza \
+    --m-metadata-file ${metadata} \
+    --o-visualization shanon.qzv 
+
+    qiime diversity alpha-group-significance \
+    --i-alpha-diversity simpson.qza \
+    --m-metadata-file ${metadata} \
+    --o-visualization simpson.qzv
+
+    qiime diversity alpha-group-significance \
+    --i-alpha-diversity chao1.qza \
+    --m-metadata-file ${metadata} \
+    --o-visualization chao1.qzv 
+
+    qiime diversity alpha-group-significance \
+    --i-alpha-diversity ace.qza \
+    --m-metadata-file ${metadata} \
+    --o-visualization ace.qzv 
+
+    qiime diversity alpha-group-significance \
+    --i-alpha-diversity obs.qza \
+    --m-metadata-file ${metadata} \
+    --o-visualization obs.qzv 
+
+    qiime diversity alpha-group-significance \
+    --i-alpha-diversity faith_pd.qza \
+    --m-metadata-file ${metadata} \
+    --o-visualization faith_pd.qzv 
+
+    qiime tools export \
+    --input-path shannon.qzv \
+    --output-path shannon
+
+    qiime tools export \
+    --input-path simpson.qzv \
+    --output-path simpson
+
+    qiime tools export \
+    --input-path chao1.qzv \
+    --output-path chao1
+
+    qiime tools export \
+    --input-path ace.qzv \
+    --output-path ace 
+
+    qiime tools export \
+    --input-path obs.qzv \
+    --output-path obs
+
+    qiime tools export \
+    --input-path faith_pd.qzv \
+    --output-path faith_pd
+    """
+}
+
+process BetaDiversitySignificance{
+    publishDir "${params.outdir}/qiime", mode: 'copy'
+
+    //conda "${projectDir}/environment.yml"
+    conda "environment.yml"
+
+    input:
+    val ioi from ch_ioi_beta_sig
+    file metadata from ch_metadata_beta_sig
+    path "core-metrics-results/*" from ch_core_beta_significance 
+
+    output:
+
+    script:
+    """
+    #!/usr/bin/env bash
+
+    qiime diversity beta-group-significance \
+    --i-distance-matrix core-metrics-results/unweighted_unifrac_distance_matrix.qza \
+    --m-metadata-file ${metadata} \
+    --m-metadata-column ${ioi} \
+    --o-visualization unweighted-unifrac-${ioi}-significance.qzv \
+    --p-pairwise
+
+    """
+
 }
