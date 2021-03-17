@@ -117,7 +117,7 @@ process SetupRPackages{
     if(!require(remotes)){install.packages("remotes",repos="http://cran.us.r-project.org")}
     if(!require(devtools)){install.packages("devtools",repos="http://cran.us.r-project.org")}
     if(!require(jamba)){remotes::install_github("jmw86069/jamba")}
-    if(!requireNamespace("BiocManager")){install.packages("BiocManager")}
+    if(!require("BiocManager")){install.packages("BiocManager")}
     if(!require(microbiome)){BiocManager::install("microbiome")}
     if(!require(ampvis2)){remotes::install_github("MadsAlbertsen/ampvis2")}
     if(!require(ggvegan)){remotes::install_github("gavinsimpson/ggvegan")}
