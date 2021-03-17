@@ -78,7 +78,11 @@ Channel
 
 Channel
     .fromPath("${baseDir}/graph.sh")
-    .set{ ch_graph_script }    
+    .set{ ch_graph_script } 
+
+Channel
+    .fromPath("${baseDir}/qiime_to_lefse.R")
+    .set { ch_lefse_format_script }
 
 process SetupPy2CondaEnv{
 
@@ -1104,6 +1108,7 @@ process LefseAnalysis {
     file "rooted-tree.qza" from ch_tree_lefse
     file "taxonomy.qza" from ch_tax_lefse
     file metadata from ch_metadata_lefse
+    file "qiime_to_lefse.R" from ch_lefse_format_script
 
     output:
     file "lefse_formatted.txt" into ch_lefse_obj
