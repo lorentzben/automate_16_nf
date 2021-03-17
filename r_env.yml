@@ -27,3 +27,4 @@ dependencies:
 - r-openssl
 - r-doparallel
 - r-plotly
+- r-lattice
