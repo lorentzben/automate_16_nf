@@ -63,7 +63,7 @@ for(item in combos){
   # transforms phyloseq object into lefse input object
   lefse <- phyloseq_to_lefs(comp)
   lefse <- lefse[, mixedOrder(lefse[which(rownames(lefse)==ioi),])]
-  write.table(lefse, paste0(item[1],"_",item[2],"_lefse_formatted.txt"), sep="\t", row.names = T, col.names = F, quote = F)
+  write.table(lefse, paste0("combos/",item[1],"_",item[2],"_lefse_formatted.txt"), sep="\t", row.names = T, col.names = F, quote = F)
 }
 
 mm <- phyloseq_to_lefs(cycle_2)

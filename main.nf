@@ -103,6 +103,22 @@ process SetupPy2CondaEnv{
 
 }
 
+process SetupRPackages{
+    conda "r_env.yml"
+    output:
+    file "set.txt" into ch_r_wait
+    script:
+    """
+    #!/usr/bin/env Rscript --vanilla
+    if(!require(remotes)){install.packages("remotes",repos="http://cran.us.r-project.org")}
+    if(!require(devtools)){install.packages("devtools",repos="http://cran.us.r-project.org")}
+    if(!require(jamba)){remotes::install_github("jmw86069/jamba")}
+
+    cat('done',file='set.txt', sep='\n')
+    """
+
+}
+
 //TODO write item of interest into csv/txt for r script
 process VerifyManifest{
 
@@ -1109,12 +1125,16 @@ process LefseAnalysis {
     file "taxonomy.qza" from ch_tax_lefse
     file metadata from ch_metadata_lefse
     file "qiime_to_lefse.R" from ch_lefse_format_script
+    file "set.txt" from ch_r_wait
 
     output:
     file "lefse_formatted.txt" into ch_lefse_obj
+    path "combos/*" into ch_paired_lefse_format
 
     script:
     """
+    #!/usr/bin/env bash
+    mkdir combos
     cp ${metadata} "metadata.tsv"
     Rscript qiime_to_lefse.R ${ioi}
     """
