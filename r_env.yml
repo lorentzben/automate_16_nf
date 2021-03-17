@@ -12,7 +12,6 @@ dependencies:
 - rujinlong::r-qiime2r
 - bioconductor-phyloseq
 - r-kableextra
-- r-ggplot2
 - r-tidyverse
 - r-gtools
 - r-reshape2
