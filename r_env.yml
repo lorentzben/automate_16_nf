@@ -21,7 +21,6 @@ dependencies:
 - r-pheatmap
 - r-rstatix
 - r-ggdendro
-- r-vegan
 - r-pegas
 - r-ggpubr
 - r-openssl
