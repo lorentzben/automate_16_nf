@@ -49,7 +49,7 @@ if(params.metadata) {
     Channel
         .fromPath(params.metadata)
         .ifEmpty { exit 1, log.info "Cannot find path file ${tsvFile}"}
-        .into{ ch_meta_feature_viz; ch_alpha_metadata ; ch_metadata_rare_curve ; ch_metadata_alpha_sig ; ch_metadata_beta_sig ; ch_metadata_phylo_tree ; ch_metadata_lefse }
+        .into{ ch_meta_feature_viz; ch_alpha_metadata ; ch_metadata_rare_curve ; ch_metadata_alpha_sig ; ch_metadata_beta_sig ; ch_metadata_phylo_tree ; ch_metadata_lefse ; ch_metadata_finalize}
 }
 
 Channel
@@ -561,7 +561,7 @@ process FeatureVisualization{
     file "rep-seqs-dada2.qza" from ch_rep_seqs
 
     output:
-    file "stats-dada2.qzv" into ch_dada2_stats_viz
+    file "stats-dada2.qzv" into ch_dada_stats_export
     file "table.qzv" into ch_table_viz_obj
     file "rep-seqs.qzv" into ch_req_seq_vis_obj
     file "rep-seqs-dada2.qza" into ch_rep_seq_tree_gen
@@ -1170,7 +1170,37 @@ process LefseAnalysis{
     mkdir result
     bash lefse_analysis.sh
     """
+}
 
+process ExportSetup{
+    publishDir "${params.outdir}", mode: 'copy'
+
+    //conda "${projectDir}/environment.yml"
+    conda "environment.yml"
+
+    input:
+    file "stats-dada2.qzv" from ch_dada_stats_export
+    file metadata from ch_metadata_finalize 
+
+    output:
+    file "dada_stats.tsv" into ch_dada_stats_file
+    file "metadata.tsv" into ch_metadata_renamed
+
+    script:
+    """
+    #!/usr/bin/env bash
+
+    qiime tools export \
+    --input-path stats-dada2.qzv \
+    --output-path stats-dada2
+
+    cp stats-dada2/metadata.tsv dada2_stats.tsv
+
+    cp ${metadata} metadata.tsv  
+    """
+}
+
+process GenerateReport{
 
 }
 
