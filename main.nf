@@ -84,6 +84,10 @@ Channel
     .fromPath("${baseDir}/qiime_to_lefse.R")
     .set { ch_lefse_format_script }
 
+Channel 
+    .fromPath("${baseDir}/lefse_analysis.sh")
+    .set{ ch_lefse_analysis_script }
+
 process SetupPy2CondaEnv{
 
     input:
@@ -1113,7 +1117,7 @@ process GeneratePhylogeneticTrees{
 
 }
 
-process LefseAnalysis {
+process LefseFormat {
     publishDir "${params.outdir}/lefse", mode: 'copy'
 
     //conda "${projectDir}/r_env.yml"
@@ -1126,10 +1130,12 @@ process LefseAnalysis {
     file metadata from ch_metadata_lefse
     file "qiime_to_lefse.R" from ch_lefse_format_script
     file "set.txt" from ch_r_wait
+    
 
     output:
     file "lefse_formatted.txt" into ch_lefse_obj
     path "combos/*" into ch_paired_lefse_format
+
 
     script:
     """
@@ -1137,7 +1143,30 @@ process LefseAnalysis {
     mkdir combos
     cp ${metadata} "metadata.tsv"
     Rscript qiime_to_lefse.R ${ioi}
+    mv lefse_formatted.txt combos/
     """
+}
+
+process LefseAnalysis{
+    publishDir "${params.outdir}/lefse", mode: 'copy'
+
+    //conda "${projectDir}/python2_env.yml"
+    conda "python2_env.yml"
+
+    input:
+    path "combos/*" from ch_paired_lefse_format
+    file "lefse_analysis.sh" from ch_lefse_analysis_script
+
+    output:
+    path "result/*" into ch_lefse_results
+
+    script:
+    """
+    #!/usr/bin/env bash
+    mkdir result
+    bash lefse_analysis.sh
+    """
+
 
 }
 
