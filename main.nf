@@ -1112,6 +1112,11 @@ process GeneratePhylogeneticTrees{
         rename_image = 'cp image_graph.png phylo_trees/image_'+item+'_graph.png'
 
         result = subprocess.run([rename_image], shell=True)
+
+        # rename pdf quality image so that it has meaning
+        rename_pdf_image = 'cp image_pdf_graph.png phylo_trees/image_'+item+'_pdf_g.png'
+
+        result = subprocess.run([rename_pdf_image], shell=True)
         
     """
 
