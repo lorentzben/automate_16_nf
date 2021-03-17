@@ -1,0 +1,12 @@
+name: r_env
+channels:
+- conda-forge
+- bioconda
+- defaults
+dependencies:
+- r-base=4.0.0
+- r-remotes=2.2.0
+- r-dplyr=1.0.4
+- r-tibble=3.0.6
+- rujinlong::r-qiime2r=0.99
+- bioconductor-phyloseq=1.34.0
