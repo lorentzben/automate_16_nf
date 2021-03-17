@@ -1138,7 +1138,6 @@ process LefseFormat {
     
 
     output:
-    file "lefse_formatted.txt" into ch_lefse_obj
     path "combos/*" into ch_paired_lefse_format
 
 
