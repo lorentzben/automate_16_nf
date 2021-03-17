@@ -49,7 +49,7 @@ if(params.metadata) {
     Channel
         .fromPath(params.metadata)
         .ifEmpty { exit 1, log.info "Cannot find path file ${tsvFile}"}
-        .into{ ch_meta_feature_viz; ch_alpha_metadata ; ch_metadata_rare_curve ; ch_metadata_alpha_sig ; ch_metadata_beta_sig ; ch_metadata_phylo_tree }
+        .into{ ch_meta_feature_viz; ch_alpha_metadata ; ch_metadata_rare_curve ; ch_metadata_alpha_sig ; ch_metadata_beta_sig ; ch_metadata_phylo_tree ; ch_metadata_lefse }
 }
 
 Channel
@@ -74,7 +74,7 @@ Channel
 Channel
     .from(params.itemOfInterest)
     .ifEmpty {exit 1, log.info "Cannot find Item of interest"}
-    .into{ ch_ioi_beta_sig ; ch_ioi_phylo_tree }
+    .into{ ch_ioi_beta_sig ; ch_ioi_phylo_tree ; ch_ioi_lefse }
 
 Channel
     .fromPath("${baseDir}/graph.sh")
@@ -837,6 +837,7 @@ process RareCurveCalc{
     file "alpha-rarefaction.qzv" into ch_alpha_rare_obj
     path "alpha-rareplot" into ch_alpha_rare_viz
     file "table-dada2.qza" into ch_table_phylo_tree
+    file "rooted-tree.qza" into ch_tree_lefse
     
 
     shell:
@@ -986,7 +987,6 @@ process BetaDiversitySignificance{
 }
 
 process GeneratePhylogeneticTrees{
-    //TODO can move this to a different outdir
     publishDir "${params.outdir}/graphlan", mode: 'copy'
 
     //conda "${projectDir}/environment.yml"
@@ -1001,6 +1001,8 @@ process GeneratePhylogeneticTrees{
 
     output:
     path "phylo_trees/*" into ch_png_phylo_tree
+    file "table-dada2.qza" into ch_table_lefse
+    file "taxonomy.qza" into ch_tax_lefse
     
 
     script:
@@ -1091,4 +1093,26 @@ process GeneratePhylogeneticTrees{
 
 }
 
+process LefseAnalysis {
+    publishDir "${params.outdir}/lefse", mode: 'copy'
+
+    //conda "${projectDir}/r_env.yml"
+    conda "r_env.yml"
+    input:
+    val ioi from ch_ioi_lefse
+    file "table-dada2.qza" from ch_table_lefse
+    file "rooted-tree.qza" from ch_tree_lefse
+    file "taxonomy.qza" from ch_tax_lefse
+    file metadata from ch_metadata_lefse
+
+    output:
+    file "lefse_formatted.txt" into ch_lefse_obj
+
+    script:
+    """
+    cp ${metadata} "metadata.tsv"
+    Rscript qiime_to_lefse.R ${ioi}
+    """
+
+}
 
