@@ -120,7 +120,7 @@ process SetupRPackages{
     if(!require(jamba)){remotes::install_github("jmw86069/jamba")}
     #if(!require(ggplot2)) {remotes::install_github("tidyverse/ggplot2@v3.3.2")}
     #if(!require(vegan)){remotes::install_github("vegandevs/vegan@v2.5.7")}
-    if(!require(ampvis2)){remotes::install_github("MadsAlbertsen/ampvis2@v2.6.8")}
+    if(!require(ampvis2)){remotes::install_github("MadsAlbertsen/ampvis2@191912c33dab9f056cf43761a73901384e795944")}
     if(!require(ggvegan)){remotes::install_github("gavinsimpson/ggvegan")}
     if(!require(ggConvexHull)){remotes::install_github("cmartin/ggConvexHull")}
     
