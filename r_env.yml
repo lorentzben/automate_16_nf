@@ -26,3 +26,4 @@ dependencies:
 - r-ggpubr
 - r-openssl
 - r-doparallel
+- r-plotly
