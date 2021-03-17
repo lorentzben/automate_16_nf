@@ -1183,7 +1183,7 @@ process ExportSetup{
     file metadata from ch_metadata_finalize 
 
     output:
-    file "dada_stats.tsv" into ch_dada_stats_file
+    file "dada2_stats.tsv" into ch_dada_stats_file
     file "metadata.tsv" into ch_metadata_renamed
 
     script:
