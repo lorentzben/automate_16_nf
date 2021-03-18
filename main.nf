@@ -732,7 +732,7 @@ process AlphaDiversityMeasure{
     file "samp_depth_simple.txt" from ch_depth
 
     output:
-    file "core-metric-results/*" into ch_core_beta_significance
+    file "core-metric-results" into ch_core_beta_significance
     file "shannon.qza" into ch_shannon_qza
     file "simpson.qza" into ch_simpson_qza 
     file "chao1.qza" into ch_chao_qza
@@ -991,19 +991,19 @@ process BetaDiversitySignificance{
     input:
     val ioi from ch_ioi_beta_sig
     file metadata from ch_metadata_beta_sig
-    path "core-metrics-results/*" from ch_core_beta_significance 
+    path "core-metric-results/*" from ch_core_beta_significance 
 
     output:
     path "unweighted-sig/*" into ch_u_unifrac_beta_path
     path "weighted-sig/*" into ch_w_unifrac_beta_path
-    path "core-metrics-results/*" into ch_core_report
+    path "core-metric-results/*" into ch_core_report
 
     script:
     """
     #!/usr/bin/env bash
 
     qiime diversity beta-group-significance \
-    --i-distance-matrix core-metrics-results/unweighted_unifrac_distance_matrix.qza \
+    --i-distance-matrix core-metric-results/unweighted_unifrac_distance_matrix.qza \
     --m-metadata-file ${metadata} \
     --m-metadata-column ${ioi} \
     --o-visualization unweighted-unifrac-${ioi}-significance.qzv \
@@ -1014,7 +1014,7 @@ process BetaDiversitySignificance{
     --output-path unweighted-sig/
 
     qiime diversity beta-group-significance \
-    --i-distance-matrix core-metrics-results/weighted_unifrac_distance_matrix.qza \
+    --i-distance-matrix core-metric-results/weighted_unifrac_distance_matrix.qza \
     --m-metadata-file ${metadata} \
     --m-metadata-column ${ioi} \
     --o-visualization  weighted-unifrac-${ioi}-significance.qzv \
