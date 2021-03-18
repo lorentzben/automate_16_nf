@@ -74,7 +74,7 @@ Channel
 Channel
     .from(params.itemOfInterest)
     .ifEmpty {exit 1, log.info "Cannot find Item of interest"}
-    .into{ ch_ioi_beta_sig ; ch_ioi_phylo_tree ; ch_ioi_lefse }
+    .into{ ch_ioi_beta_sig ; ch_ioi_phylo_tree ; ch_ioi_lefse ; ch_ioi_denoise_to_file }
 
 Channel
     .fromPath("${baseDir}/graph.sh")
@@ -502,11 +502,13 @@ process Denoise {
     file seq_object from ch_qiime_denoise
     file("cutoffs.csv") from ch_cutoff_vals
     file("manifest_format.txt") from ch_manifest_type_denoise
+    val ioi from ch_ioi_denoise_to_file
     
     output:
     file "rep-seqs-dada2.qza" into ch_rep_seqs
     file "table-dada2.qza" into ch_table
     file "stats-dada2.qza" into ch_dada2_stats
+    file "item_of_interest.csv" into ch_ioi_file_out
 
     //conda "${projectDir}/environment.yml"
     conda "environment.yml"
@@ -521,6 +523,13 @@ process Denoise {
     import subprocess
 
     wd = Path.cwd()
+
+    with open('item_of_interest.csv', 'w', newline='') as csvfile:
+        fieldnames = ['item name']
+        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+
+        writer.writeheader()
+        writer.writerow({'item name': ${ioi}})
 
     seq_file = pd.read_table("manifest_format.txt")
     if seq_file.columns[0] == "SingleEndFastqManifestPhred33V2":
@@ -865,7 +874,7 @@ process RareCurveCalc{
 
     output:
     file "alpha-rarefaction.qzv" into ch_alpha_rare_obj
-    path "alpha-rareplot" into ch_alpha_rare_viz
+    path "alpha-rareplot/*" into ch_alpha_rare_viz
     file "table-dada2.qza" into ch_table_phylo_tree
     file "rooted-tree.qza" into ch_tree_lefse
     
@@ -987,6 +996,7 @@ process BetaDiversitySignificance{
     output:
     path "unweighted-sig/*" into ch_u_unifrac_beta_path
     path "weighted-sig/*" into ch_w_unifrac_beta_path
+    path "core-metrics-results/*" into ch_core_report
 
     script:
     """
@@ -1145,6 +1155,10 @@ process LefseFormat {
 
     output:
     path "combos/*" into ch_paired_lefse_format
+    file "table-dada2.qza" into ch_table_report
+    file "rooted-tree.qza" into ch_tree_report
+    file "taxonomy.qza" into ch_tax_report
+    file "metadata.tsv" into ch_metadata_report
 
 
     script:
@@ -1206,9 +1220,48 @@ process ExportSetup{
     """
 }
 
-/*
+
 process GenerateReport{
+     publishDir "${params.outdir}/report", mode: 'copy'
+
+    //conda "${projectDir}/r_env.yml"
+    conda "r_env.yml"
+
+    input:
+    file "item_of_interest.csv" from ch_ioi_file_out
+    file "table-dada2.qza" from ch_table_report
+    file "rooted-tree.qza" from ch_tree_report
+    file "taxonomy.qza" from ch_tax_report
+    file metadata from ch_metadata_report
+    path "phylo_trees/*" from ch_png_phylo_tree
+    path "shannon/*" from ch_shannon_path
+    path "simpson/*" from ch_simpson_path
+    path "chao1/*" from ch_chao_path
+    path "ace/*" from ch_ace_path
+    path "obs/*" from ch_obs_path
+    path "faith_pd/*" from ch_faith_path
+    file "core-metric-results/*" from ch_core_report
+    path "alpha-rareplot/*" from ch_alpha_rare_viz
+    path "unweighted-sig/*" into ch_u_unifrac_beta_path
+    path "weighted-sig/*" into ch_w_unifrac_beta_path
+    path "result/*" from ch_lefse_results
+
+
+
+    output:
+    path "Figures/*" into ch_figures_from_report
+    file "report.html" into ch_figures
+    
+    
+    script:
+    """
+    #!/usr/bin/env bash
+
+    mkdir Figures
+    
+    echo "hello" > report.html
+    """
 
 }
-*/
+
 
