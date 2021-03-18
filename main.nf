@@ -733,7 +733,7 @@ process AlphaDiversityMeasure{
 
     output:
     path "core-metric-results/*" into ch_core_beta_significance 
-    path "core-metric-results/*" ch_core_report
+    path "core-metric-results/*" into ch_core_report
     file "shannon.qza" into ch_shannon_qza
     file "simpson.qza" into ch_simpson_qza 
     file "chao1.qza" into ch_chao_qza
