@@ -529,7 +529,7 @@ process Denoise {
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
 
         writer.writeheader()
-        writer.writerow({'item name': ${ioi}})
+        writer.writerow({'item name': '${ioi}'})
 
     seq_file = pd.read_table("manifest_format.txt")
     if seq_file.columns[0] == "SingleEndFastqManifestPhred33V2":
