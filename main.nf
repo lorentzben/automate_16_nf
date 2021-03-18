@@ -1242,8 +1242,8 @@ process GenerateReport{
     path "faith_pd/*" from ch_faith_path
     file "core-metric-results/*" from ch_core_report
     path "alpha-rareplot/*" from ch_alpha_rare_viz
-    path "unweighted-sig/*" into ch_u_unifrac_beta_path
-    path "weighted-sig/*" into ch_w_unifrac_beta_path
+    path "unweighted-sig/*" from ch_u_unifrac_beta_path
+    path "weighted-sig/*" from ch_w_unifrac_beta_path
     path "result/*" from ch_lefse_results
 
 
