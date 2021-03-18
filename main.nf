@@ -1003,7 +1003,7 @@ process BetaDiversitySignificance{
     #!/usr/bin/env bash
 
     qiime diversity beta-group-significance \
-    --i-distance-matrix unweighted_unifrac_distance_matrix.qza \
+    --i-distance-matrix core-metric-results/core-metric-results/unweighted_unifrac_distance_matrix.qza \
     --m-metadata-file ${metadata} \
     --m-metadata-column ${ioi} \
     --o-visualization unweighted-unifrac-${ioi}-significance.qzv \
@@ -1014,7 +1014,7 @@ process BetaDiversitySignificance{
     --output-path unweighted-sig/
 
     qiime diversity beta-group-significance \
-    --i-distance-matrix weighted_unifrac_distance_matrix.qza \
+    --i-distance-matrix core-metric-results/core-metric-results/weighted_unifrac_distance_matrix.qza \
     --m-metadata-file ${metadata} \
     --m-metadata-column ${ioi} \
     --o-visualization  weighted-unifrac-${ioi}-significance.qzv \
