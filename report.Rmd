@@ -1,0 +1,2390 @@
+---
+title: "16s Analysis Report"
+output:
+  html_document:
+    df_print: kable
+    smart: false
+  pdf_document:
+    df_print: kable
+    
+    
+---
+<!-- This is sometimes nessecary, it will manifest with a unable to load shared object '/usr/local/lib/R/ error -->
+<!-- you can run ldconfig -p|grep $BROKEN_PACKAGE -->
+<!-- then you take the stem of where the bin for that package is and replace it below -->
+
+```{r handle lib errors, echo=FALSE, message=FALSE, warning=FALSE}
+Sys.setenv(LD_LIBRARY_PATH = "/lib64")
+Sys.setenv(PKG_CONFIG_PATH = "/lib64/pkgconfig")
+#Sys.setenv(R_REMOTES_NO_ERRORS_FROM_WARNINGS="true")
+```
+
+```{r function to check how the document is being rendered, message=FALSE, warning=FALSE, include=FALSE}
+getOutputFormat <- function() {
+  output <- rmarkdown:::parse_yaml_front_matter(
+    readLines(knitr::current_input())
+    )$output
+  if (is.list(output)){
+    return(names(output)[1])
+  } else {
+    return(output[1])
+  }
+}
+```
+
+```{r install/load libraries, message=FALSE, warning=FALSE, include=FALSE}
+if(!require(kableExtra)) {install.packages("kableExtra", repos="http://cran.us.r-project.org")}
+if(!require(remotes)){install.packages("remotes")}
+if(!require(ggplot2)) {remotes::install_github("tidyverse/ggplot2@v3.3.2")}
+if(!require(tidyverse)) {install.packages("tidyverse", repos="http://cran.us.r-project.org")}
+
+if (!require("devtools", quietly = TRUE)){install.packages("devtools")}
+if(!require(qiime2R)) {devtools::install_github("jbisanz/qiime2R")} # current version is 0.99.20
+if(!require(phyloseq)) {install.packages("phyloseq",repos="http://cran.us.r-project.org")}
+if(!require(gtools)) {install.packages("gtools",repos="http://cran.us.r-project.org")}
+if(!require(reshape2)) {install.packages("reshape2",repos="http://cran.us.r-project.org")}
+if(!require(forcats)) {install.packages("forcats",repos="http://cran.us.r-project.org")}
+if(!require(gridExtra)) {install.packages("gridExtra",repos="http://cran.us.r-project.org")}
+if(!requireNamespace("BiocManager")){install.packages("BiocManager")}
+if(!require(microbiome)){BiocManager::install("microbiome")}
+
+if(!require(pheatmap)){install.packages("pheatmap",repos="http://cran.us.r-project.org")}
+if(!require(rstatix)){installl.packages("rstatix",repos="http://cran.us.r-project.org")}
+# if(!require(knitr)){install.packages("knitr")}
+if(!require(tidyverse)){install.packages("tidyverse",repos="http://cran.us.r-project.org")}
+if(!require(ampvis2)){remotes::install_github("MadsAlbertsen/ampvis2")}
+if(!require(devtools)) {install.packages("devtools",repos="http://cran.us.r-project.org")}
+if(!require(ggdendro)){install.packages("ggendro",repos="http://cran.us.r-project.org")}
+if(!require(vegan)){install.packages("vegan",repos="http://cran.us.r-project.org")}
+if(!require(pegas)){install.packages("pegas",repos="http://cran.us.r-project.org")}
+
+if(!require(ggvegan)){remotes::install_github("gavinsimpson/ggvegan")}
+if(!require(ggpubr)){install.packages("ggpubr")}
+if(!require(dplyr)){install.packages("dplyr")}
+if(!require(jamba)){remotes::install_github("jmw86069/jamba")}
+if(!require(ggConvexHull)){remotes::install_github("cmartin/ggConvexHull")}
+# library(remotes)
+library(openssl)
+library(gtools)
+library(kableExtra)
+library(qiime2R)
+library(phyloseq)
+library(reshape2)
+library(forcats)
+library(gridExtra)
+#library(microbiome)
+
+library(pheatmap)
+library(rstatix)
+library(knitr)
+#library(tidyverse)
+library(reshape2)
+library(ampvis2)
+library(ggdendro)
+library(vegan)
+library(pegas)
+library(ggvegan)
+
+library(ggpubr)
+library(dplyr)
+library(jamba)
+library(ggConvexHull)
+```
+<!-- input files required:  -->
+<!-- item_of_interest.csv -->
+<!-- table-dada2.qza -->
+<!-- rooted-tree.qza -->
+<!-- taxonomy.qza -->
+<!-- metadata.tsv -->
+<!-- image_.*_graph.png[any number of files that match that pattern for phylo trees] -->
+<!-- *cutoffs.csv -->
+<!-- *dada2_stats.tsv -->
+<!-- *sampling_depth.csv -->
+<!-- obs/metadata.tsv -->
+<!-- shannon/metadata.tsv -->
+<!-- simpson/metadata.tsv -->
+<!-- chao1/metadata.tsv -->
+<!-- ace/metadata.tsv -->
+<!-- faith_pd/metadata.tsv -->
+<!-- core-metrics-results/bray_curtis_pcoa_results.qza -->
+<!-- core-metrics-results/shannon_vector.qza -->
+<!-- core-metrics-results/jaccard_pcoa_results.qza -->
+<!-- core-metrics-results/unweighted_unifrac_pcoa_results.qza -->
+<!-- core-metrics-results/weighted_unifrac_pcoa_results.qza -->
+<!-- alpha-rare/observed_otus.csv -->
+
+```{r parse item of interest and make outdir for figures, echo=FALSE, message=FALSE, warning=FALSE}
+#item of interest, comes from bash and python script that orchestrates everything
+ioi <- read.csv("item_of_interest.csv")
+ioi<-as.character(ioi)
+
+outdir_name <- "Figures"
+if(!dir.exists(paste0("./",outdir_name))) {dir.create(paste0("./",outdir_name))}
+outdir <- paste0("./",outdir_name)
+
+
+```
+
+## 1 Species Distribution 
+
+### 1.1 Relative Abundance of Top 10 Phyla
+
+```{r stacked bar chart at Phylum level, echo=FALSE, fig.height=12, fig.width=18, message=FALSE, warning=FALSE}
+options(bitmapType='cairo')
+level = "Phylum"
+
+#Create phyloseq object from qiime objects
+cycle_1 <- qza_to_phyloseq("table-dada2.qza","rooted-tree.qza","taxonomy.qza","metadata.tsv")
+
+#Select number of taxa at phylum level to plot
+topN <- 10
+
+#selects top n taxa and creates phyloseq object
+cycle_n_names <- sort(tapply(taxa_sums(cycle_1), tax_table(cycle_1)[,as.character(level)], sum), TRUE) [1:topN]
+cycle_n <- subset_taxa(cycle_1, get(level) %in% names(cycle_n_names))
+cycle_n_glom <- tax_glom(cycle_n, taxrank = level)
+
+#selects top n + 1 to the end of table
+rest_tax <- sort(tapply(taxa_sums(cycle_1), tax_table(cycle_1)[,as.character(level)], sum), TRUE) [topN+1:length(tax_table(cycle_1))]
+rest <- subset_taxa(cycle_1, get(level) %in% names(rest_tax))
+rest_glom <- tax_glom(rest, taxrank = level)
+
+#collapse all phyla not in top 10 into one taxon
+rest_merge <- merge_taxa(rest, taxa_names(rest))
+
+#create dummy taxonomy classification for collapsed taxa
+taxvec <- c("Other","Other","Other","Other","Other", "Other","Other")
+taxlist <- list(OTU1=parse_taxonomy_default(taxvec))
+tax_tab <- build_tax_table(taxlist)
+colnames(tax_tab) <- c("Kingdom","Phylum","Class","Order","Family","Genus","Species")
+rownames(tax_tab) <- rownames(tax_table(rest_merge))
+tax_table(rest_merge) <- tax_tab
+
+#attaches top n phyloseq object with the other phyloseq object
+merge_tax <- merge_phyloseq(tax_table(cycle_n), tax_table(rest_merge))
+merge_otu <- merge_phyloseq(otu_table(cycle_n), otu_table(rest_merge))
+merge_samp <- merge_phyloseq(sample_data(cycle_n), sample_data(rest_merge))
+
+merged <- merge_phyloseq(merge_tax, merge_otu, merge_samp)
+
+#calculates relative abundance based on sample provided and turns that into a dataframe for ggplot2 plotting
+cycle_1_phylum <- merged %>%
+  tax_glom(taxrank = level) %>%
+  transform_sample_counts(function(x) {x/sum(x)}) %>%
+  psmelt() %>%
+  arrange(Abundance)
+
+
+#ggplot2 stacked bar chart separated by sample in the metadata from qiime2
+by_sample <- ggplot(cycle_1_phylum, aes(x=Sample, y=Abundance, fill=fct_relevel(fct_reorder(cycle_1_phylum[[level]], Abundance),"Other"))) + 
+  geom_bar(stat= "identity") +
+  xlab("Sample ID") +
+  ylab(label="Relative Abundance") +
+  guides(fill=guide_legend(title=level))+
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 90,vjust=0.5, hjust=1))+
+  theme(text=element_text(size = 20))
+
+print(by_sample)
+ggsave("stacked_bar_phylum_by_sample.png", plot=by_sample, path=outdir)
+
+#calculates relative abundance based on item of interest provided in original bash script
+cy_phylum <- merged %>%
+  tax_glom(taxrank = level) %>%
+  merge_samples(ioi,fun=sum) %>%
+  transform_sample_counts(function(x) {x/sum(x)}) %>%
+  psmelt() %>%
+  arrange(Abundance)
+
+cy_phylum$Sample <- reorder(as.factor(cy_phylum$Sample))
+
+#ggplot2 stacked bar chart separated by item of interet in the metadata from qiime2 identified by user
+by_treatment <- ggplot(cy_phylum, aes(x=Sample, y=Abundance, fill=fct_relevel(fct_reorder(cy_phylum[[level]],Abundance),"Other"))) + 
+  geom_bar(stat="identity") +
+  guides(fill=guide_legend(title=level)) + 
+  xlab(label = ioi) +
+  ylab(label="Relative Abundance") +
+  theme_minimal()+
+  theme(text=element_text(size = 20))
+
+
+#prints charts to rnotebook
+
+print(by_treatment)
+
+#saves charts to directory
+
+ggsave("stacked_bar_phylum_by_treatment.png", plot=by_treatment, path=outdir)
+
+```
+
+
+
+
+### 1.2 Relative Abundance of Top 10 Genera
+
+```{r stacked bar chart at Genus level, echo=FALSE, fig.height=12, fig.width=18, message=FALSE, warning=FALSE}
+level = "Genus"
+
+#Create phyloseq object from qiime objects
+cycle_1 <- qza_to_phyloseq("table-dada2.qza","rooted-tree.qza","taxonomy.qza","metadata.tsv")
+
+#Select number of taxa at genus level to plot
+topN <- 10
+
+#selects top n taxa and creates phyloseq object
+cycle_n_names <- sort(tapply(taxa_sums(cycle_1), tax_table(cycle_1)[,as.character(level)], sum), TRUE) [1:topN]
+cycle_n <- subset_taxa(cycle_1, get(level) %in% names(cycle_n_names))
+cycle_n_glom <- tax_glom(cycle_n, taxrank = level)
+
+#selects top n + 1 to the end of table
+rest_tax <- sort(tapply(taxa_sums(cycle_1), tax_table(cycle_1)[,as.character(level)], sum), TRUE) [topN+1:length(tax_table(cycle_1))]
+rest <- subset_taxa(cycle_1, get(level) %in% names(rest_tax))
+rest_glom <- tax_glom(rest, taxrank = level)
+
+#collapse all genera not in top 10 into one taxon
+rest_merge <- merge_taxa(rest, taxa_names(rest))
+
+#create dummy taxonomy classificaiton for collapsed taxa
+taxvec <- c("Other","Other","Other","Other","Other", "Other","Other")
+taxlist <- list(OTU1=parse_taxonomy_default(taxvec))
+tax_tab <- build_tax_table(taxlist)
+colnames(tax_tab) <- c("Kingdom","Phylum","Class","Order","Family","Genus","Species")
+rownames(tax_tab) <- rownames(tax_table(rest_merge))
+tax_table(rest_merge) <- tax_tab
+
+#attaches top n phyloseq object with the other phyloseq object
+merge_tax <- merge_phyloseq(tax_table(cycle_n), tax_table(rest_merge))
+merge_otu <- merge_phyloseq(otu_table(cycle_n), otu_table(rest_merge))
+merge_samp <- merge_phyloseq(sample_data(cycle_n), sample_data(rest_merge))
+
+merged <- merge_phyloseq(merge_tax, merge_otu, merge_samp)
+
+#calculate relative abundance based on sample
+cycle_1_genus <- merged %>%
+  tax_glom(taxrank = level) %>%
+  transform_sample_counts(function(x) {x/sum(x)}) %>%
+  psmelt() %>%
+  arrange(Abundance)
+
+#ggplot of stacked bar chart separated by sample
+by_sample <- ggplot(cycle_1_genus, aes(x=Sample, y=Abundance, fill=fct_relevel(fct_reorder(cycle_1_genus[[level]], Abundance),"Other"))) + 
+  geom_bar(stat= "identity") +
+  xlab("Sample ID") +
+  ylab(label="Relative Abundance") +
+  guides(fill=guide_legend(title=level))+
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 90,vjust=0.5, hjust=1)) +
+  theme(text=element_text(size = 20))
+
+print(by_sample)
+ggsave("stacked_bar_genus_by_sample.png", plot=by_sample, path=outdir)
+
+#calculate relative abundance based on treatment 
+cy_genus <- merged %>%
+  tax_glom(taxrank = level) %>%
+  merge_samples(ioi,fun=sum) %>%
+  transform_sample_counts(function(x) {x/sum(x)}) %>%
+  psmelt() %>%
+  arrange(Abundance)
+
+cy_genus$Sample <- reorder(as.factor(cy_genus$Sample))
+
+#ggplot figure of stacked bar chart separated by treatment
+by_treatment <- ggplot(cy_genus, aes(x=Sample, y=Abundance, fill=fct_relevel(fct_reorder(cy_genus[[level]],Abundance),"Other"))) + 
+  geom_bar(stat="identity") +
+  guides(fill=guide_legend(title=level)) + 
+  xlab(label = ioi) +
+  ylab(label="Relative Abundance") +
+  theme_minimal()+
+  theme(text=element_text(size = 20))
+
+#prints charts for rnotebook
+
+print(by_treatment)
+
+#saves copies of figures to outdir
+
+ggsave("stacked_bar_genus_by_treatment.png", plot = by_treatment, path=outdir)
+
+```
+
+
+
+
+### 1.3 Relative Abundance of Top 10 Species
+
+```{r stacked bar chart at Species level, echo=FALSE, fig.height=12, fig.width=18, message=FALSE, warning=FALSE}
+level = "Species"
+
+#Create phyloseq object from qiime objects
+cycle_1 <- qza_to_phyloseq("table-dada2.qza","rooted-tree.qza","taxonomy.qza","metadata.tsv")
+
+#Select number of taxa at species level to plot
+topN <- 10
+
+#selects top n taxa and creates phyloseq object
+cycle_n_names <- sort(tapply(taxa_sums(cycle_1), tax_table(cycle_1)[,as.character(level)], sum), TRUE) [1:topN]
+cycle_n <- subset_taxa(cycle_1, get(level) %in% names(cycle_n_names))
+cycle_n_glom <- tax_glom(cycle_n, taxrank = level)
+
+#selects top n + 1 to the end of table
+rest_tax <- sort(tapply(taxa_sums(cycle_1), tax_table(cycle_1)[,as.character(level)], sum), TRUE) [topN+1:length(tax_table(cycle_1))]
+rest <- subset_taxa(cycle_1, get(level) %in% names(rest_tax))
+rest_glom <- tax_glom(rest, taxrank = level)
+
+#collapse all species not in top 10 into one taxon
+rest_merge <- merge_taxa(rest, taxa_names(rest))
+
+#create dummy taxonomy classificaiton for collapsed taxa
+taxvec <- c("Other","Other","Other","Other","Other", "Other","Other")
+taxlist <- list(OTU1=parse_taxonomy_default(taxvec))
+tax_tab <- build_tax_table(taxlist)
+colnames(tax_tab) <- c("Kingdom","Phylum","Class","Order","Family","Genus","Species")
+rownames(tax_tab) <- rownames(tax_table(rest_merge))
+tax_table(rest_merge) <- tax_tab
+
+#attaches top n phyloseq object with the other phyloseq object
+merge_tax <- merge_phyloseq(tax_table(cycle_n), tax_table(rest_merge))
+merge_otu <- merge_phyloseq(otu_table(cycle_n), otu_table(rest_merge))
+merge_samp <- merge_phyloseq(sample_data(cycle_n), sample_data(rest_merge))
+
+merged <- merge_phyloseq(merge_tax, merge_otu, merge_samp)
+
+#calculates relative abundance based on sample
+cycle_1_species <- merged %>%
+  tax_glom(taxrank = level) %>%
+  transform_sample_counts(function(x) {x/sum(x)}) %>%
+  psmelt() %>%
+  arrange(Abundance)
+
+#ggplot stacked bar chart separated by species
+by_sample <- ggplot(cycle_1_species, aes(x=Sample, y=Abundance, fill=fct_relevel(fct_reorder(cycle_1_species[[level]], Abundance),"Other"))) + 
+  geom_bar(stat= "identity") +
+  xlab("Sample ID") +
+  ylab(label="Relative Abundance") +
+  guides(fill=guide_legend(title=level))+
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 90,vjust=0.5, hjust=1)) +
+  theme(text=element_text(size = 20))
+
+print(by_sample)
+ggsave("stacked_bar_species_by_sample.png", plot=by_sample, path=outdir)
+
+
+#calculates relative abundance based on treatment
+cy_species <- merged %>%
+  tax_glom(taxrank = level) %>%
+  merge_samples(ioi,fun=sum) %>%
+  transform_sample_counts(function(x) {x/sum(x)}) %>%
+  psmelt() %>%
+  arrange(Abundance)
+
+cy_species$Sample <- reorder(as.factor(cy_species$Sample))
+
+#ggplot stacked bar chart separated by treatment
+by_treatment <- ggplot(cy_species, aes(x=Sample, y=Abundance, fill=fct_relevel(fct_reorder(cy_species[[level]],Abundance),"Other"))) + 
+  geom_bar(stat="identity") +
+  ylab(label="Relative Abundance") +
+  guides(fill=guide_legend(title=level)) + 
+  xlab(label = ioi) +
+  theme_minimal()+
+  theme(text=element_text(size = 20))
+
+#prints figures to rnotebook
+
+print(by_treatment)
+
+#saves copies of figures to directory
+
+ggsave("stacked_bar_species_by_treatment.png", plot=by_treatment, path=outdir)
+
+```
+
+
+
+
+## 2 Phylogentic Trees
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+if(getOutputFormat() =='pdf_document'){
+  print("see end of report")
+}
+
+```
+
+
+```{r phylo-tree", echo=FALSE, message=FALSE, warning=FALSE, fig.pos='h', out.width="100%", fig.cap="\\newline{}"}
+if(getOutputFormat() == 'html_document') {
+  tree_filenames <- list.files(pattern="image_.*_graph.png")
+  tree_filenames <- mixedsort(tree_filenames)
+
+  include_graphics(tree_filenames)
+} 
+
+if(getOutputFormat() =='pdf_document'){
+  print("see end of report")
+  tree_filenames <- list.files(pattern="image_.*_pdf_g.png")
+  tree_filenames <- mixedsort(tree_filenames)
+
+  include_graphics(tree_filenames)
+  
+}
+```
+
+
+
+
+## 3 Species Abundance Heatmap
+
+```{r heatmap at the Genus level annotatted with item of interest, echo=FALSE, fig.height=10, fig.width=14, message=FALSE, warning=FALSE}
+devtools::source_gist("8d0ca4206a66be7ff6d76fc4ab8e66c6")
+cycle_1 <- qza_to_phyloseq("table-dada2.qza","rooted-tree.qza","taxonomy.qza","metadata.tsv") 
+cycle_1@sam_data[[ioi]] <- reorder(cycle_1@sam_data[[ioi]])
+
+cycle_1_amp <- phyloseq_to_ampvis2(cycle_1)
+
+heatmap <- ampvis2::amp_heatmap(cycle_1_amp,
+                     group_by = "SampleID", 
+                     tax_aggregate = "Genus",
+                     tax_show = 30,
+                     facet_by = ioi,
+                     tax_add = "Phylum",
+                     plot_values = FALSE,
+                     plot_colorscale = "log10") +
+  theme(text=element_text(size = 20))
+
+heatmap
+ggsave("heatmap.png", plot=heatmap, path=outdir)
+
+```
+
+
+```{r read in cutoffs used by qiime, message=FALSE, warning=FALSE, include=FALSE}
+cutoffs = read.csv("cutoffs.csv",sep = ',',strip.white = TRUE)
+#cutoffs = knitr::kable(cutoffs)
+cutoffs %>% kbl() %>% kable_styling(bootstrap_options = c("striped","condensed","responsive"))
+```
+
+
+```{r make data table for dada2 stats from qiime, message=FALSE, warning=FALSE, include=FALSE}
+dadastat = read.csv("dada2_stats.tsv",sep = '\t',strip.white = TRUE)
+#dadastat_t = dadastat %>% kbl() %>% kable_classic(full_width = F)
+dadastat %>% kbl() %>% kable_styling(bootstrap_options = c("striped","condensed","responsive")) 
+```
+
+```{r table for sampling depth in qiime, message=FALSE, warning=FALSE, include=FALSE}
+depth = read.csv("sampling_depth.csv", sep=",")
+depth %>% kbl() %>% kable_styling(bootstrap_options = c("striped","condensed","responsive"))
+```
+
+
+
+
+## 4 Alpha Diversity Table
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+obs <- read.table("obs/metadata.tsv", header = TRUE)
+shannon <- read.table("shannon/metadata.tsv", header = TRUE)
+simpson <- read.table("simpson/metadata.tsv", header=TRUE)
+chao1 <- read.table("chao1/metadata.tsv", header=TRUE)
+ace <- read.table("ace/metadata.tsv", header=TRUE)
+faith_pd <- read.table("faith_pd/metadata.tsv", header=TRUE)
+
+obs <- data.frame(obs[c('id','observed_otus')])
+shannon <- data.frame(shannon[c('id','shannon')])
+simpson <- data.frame(simpson[c('id','simpson')])
+chao1 <- data.frame(chao1[c('id','chao1')])
+ace <- data.frame(ace[c("id","ace")])
+faith_pd <- data.frame(faith_pd[c("id","faith_pd")])
+
+alpha_summary <- Reduce(function(...) merge(..., by='id', all.x=TRUE), list(obs,shannon,simpson,chao1,ace,faith_pd))
+kable(alpha_summary) %>% 
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
+```
+
+
+
+
+## 5 Alpha Diversity Plot 
+
+
+
+
+### 5.1 Observed Features 
+
+```{r alpha diversity plot of obs, results = "asis", echo=FALSE, message=FALSE, warning=FALSE}
+#subsets and plots observed features in a boxplot format
+ioi <- read.csv("item_of_interest.csv")
+ioi<-as.character(ioi)
+obs_vals = read.csv("./obs/metadata.tsv", sep='\t')
+dims = dim(obs_vals)
+obs_vals <- data.frame(obs_vals[2:dims[1],])
+obs_vals[[ioi]] <- reorder(as.factor(obs_vals[[ioi]]))
+obs_vals$observed_otus <- as.numeric(as.character(obs_vals$observed_otus))
+obs_boxplot <- ggplot(obs_vals, aes_string(x=ioi,y = obs_vals$observed_otus, fill=ioi)) + geom_boxplot() + ylab("Observed Features") +theme_bw()
+obs_boxplot 
+
+ggsave("obs_boxplot.png", plot=obs_boxplot, path=outdir)
+
+#plots obs values in a violin plot format 
+p <- ggplot(obs_vals, aes(x=obs_vals[[ioi]], y=observed_otus)) + geom_violin()+ geom_boxplot(width=0.1)
+p<- p + stat_summary(fun.y=mean, geom="point", shape=23, size=2)
+p<-p + stat_summary(fun.y=median, geom="point", size=2, color="red")
+p <- p+geom_jitter(shape=16, position=position_jitter(0.2)) + xlab(ioi) + ylab("Observed Features") + theme_bw()
+p
+
+ggsave("obs_violin_plot.png", plot=p, path=outdir)
+```
+
+
+```{r Kruskal-Wallace test for signifiance observed feat,results = "asis", echo=FALSE, message=FALSE, warning=FALSE}
+library("ggpubr")
+obs <- read.table("obs/metadata.tsv", header = TRUE)
+obs_stat <- data.frame(obs[c('id',ioi,'observed_otus')])
+
+
+
+form <- as.formula(paste0("observed_otus ~ ", ioi))
+kruskal_table <- rstatix::kruskal_test(data = obs_stat, formula = form)
+kruskal_table <- add_significance(kruskal_table, p.col="p",output.col = "p.signif",symbols =c("****", "***", "**", "$*$", "ns"))
+
+kable(kruskal_table) %>% 
+  kable_styling(bootstrap_options = c("hover", "condensed", "responsive"))
+
+form = as.formula(paste0("observed_otus ~", ioi))
+
+dunn_table <- rstatix::dunn_test(data = obs_stat, formula = form, p.adjust.method = "holm") 
+dunn_table<- add_significance(dunn_table, p.col="p.adj",output.col = "p.adj.signif",symbols =c("****", "***", "**", "$*$", "ns"))
+kable(dunn_table) %>% 
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
+
+dunn_table <- dunn_table %>% add_xy_position()
+
+p <- ggplot(obs_vals, aes(x=obs_vals[[ioi]], y=observed_otus)) + geom_violin()+ geom_boxplot(width=0.1)
+p<- p + stat_summary(fun.y=mean, geom="point", shape=23, size=2)
+p<-p + stat_summary(fun.y=median, geom="point", size=2, color="red")
+p <- p+geom_jitter(shape=16, position=position_jitter(0.2)) + xlab(ioi) + ylab("Observed Features") + theme_bw()
+dunn_table<- add_significance(dunn_table, p.col="p.adj",output.col = "p.adj.signif")
+p <- p + stat_pvalue_manual(dunn_table, label = "p.adj.signif",hide.ns = TRUE )
+p
+ggsave("obs_boxplot_w_signif.png", plot=p, path=outdir)
+
+```
+
+
+
+
+### 5.2 Shannon
+
+```{r alpha diversity plot of shannon diversity, echo=FALSE, message=FALSE, warning=FALSE}
+shannon_vals <- read.table("./shannon/metadata.tsv",sep = '\t', header = TRUE)
+dims = dim(shannon_vals)
+shannon_vals <- data.frame(shannon_vals[2:dims[1],])
+shannon_vals[[ioi]] <- reorder(as.factor(shannon_vals[[ioi]]))
+shannon_vals$shannon <- as.numeric(as.character(shannon_vals$shannon))
+shannon_boxplot <- ggplot(shannon_vals, aes_string(x=ioi, y=shannon_vals$shannon, fill=ioi)) + geom_boxplot() + ylab("Shannon") + theme_bw() + xlab(ioi)
+shannon_boxplot
+
+ggsave("shannon_boxplot.png", plot=shannon_boxplot, path=outdir)
+
+p <- ggplot(shannon_vals, aes(x=shannon_vals[[ioi]], y=shannon)) + geom_violin()+ geom_boxplot(width=0.1)
+p<- p + stat_summary(fun.y=mean, geom="point", shape=23, size=2)
+p<-p + stat_summary(fun.y=median, geom="point", size=2, color="red")
+p <- p+geom_jitter(shape=16, position=position_jitter(0.2)) + xlab(ioi) + ylab("Shannon") + theme_bw()
+p
+
+ggsave("shannon_violin_plot.png", plot=p, path=outdir)
+```
+
+```{r Kuskal-Wallace test for significance shannon,results = "asis", echo=FALSE, message=FALSE, warning=FALSE}
+shannon <- read.table("shannon/metadata.tsv", header = TRUE, sep='\t')
+shannon_stat <- data.frame(shannon[c('id',ioi,'shannon')])
+
+form <- as.formula(paste0("shannon ~ ", ioi))
+kruskal_table <- rstatix::kruskal_test(data = shannon_stat, formula =form)
+kruskal_table <- add_significance(kruskal_table, p.col="p",output.col = "p.signif",symbols =c("****", "***", "**", "$*$", "ns"))
+kable(kruskal_table) %>% 
+  kable_styling(bootstrap_options = c("hover", "condensed", "responsive"))
+
+form = as.formula(paste0("shannon ~", ioi))
+
+dunn_table <- rstatix::dunn_test(data = shannon_stat, formula = form, p.adjust.method = "holm")
+dunn_table<- add_significance(dunn_table, p.col="p.adj",output.col = "p.adj.signif",symbols =c("****", "***", "**", "$*$", "ns"))
+kable(dunn_table) %>% 
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
+
+dunn_table <- dunn_table  %>% add_xy_position()
+
+p <- ggplot(shannon_vals, aes(x=shannon_vals[[ioi]], y=shannon)) + geom_violin()+ geom_boxplot(width=0.1)
+p<- p + stat_summary(fun.y=mean, geom="point", shape=23, size=2)
+p<-p + stat_summary(fun.y=median, geom="point", size=2, color="red")
+p <- p+geom_jitter(shape=16, position=position_jitter(0.2)) + xlab(ioi) + ylab("Shannon") + theme_bw()
+dunn_table<- add_significance(dunn_table, p.col="p.adj",output.col = "p.adj.signif")
+p <- p + stat_pvalue_manual(dunn_table, label = "p.adj.signif",hide.ns = TRUE)
+p
+ggsave("shannon_boxplot_w_signif.png", plot=p, path=outdir)
+```
+
+
+
+
+### 5.3 Simpson
+
+```{r alpha diversity plot of simpson diversity, echo=FALSE, message=FALSE, warning=FALSE}
+simpson_vals <- read.table("./simpson/metadata.tsv",sep = '\t', header = TRUE)
+dims = dim(simpson_vals)
+simpson_vals <- data.frame(simpson_vals[2:dims[1],])
+simpson_vals[[ioi]] <- reorder(as.factor(simpson_vals[[ioi]]))
+simpson_vals$simpson <- as.numeric(as.character(simpson_vals$simpson))
+simpson_boxplot <- ggplot(simpson_vals, aes_string(x=simpson_vals[[ioi]], y=simpson_vals$simpson, fill=ioi)) + geom_boxplot() + ylab("Simpson") + theme_bw() + xlab(ioi)
+simpson_boxplot
+
+ggsave("simpson_boxplot.png", plot=simpson_boxplot, path=outdir)
+
+p <- ggplot(simpson_vals, aes(x=simpson_vals[[ioi]], y=simpson)) + geom_violin()+ geom_boxplot(width=0.1)
+p<- p + stat_summary(fun.y=mean, geom="point", shape=23, size=2)
+p<-p + stat_summary(fun.y=median, geom="point", size=2, color="red")
+p <- p+geom_jitter(shape=16, position=position_jitter(0.2)) + xlab(ioi) + ylab("Simpson") + theme_bw()
+p
+
+ggsave("simpson_violin_plot.png", plot=p, path=outdir)
+```
+
+```{r Kuskal-Wallace test for significance simpson,results = "asis", echo=FALSE, message=FALSE, warning=FALSE}
+simpson <- read.table("simpson/metadata.tsv", header = TRUE, sep='\t')
+simpson_stat <- data.frame(simpson[c('id',ioi,'simpson')])
+
+form <- as.formula(paste0("simpson ~ ", ioi))
+kruskal_table <- rstatix::kruskal_test(data = simpson_stat, formula = form)
+kruskal_table <- add_significance(kruskal_table, p.col="p",output.col = "p.signif",symbols =c("****", "***", "**", "$*$", "ns"))
+kable(kruskal_table) %>% 
+  kable_styling(bootstrap_options = c("hover", "condensed", "responsive"))
+
+form = as.formula(paste0("simpson ~", ioi))
+
+dunn_table <- rstatix::dunn_test(data = simpson_stat, formula = form, p.adjust.method = "holm") 
+dunn_table<- add_significance(dunn_table, p.col="p.adj",output.col = "p.adj.signif",symbols =c("****", "***", "**", "$*$", "ns"))
+kable(dunn_table) %>% 
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
+
+dunn_table <- dunn_table %>% add_xy_position()
+
+p <- ggplot(simpson_vals, aes(x=simpson_vals[[ioi]], y=simpson)) + geom_violin()+ geom_boxplot(width=0.1)
+p<- p + stat_summary(fun.y=mean, geom="point", shape=23, size=2)
+p<-p + stat_summary(fun.y=median, geom="point", size=2, color="red")
+p <- p+geom_jitter(shape=16, position=position_jitter(0.2)) + xlab(ioi) + ylab("Simpson") + theme_bw()
+dunn_table<- add_significance(dunn_table, p.col="p.adj",output.col = "p.adj.signif")
+p <- p+ stat_pvalue_manual(dunn_table, label = "p.adj.signif", hide.ns = TRUE)
+p
+ggsave("simpson_boxplot_w_signif.png", plot=p, path=outdir)
+```
+
+
+
+
+### 5.4 Chao 1
+
+```{r alpha diversity plot of Chao 1 diversity, echo=FALSE, message=FALSE, warning=FALSE}
+chao1_vals <- read.table("./chao1/metadata.tsv",sep = '\t', header = TRUE)
+dims = dim(chao1_vals)
+chao1_vals <- data.frame(chao1_vals[2:dims[1],])
+chao1_vals[[ioi]] <- reorder(as.factor(chao1_vals[[ioi]]))
+chao1_vals$chao1 <- as.numeric(as.character(chao1_vals$chao1))
+chao1_boxplot <- ggplot(chao1_vals, aes_string(x=chao1_vals[[ioi]], y=chao1_vals$chao1, fill=ioi)) + geom_boxplot() + ylab("Chao 1") + theme_bw() + xlab(ioi)
+chao1_boxplot
+
+ggsave("chao1_boxplot.png", plot=chao1_boxplot, path=outdir)
+
+p <- ggplot(chao1_vals, aes(x=chao1_vals[[ioi]], y=chao1)) + geom_violin()+ geom_boxplot(width=0.1)
+p<- p + stat_summary(fun.y=mean, geom="point", shape=23, size=2)
+p<-p + stat_summary(fun.y=median, geom="point", size=2, color="red")
+p <- p+geom_jitter(shape=16, position=position_jitter(0.2)) + xlab(ioi) + ylab("Chao 1") + theme_bw()
+p
+
+ggsave("chao1_violin_plot.png", plot=p, path=outdir)
+```
+
+```{r Kuskal-Wallace test for significance chao1,results = "asis", echo=FALSE, message=FALSE, warning=FALSE}
+chao1 <- read.table("chao1/metadata.tsv", header = TRUE, sep='\t')
+chao1_stat <- data.frame(chao1[c('id',ioi,'chao1')])
+
+form <- as.formula(paste0("chao1 ~ ", ioi))
+kruskal_table <- rstatix::kruskal_test(data = chao1_stat , formula = form)
+kruskal_table <- add_significance(kruskal_table, p.col="p",output.col = "p.signif",symbols =c("****", "***", "**", "$*$", "ns"))
+kable(kruskal_table) %>% 
+  kable_styling(bootstrap_options = c("hover", "condensed", "responsive"))
+
+form = as.formula(paste0("chao1 ~", ioi))
+
+dunn_table <- rstatix::dunn_test(data = chao1_stat, formula = form, p.adjust.method = "holm") 
+dunn_table<- add_significance(dunn_table, p.col="p.adj",output.col = "p.adj.signif",symbols =c("****", "***", "**", "$*$", "ns"))
+kable(dunn_table) %>% 
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
+
+dunn_table <- dunn_table %>% add_xy_position()
+
+p <- ggplot(chao1_vals, aes(x=chao1_vals[[ioi]], y=chao1)) + geom_violin()+ geom_boxplot(width=0.1)
+p<- p + stat_summary(fun.y=mean, geom="point", shape=23, size=2)
+p<-p + stat_summary(fun.y=median, geom="point", size=2, color="red")
+p <- p+geom_jitter(shape=16, position=position_jitter(0.2)) + xlab(ioi) + ylab("Chao 1") + theme_bw()
+dunn_table<- add_significance(dunn_table, p.col="p.adj",output.col = "p.adj.signif")
+p <- p+stat_pvalue_manual(dunn_table, label="p.adj.signif", hide.ns = TRUE)
+p
+ggsave("chao1_boxplot_w_signif.png", plot=p, path=outdir)
+```
+
+
+
+
+### 5.5 ACE
+
+```{r alpha diversity plot of ACE diversity, echo=FALSE, message=FALSE, warning=FALSE}
+ace_vals <- read.table("./ace/metadata.tsv",sep = '\t', header = TRUE)
+dims = dim(ace_vals)
+ace_vals <- data.frame(ace_vals[2:dims[1],])
+ace_vals[[ioi]] <- reorder(as.factor(ace_vals[[ioi]]))
+ace_vals$ace <- as.numeric(as.character(ace_vals$ace))
+ace_boxplot <- ggplot(ace_vals, aes_string(x=ace_vals[[ioi]], y=ace_vals$ace, fill=ioi)) + geom_boxplot() + ylab("ACE") + theme_bw() + xlab(ioi)
+ace_boxplot
+
+ggsave("ace_boxplot.png", plot=ace_boxplot, path=outdir)
+
+p <- ggplot(ace_vals, aes(x=ace_vals[[ioi]], y=ace)) + geom_violin()+ geom_boxplot(width=0.1)
+p<- p + stat_summary(fun.y=mean, geom="point", shape=23, size=2)
+p<-p + stat_summary(fun.y=median, geom="point", size=2, color="red")
+p <- p+geom_jitter(shape=16, position=position_jitter(0.2)) + xlab(ioi) + ylab("ACE") + theme_bw()
+p
+
+ggsave("ace_violin_plot.png", plot=p, path=outdir)
+```
+
+```{r Kuskal-Wallace test for significance ace,results = "asis", echo=FALSE, message=FALSE, warning=FALSE}
+ace <- read.table("ace/metadata.tsv", header = TRUE, sep='\t')
+ace_stat <- data.frame(ace[c('id',ioi,'ace')])
+
+form <- as.formula(paste0("ace ~ ", ioi))
+kruskal_table <- rstatix::kruskal_test(data = ace_stat, formula = form)
+kruskal_table <- add_significance(kruskal_table, p.col="p",output.col = "p.signif",symbols =c("****", "***", "**", "$*$", "ns"))
+kable(kruskal_table) %>% 
+  kable_styling(bootstrap_options = c("hover", "condensed", "responsive"))
+
+form = as.formula(paste0("ace ~", ioi))
+
+dunn_table <- rstatix::dunn_test(data = ace_stat, formula = form, p.adjust.method = "holm") 
+dunn_table<- add_significance(dunn_table, p.col="p.adj",output.col = "p.adj.signif",symbols =c("****", "***", "**", "$*$", "ns"))
+kable(dunn_table) %>% 
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
+
+dunn_table <- dunn_table %>% add_xy_position()
+
+p <- ggplot(ace_vals, aes(x=ace_vals[[ioi]], y=ace)) + geom_violin()+ geom_boxplot(width=0.1)
+p<- p + stat_summary(fun.y=mean, geom="point", shape=23, size=2)
+p<-p + stat_summary(fun.y=median, geom="point", size=2, color="red")
+p <- p+geom_jitter(shape=16, position=position_jitter(0.2)) + xlab(ioi) + ylab("ACE") + theme_bw()
+dunn_table<- add_significance(dunn_table, p.col="p.adj",output.col = "p.adj.signif")
+p <- p+ stat_pvalue_manual(dunn_table, label = "p.adj.signif", hide.ns = TRUE)
+p
+ggsave("ace_boxplot_w_signif.png", plot=p, path=outdir)
+```
+
+
+
+
+### 5.6 Phylogenetic Distance Over The whole Tree
+
+```{r alpha diversity plot of PD_whole_tree, echo=FALSE, message=FALSE, warning=FALSE}
+faith_pd_vals <- read.table("./faith_pd/metadata.tsv",sep = '\t', header = TRUE)
+dims = dim(faith_pd_vals)
+faith_pd_vals <- data.frame(faith_pd_vals[2:dims[1],])
+faith_pd_vals[[ioi]] <- reorder(as.factor(faith_pd_vals[[ioi]]))
+faith_pd_vals$faith_pd <- as.numeric(as.character(faith_pd_vals$faith_pd))
+faith_pd_boxplot <- ggplot(faith_pd_vals, aes_string(x=faith_pd_vals[[ioi]], y=faith_pd_vals$faith_pd, fill=ioi)) + geom_boxplot() + ylab("Faith PD") + theme_bw() + xlab(ioi)
+faith_pd_boxplot
+
+ggsave("faith_pd_boxplot.png", plot=faith_pd_boxplot, path=outdir)
+
+p <- ggplot(faith_pd_vals, aes(x=faith_pd_vals[[ioi]], y=faith_pd)) + geom_violin()+ geom_boxplot(width=0.1)
+p<- p + stat_summary(fun.y=mean, geom="point", shape=23, size=2)
+p<-p + stat_summary(fun.y=median, geom="point", size=2, color="red")
+p <- p+geom_jitter(shape=16, position=position_jitter(0.2)) + xlab(ioi) + ylab("Faith PD") + theme_bw()
+p
+
+ggsave("faith_pd_violin_plot.png", plot=p, path=outdir)
+```
+
+```{r Kuskal-Wallace test for significance faith pd,results = "asis", echo=FALSE, message=FALSE, warning=FALSE}
+faith_pd <- read.table("faith_pd/metadata.tsv", header = TRUE, sep='\t')
+faith_pd_stat <- data.frame(faith_pd[c('id',ioi,'faith_pd')])
+
+form <- as.formula(paste0("faith_pd ~ ", ioi))
+kruskal_table <- rstatix::kruskal_test(data = faith_pd_stat, formula = form)
+kruskal_table <- add_significance(kruskal_table, p.col="p",output.col = "p.signif",symbols =c("****", "***", "**", "$*$", "ns"))
+kable(kruskal_table) %>% 
+  kable_styling(bootstrap_options = c("hover", "condensed", "responsive"))
+
+form = as.formula(paste0("faith_pd ~", ioi))
+
+dunn_table <- rstatix::dunn_test(data = faith_pd_stat, formula = form, p.adjust.method = "holm") 
+dunn_table<- add_significance(dunn_table, p.col="p.adj",output.col = "p.adj.signif",symbols =c("****", "***", "**", "$*$", "ns"))
+kable(dunn_table) %>% 
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
+
+dunn_table <- dunn_table %>% add_xy_position()
+
+p <- ggplot(faith_pd_vals, aes(x=faith_pd_vals[[ioi]], y=faith_pd)) + geom_violin()+ geom_boxplot(width=0.1)
+p<- p + stat_summary(fun.y=mean, geom="point", shape=23, size=2)
+p<-p + stat_summary(fun.y=median, geom="point", size=2, color="red")
+p <- p+geom_jitter(shape=16, position=position_jitter(0.2)) + xlab(ioi) + ylab("Faith PD") + theme_bw()
+dunn_table<- add_significance(dunn_table, p.col="p.adj",output.col = "p.adj.signif")
+p <- p+stat_pvalue_manual(dunn_table, label="p.adj.signif", hide.ns = TRUE)
+p
+ggsave("faith_pd_boxplot_w_signif.png", plot=p, path=outdir)
+```
+
+
+
+
+## 6 Beta diversity 
+
+### 6.1 Bray curtis ordination
+
+```{r beta diversity plot of bray curtis measurement, echo=FALSE, message=FALSE, warning=FALSE}
+library(qiime2R)
+metadata<-read_q2metadata("metadata.tsv")
+metadata[[ioi]] <- reorder(metadata[[ioi]])
+bray_pcoa <- qiime2R::read_qza("core-metrics-results/bray_curtis_pcoa_results.qza")
+shannon<-qiime2R::read_qza("core-metrics-results/shannon_vector.qza")
+shannon <- shannon$data %>% rownames_to_column("SampleID")
+
+
+bray_curtis <- bray_pcoa$data$Vectors %>%
+  select(SampleID, PC1, PC2) %>%
+  left_join(metadata) %>%
+  left_join(shannon) %>%
+  ggplot(aes_string(x="PC1", y="PC2", color=ioi))+
+  geom_point() +
+  geom_convexhull(alpha=0.5, aes_string(fill=ioi)) +
+  theme_q2r() +
+  scale_color_discrete(name=ioi)
+
+bray_curtis_no_poly <- bray_pcoa$data$Vectors %>%
+  select(SampleID, PC1, PC2) %>%
+  left_join(metadata) %>%
+  left_join(shannon) %>%
+  ggplot(aes_string(x="PC1", y="PC2", color=ioi))+
+  geom_point() +
+  theme_q2r() +
+  scale_color_discrete(name=ioi)
+
+bray_curtis
+ggsave("bray_curtis_pcoa_ordination.png", plot=bray_curtis, path=outdir)
+
+bray_curtis_no_poly
+ggsave("bray_curtis_pcoa_ordination_no_polygon.png", plot=bray_curtis_no_poly, path=outdir)
+
+```
+
+
+
+
+### 6.2 Jaccard ordination
+
+```{r pcoa using Jaccard distance, echo=FALSE, message=FALSE, warning=FALSE}
+metadata<-read_q2metadata("metadata.tsv")
+jaccard <- qiime2R::read_qza("core-metrics-results/jaccard_pcoa_results.qza")
+shannon<-qiime2R::read_qza("core-metrics-results/shannon_vector.qza")
+shannon <- shannon$data %>% rownames_to_column("SampleID")
+
+metadata[[ioi]] <- reorder(metadata[[ioi]])
+
+jaccard_pcoa <- jaccard$data$Vectors %>%
+  select(SampleID, PC1, PC2) %>%
+  left_join(metadata) %>%
+  left_join(shannon) %>%
+  ggplot(aes_string(x="PC1", y="PC2", color=ioi))+
+  geom_point() +
+  geom_convexhull(alpha=0.5, aes_string(fill=ioi)) +
+  theme_q2r() +
+  scale_size_continuous(name="Shannon Diversity") +
+  scale_color_discrete(name=ioi)
+
+jaccard_pcoa_no_polygon <- jaccard$data$Vectors %>%
+  select(SampleID, PC1, PC2) %>%
+  left_join(metadata) %>%
+  left_join(shannon) %>%
+  ggplot(aes_string(x="PC1", y="PC2", color=ioi))+
+  geom_point() +
+  theme_q2r() +
+  scale_size_continuous(name="Shannon Diversity") +
+  scale_color_discrete(name=ioi)
+
+jaccard_pcoa
+
+ggsave("jaccard_pcoa_ordination.png", plot=jaccard_pcoa, path=outdir)
+
+jaccard_pcoa_no_polygon
+ggsave("jaccard_pcoa_ordination_no_polygons.png", plot=jaccard_pcoa_no_polygon, path=outdir)
+
+
+```
+
+
+
+
+### 6.3 Unweighted unifrac ordination
+
+```{r unweighted unifrac pcoa ordination, echo=FALSE, message=FALSE, warning=FALSE}
+metadata<-read_q2metadata("metadata.tsv")
+metadata[[ioi]] <- reorder(metadata[[ioi]])
+jaccard <- qiime2R::read_qza("core-metrics-results/unweighted_unifrac_pcoa_results.qza")
+shannon<-qiime2R::read_qza("core-metrics-results/shannon_vector.qza")
+shannon <- shannon$data %>% rownames_to_column("SampleID")
+
+
+unweight_unifrac_pcoa <- jaccard$data$Vectors %>%
+  select(SampleID, PC1, PC2) %>%
+  left_join(metadata) %>%
+  left_join(shannon) %>%
+  ggplot(aes_string(x="PC1", y="PC2", color=ioi))+
+  geom_point() +
+  geom_convexhull(alpha=0.5, aes_string(fill=ioi)) +
+  theme_q2r() +
+  scale_color_discrete(name=ioi)
+
+unweight_unifrac_pcoa 
+
+ggsave("unweighted_unifrac_pcoa_ordination.png", plot=unweight_unifrac_pcoa, path=outdir)
+
+unweight_unifrac_pcoa_no_polygon <- jaccard$data$Vectors %>%
+  select(SampleID, PC1, PC2) %>%
+  left_join(metadata) %>%
+  left_join(shannon) %>%
+  ggplot(aes_string(x="PC1", y="PC2", color=ioi))+
+  geom_point() +
+  theme_q2r() +
+  scale_color_discrete(name=ioi)
+
+unweight_unifrac_pcoa_no_polygon
+
+ggsave("unweighted_unifrac_pcoa_ordination_no_polygons.png", plot=unweight_unifrac_pcoa_no_polygon, path=outdir)
+
+
+```
+
+
+
+
+### 6.4 Weighted unifrac ordination
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+metadata<-read_q2metadata("metadata.tsv")
+metadata[[ioi]] <- reorder(metadata[[ioi]])
+jaccard <- qiime2R::read_qza("core-metrics-results/weighted_unifrac_pcoa_results.qza")
+shannon<-qiime2R::read_qza("core-metrics-results/shannon_vector.qza")
+shannon <- shannon$data %>% rownames_to_column("SampleID")
+
+weighted_unifrac_pcoa <- jaccard$data$Vectors %>%
+  select(SampleID, PC1, PC2) %>%
+  left_join(metadata) %>%
+  left_join(shannon)
+
+
+weighted_unifrac_pcoa <- jaccard$data$Vectors %>%
+  select(SampleID, PC1, PC2) %>%
+  left_join(metadata) %>%
+  left_join(shannon) %>%
+  ggplot(aes_string(x="PC1", y="PC2", color=ioi))+
+  geom_point() +
+  geom_convexhull(alpha=0.5, aes_string(fill=ioi)) +
+  theme_q2r() +
+  scale_color_discrete(name=ioi)
+
+weighted_unifrac_pcoa
+
+ggsave("weighted_unifrac_pcoa_ordination.png", plot=weighted_unifrac_pcoa, path=outdir)
+
+weighted_unifrac_pcoa_no_polygon <- jaccard$data$Vectors %>%
+  select(SampleID, PC1, PC2) %>%
+  left_join(metadata) %>%
+  left_join(shannon) %>%
+  ggplot(aes_string(x="PC1", y="PC2", color=ioi))+
+  geom_point() +
+  theme_q2r() +
+  scale_color_discrete(name=ioi)
+
+weighted_unifrac_pcoa_no_polygon
+ggsave("weighted_unifrac_pcoa_ordination_no_polygons.png", plot=weighted_unifrac_pcoa_no_polygon, path=outdir)
+```
+
+
+
+
+### 6.5 Principal Components Analysis
+
+```{r PCA created by ampvis2, echo=FALSE, message=FALSE, warning=FALSE}
+devtools::source_gist("8d0ca4206a66be7ff6d76fc4ab8e66c6")
+
+cycle_1 <- qza_to_phyloseq("table-dada2.qza","rooted-tree.qza","taxonomy.qza","metadata.tsv") 
+cycle_1@sam_data[[ioi]] <- reorder(cycle_1@sam_data[[ioi]])
+cycle_1_amp <- phyloseq_to_ampvis2(cycle_1)
+
+euclidean_frame <- amp_ordinate(cycle_1_amp, filter_species = 0, type = "PCA", transform = "hellinger", print_caption = T,sample_color_by = ioi, sample_colorframe = T) 
+euclidean_frame
+ggsave("PCA_ordination_with_boundries.png", plot=euclidean_frame , path=outdir)
+euclidean <- amp_ordinate(cycle_1_amp, filter_species = 0, type = "PCA", transform = "hellinger", print_caption = T,sample_color_by = ioi) 
+euclidean
+
+ggsave("PCA_ordination_without_boundries.png", plot=euclidean , path=outdir)
+```
+
+
+
+
+## 7 Rarefaction Curves
+
+```{r rarefaction curves, echo=FALSE, fig.height=10, fig.width=16, message=FALSE, warning=FALSE}
+
+
+numextract <- function(string){
+  str_extract(string, "\\-*\\d+\\.*\\d*")
+}
+
+obs_rarefy <- read.csv("alpha-rareplot/observed_otus.csv")
+samples <- obs_rarefy[1]
+one <- obs_rarefy[2:11]
+two <- obs_rarefy[12:21]
+three <- obs_rarefy[22:31]
+four <- obs_rarefy[32:41]
+five <- obs_rarefy[42:51]
+six <- obs_rarefy[52:61]
+seven <- obs_rarefy[62:71]
+eight <- obs_rarefy[72:81]
+nine <- obs_rarefy[82:91]
+ten <- obs_rarefy[92:101]
+obs_item_of_interest <- obs_rarefy[[ioi]]
+
+
+
+one_d <- numextract(colnames(obs_rarefy[2:11])[1])
+two_d <- numextract(colnames(obs_rarefy[12:21])[1])
+three_d <- numextract(colnames(obs_rarefy[22:31])[1])
+four_d <- numextract(colnames(obs_rarefy[32:41])[1])
+five_d <- numextract(colnames(obs_rarefy[42:51])[1])
+six_d <- numextract(colnames(obs_rarefy[52:61])[1])
+seven_d <- numextract(colnames(obs_rarefy[62:71])[1])
+eight_d <- numextract(colnames(obs_rarefy[72:81])[1])
+nine_d <- numextract(colnames(obs_rarefy[82:91])[1])
+ten_d <- numextract(colnames(obs_rarefy[92:101])[1])
+
+
+one["sample"] <- samples
+one_flat <- melt(one) %>%
+  rename(depth = variable)
+one_flat["depth"] <- rep(one_d, dim(one_flat)[1])
+
+one_flat_mean <- one_flat %>%
+  group_by(sample) %>%
+  summarise(average=mean(value,na.rm = TRUE)) %>%
+  ungroup()
+
+one_flat_mean["depth"] <- rep(one_d, dim(one_flat_mean)[1])
+
+two["sample"] <- samples
+two_flat <- melt(two) %>%
+  rename(depth = variable)
+two_flat["depth"] <- rep(two_d, dim(two_flat)[1])
+
+two_flat_mean <- two_flat %>%
+  group_by(sample) %>%
+  summarise(average=mean(value,na.rm = TRUE)) %>%
+  ungroup()
+
+two_flat_mean["depth"] <- rep(two_d, dim(two_flat_mean)[1])
+
+three["sample"] <- samples
+three_flat <- melt(three) %>% 
+  rename(depth = variable)
+three_flat["depth"] <- rep(three_d, dim(three_flat)[1])
+
+three_flat_mean <- three_flat %>%
+  group_by(sample) %>%
+  summarise(average=mean(value,na.rm = TRUE)) %>%
+  ungroup()
+
+three_flat_mean["depth"] <- rep(three_d, dim(three_flat_mean)[1])
+
+four["sample"] <- samples
+four_flat <- melt(four) %>%
+  rename(depth = variable)
+four_flat["depth"] <- rep(four_d, dim(four_flat)[1])
+
+four_flat_mean <- four_flat %>%
+  group_by(sample) %>% 
+  summarise(average=mean(value,na.rm = TRUE)) %>%
+  ungroup()
+
+four_flat_mean["depth"] <- rep(four_d, dim(four_flat_mean)[1])
+
+five["sample"] <- samples
+five_flat <- melt(five) %>%
+  rename(depth=variable)
+five_flat["depth"] <- rep(five_d, dim(five_flat)[1])
+
+five_flat_mean <- five_flat %>%
+  group_by(sample) %>%
+  summarise(average=mean(value,na.rm = TRUE)) %>%
+  ungroup()
+
+five_flat_mean["depth"] <- rep(five_d, dim(five_flat_mean)[1])
+
+six["sample"]<-samples
+six_flat <- melt(six)%>%
+  rename(depth=variable)
+six_flat["depth"]<- rep(six_d, dim(six_flat)[1])
+
+six_flat_mean <- six_flat %>%
+  group_by(sample) %>%
+  summarise(average=mean(value,na.rm = TRUE)) %>%
+  ungroup()
+
+six_flat_mean["depth"] <- rep(six_d, dim(six_flat_mean)[1])
+
+seven["sample"] <- samples
+seven_flat <- melt(seven) %>%
+  rename(depth=variable)
+seven_flat["depth"]<-rep(seven_d, dim(seven_flat)[1])
+
+seven_flat_mean <- seven_flat %>%
+  group_by(sample) %>%
+  summarise(average=mean(value,na.rm = TRUE)) %>%
+  ungroup()
+
+seven_flat_mean["depth"] <- rep(seven_d, dim(seven_flat_mean)[1])
+
+eight["sample"] <- samples
+eight_flat <- melt(eight) %>%
+  rename(depth=variable)
+eight_flat["depth"] <- rep(eight_d, dim(eight_flat)[1])
+
+eight_flat_mean <- eight_flat %>%
+  group_by(sample) %>%
+  summarise(average=mean(value,na.rm = TRUE)) %>%
+  ungroup()
+
+eight_flat_mean["depth"] <- rep(eight_d, dim(eight_flat_mean)[1])
+
+nine["sample"] <- samples
+nine_flat <- melt(nine) %>%
+  rename(depth=variable)
+nine_flat["depth"] <- rep(nine_d, dim(nine_flat)[1])
+
+nine_flat_mean <- nine_flat %>%
+  group_by(sample) %>%
+  summarise(average=mean(value,na.rm = TRUE)) %>%
+  ungroup()
+
+nine_flat_mean["depth"] <- rep(nine_d, dim(nine_flat_mean)[1])
+
+ten["sample"] <- samples
+ten_flat <- melt(ten) %>%
+  rename(depth=variable)
+ten_flat["depth"] <- rep(ten_d, dim(ten_flat)[1])
+
+ten_flat_mean <- ten_flat %>%
+  group_by(sample) %>%
+  summarise(average=mean(value,na.rm = TRUE)) %>%
+  ungroup()
+
+ten_flat_mean["depth"] <- rep(ten_d, dim(ten_flat_mean)[1])
+
+
+bound <- rbind(one_flat,two_flat, three_flat, four_flat, five_flat, six_flat, seven_flat, eight_flat, nine_flat, ten_flat)
+bound_mean <- rbind(one_flat_mean, two_flat_mean, three_flat_mean, four_flat_mean, five_flat_mean, six_flat_mean, seven_flat_mean, eight_flat_mean, nine_flat_mean, ten_flat_mean)
+
+
+
+bound$depth <- as.numeric(as.character(bound$depth))
+
+bound <- bound[order(bound$depth),]
+
+rarefy_curve_by_sample <- ggplot(bound, aes(x=depth, y=value, fill=sample, color=sample))+
+  geom_point(data=bound_mean, mapping=aes(x=as.numeric(depth), y=as.numeric(average)),size=3) + 
+  geom_line(data=bound_mean, mapping= aes(x=as.numeric(depth), y=as.numeric(average), group=sample), size=1) + 
+  scale_x_binned("Sampling Depth",n.breaks = 12, nice.breaks = TRUE) + theme_bw() +
+  scale_y_continuous("Observed Species") + 
+  theme(text=element_text(size = 20))
+rarefy_curve_by_sample
+
+ggsave("rarefaction_curve_by_sample.png", plot=rarefy_curve_by_sample, path=outdir)
+
+samples <- obs_rarefy[1]
+one <- obs_rarefy[2:11]
+two <- obs_rarefy[12:21]
+three <- obs_rarefy[22:31]
+four <- obs_rarefy[32:41]
+five <- obs_rarefy[42:51]
+six <- obs_rarefy[52:61]
+seven <- obs_rarefy[62:71]
+eight <- obs_rarefy[72:81]
+nine <- obs_rarefy[82:91]
+ten <- obs_rarefy[92:101]
+obs_item_of_interest <- obs_rarefy[[ioi]]
+
+
+
+one_d <- numextract(colnames(obs_rarefy[2:11])[1])
+two_d <- numextract(colnames(obs_rarefy[12:21])[1])
+three_d <- numextract(colnames(obs_rarefy[22:31])[1])
+four_d <- numextract(colnames(obs_rarefy[32:41])[1])
+five_d <- numextract(colnames(obs_rarefy[42:51])[1])
+six_d <- numextract(colnames(obs_rarefy[52:61])[1])
+seven_d <- numextract(colnames(obs_rarefy[62:71])[1])
+eight_d <- numextract(colnames(obs_rarefy[72:81])[1])
+nine_d <- numextract(colnames(obs_rarefy[82:91])[1])
+ten_d <- numextract(colnames(obs_rarefy[92:101])[1])
+
+fct_ioi <- as.factor(obs_item_of_interest)
+one <- cbind(one,fct_ioi)
+one_flat <- melt(one,id.vars = "fct_ioi") %>%
+  rename(depth = variable) %>%
+  rename(ioi = fct_ioi)
+one_flat["depth"] <- rep(one_d, dim(one_flat)[1])
+
+one_flat_mean <- one_flat %>%
+  group_by(ioi) %>%
+  summarise(average=mean(value,na.rm = TRUE)) %>%
+  ungroup()
+
+one_flat_mean["depth"] <- rep(one_d, dim(one_flat_mean)[1])
+
+two <- cbind(two, fct_ioi)
+two_flat <- melt(two, id.vars = "fct_ioi") %>%
+  rename(depth = variable) %>%
+  rename(ioi = fct_ioi)
+two_flat["depth"] <- rep(two_d, dim(two_flat)[1])
+
+two_flat_mean <- two_flat %>%
+  group_by(ioi) %>%
+  summarise(average=mean(value,na.rm = TRUE)) %>%
+  ungroup()
+
+two_flat_mean["depth"] <- rep(two_d, dim(two_flat_mean)[1])
+
+three <- cbind(three, fct_ioi)
+three_flat <- melt(three, id.vars = "fct_ioi") %>% 
+  rename(depth = variable) %>%
+  rename(ioi = fct_ioi)
+three_flat["depth"] <- rep(three_d, dim(three_flat)[1])
+
+three_flat_mean <- three_flat %>%
+  group_by(ioi) %>%
+  summarise(average=mean(value,na.rm = TRUE)) %>%
+  ungroup()
+
+three_flat_mean["depth"] <- rep(three_d, dim(three_flat_mean)[1])
+
+four<- cbind(four, fct_ioi)
+four_flat <- melt(four, id.vars = "fct_ioi") %>%
+  rename(depth = variable) %>%
+  rename(ioi = fct_ioi)
+four_flat["depth"] <- rep(four_d, dim(four_flat)[1])
+
+four_flat_mean <- four_flat %>%
+  group_by(ioi) %>% 
+  summarise(average=mean(value,na.rm = TRUE)) %>%
+  ungroup()
+
+four_flat_mean["depth"] <- rep(four_d, dim(four_flat_mean)[1])
+
+five <- cbind(five, fct_ioi)
+five_flat <- melt(five, id.vars = "fct_ioi") %>%
+  rename(depth=variable) %>%
+  rename(ioi= fct_ioi)
+five_flat["depth"] <- rep(five_d, dim(five_flat)[1])
+
+five_flat_mean <- five_flat %>%
+  group_by(ioi) %>%
+  summarise(average=mean(value,na.rm = TRUE)) %>%
+  ungroup()
+
+five_flat_mean["depth"] <- rep(five_d, dim(five_flat_mean)[1])
+
+six<-cbind(six, fct_ioi)
+six_flat <- melt(six, id.vars = "fct_ioi")%>%
+  rename(depth=variable) %>%
+  rename(ioi = fct_ioi)
+six_flat["depth"]<- rep(six_d, dim(six_flat)[1])
+
+six_flat_mean <- six_flat %>%
+  group_by(ioi) %>%
+  summarise(average=mean(value,na.rm = TRUE)) %>%
+  ungroup()
+
+six_flat_mean["depth"] <- rep(six_d, dim(six_flat_mean)[1])
+
+seven<- cbind(seven, fct_ioi)
+seven_flat <- melt(seven,id.vars = "fct_ioi") %>%
+  rename(depth=variable) %>%
+  rename(ioi = fct_ioi)
+seven_flat["depth"]<-rep(seven_d, dim(seven_flat)[1])
+
+seven_flat_mean <- seven_flat %>%
+  group_by(ioi) %>%
+  summarise(average=mean(value,na.rm = TRUE)) %>%
+  ungroup()
+
+seven_flat_mean["depth"] <- rep(seven_d, dim(seven_flat_mean)[1])
+
+eight<- cbind(eight, fct_ioi)
+eight_flat <- melt(eight,id.vars = "fct_ioi") %>%
+  rename(depth=variable) %>%
+  rename(ioi = fct_ioi)
+eight_flat["depth"] <- rep(eight_d, dim(eight_flat)[1])
+
+eight_flat_mean <- eight_flat %>%
+  group_by(ioi) %>%
+  summarise(average=mean(value,na.rm = TRUE)) %>%
+  ungroup()
+
+eight_flat_mean["depth"] <- rep(eight_d, dim(eight_flat_mean)[1])
+
+nine <- cbind(nine, fct_ioi)
+nine_flat <- melt(nine,id.vars = "fct_ioi") %>%
+  rename(depth=variable) %>%
+  rename(ioi = fct_ioi)
+nine_flat["depth"] <- rep(nine_d, dim(nine_flat)[1])
+
+nine_flat_mean <- nine_flat %>%
+  group_by(ioi) %>%
+  summarise(average=mean(value,na.rm = TRUE)) %>%
+  ungroup()
+
+nine_flat_mean["depth"] <- rep(nine_d, dim(nine_flat_mean)[1])
+
+ten <- cbind(ten,fct_ioi)
+ten_flat <- melt(ten, id.vars = "fct_ioi") %>%
+  rename(depth=variable) %>%
+  rename(ioi = fct_ioi)
+ten_flat["depth"] <- rep(ten_d, dim(ten_flat)[1])
+
+ten_flat_mean <- ten_flat %>%
+  group_by(ioi) %>%
+  summarise(average=mean(value,na.rm = TRUE)) %>%
+  ungroup()
+
+ten_flat_mean["depth"] <- rep(ten_d, dim(ten_flat_mean)[1])
+
+
+bound <- rbind(one_flat,two_flat, three_flat, four_flat, five_flat, six_flat, seven_flat, eight_flat, nine_flat, ten_flat)
+bound_mean <- rbind(one_flat_mean, two_flat_mean, three_flat_mean, four_flat_mean, five_flat_mean, six_flat_mean, seven_flat_mean, eight_flat_mean, nine_flat_mean, ten_flat_mean)
+
+bound$depth <- as.numeric(as.character(bound$depth))
+
+bound <- bound[order(bound$depth),]
+
+
+rarefy_curve_by_treatment <- ggplot(bound, aes(x=depth, y=value, color=fct_relevel(fct_reorder(ioi, as.numeric(ioi)))))+
+  geom_point(data=bound_mean, mapping=aes(x=as.numeric(depth), y=as.numeric(average)),size=3) + 
+  geom_line(data=bound_mean, mapping= aes(x=as.numeric(depth), y=as.numeric(average), group=ioi), size=1) + 
+  scale_x_binned("Sampling Depth",n.breaks = 12, nice.breaks = TRUE) + theme_bw() +
+  scale_y_continuous("Observed Species") + 
+  theme(text=element_text(size = 20)) + 
+  scale_color_discrete(name = ioi)
+
+rarefy_curve_by_treatment
+ggsave("rarefaction_curve_by_treatment.png", plot=rarefy_curve_by_treatment, path=outdir)
+```
+
+
+
+
+## 8 Ranked Abundance Curves
+
+```{r, echo=FALSE, fig.height=10, fig.width=16, message=FALSE, warning=FALSE}
+library(ampvis2)
+library(ggplot2)
+devtools::source_gist("8d0ca4206a66be7ff6d76fc4ab8e66c6")
+
+cycle_1 <- qza_to_phyloseq("table-dada2.qza","rooted-tree.qza","taxonomy.qza","metadata.tsv") 
+cycle_1_amp <- phyloseq_to_ampvis2(cycle_1)
+
+by_sample <- ampvis2::amp_rankabundance(cycle_1_amp, group_by = "SampleID") + theme(text=element_text(size = 20))
+by_sample 
+ggsave("rank_abundance_curve_by_sample.png", plot=by_sample, path=outdir)
+
+cycle_1_amp$metadata[[ioi]] <- reorder(cycle_1_amp$metadata[[ioi]])
+
+by_group <- ampvis2::amp_rankabundance(cycle_1_amp, group_by = ioi) + theme(text=element_text(size = 20))
+by_group
+ggsave("rank_abundance_curve_by_treatemnt.png", plot=by_group, path=outdir)
+
+
+
+
+```
+
+
+
+
+## 9 Unifrac Heatmap 
+
+```{r echo=FALSE,fig.height=8, fig.width=14, message=FALSE, warning=FALSE}
+metadata<-read_q2metadata("metadata.tsv")
+metadata[[ioi]] <- reorder(metadata[[ioi]])
+w_unifrac_dist <- qiime2R::read_qza("core-metrics-results/weighted_unifrac_distance_matrix.qza")
+u_unifrac_dist <- qiime2R::read_qza("core-metrics-results/unweighted_unifrac_distance_matrix.qza")
+
+un_weight_matrix <- as.matrix(u_unifrac_dist$data)
+un_weight_matrix[lower.tri(un_weight_matrix)] <- NA
+un_weight_heatmap <- pheatmap(un_weight_matrix, cluster_rows = F, cluster_cols = F, na_col = "grey", display_numbers = T, number_format ="%.3f",main = "Beta Diversity Heatmap using Unweighted Unifrac Distance")
+un_weight_heatmap
+
+ggsave("beta_div_heatmap_unweight_unifrac.png", plot=un_weight_heatmap, path=outdir)
+
+weight_matrix <- as.matrix(w_unifrac_dist$data)
+weight_matrix[lower.tri(weight_matrix)] <- NA
+weight_heatmap <- pheatmap(weight_matrix, cluster_rows = F, cluster_cols = F, na_col = "grey", display_numbers = T, number_format ="%.3f",main = "Beta Diversity Heatmap using Weighted Unifrac Distance")
+weight_heatmap
+
+ggsave("beta_div_heatmap_Weighted_unifrac.png", plot=weight_heatmap, path=outdir)
+```
+
+
+
+
+## 10 Beta Diversity Between Groups
+
+### 10.1 Weighted boxplots
+
+```{r generated Weighted boxplots, echo=FALSE, message=FALSE, warning=FALSE}
+weighted_measurements <- read.csv("weighted-sig/raw_data.tsv", sep="\t")
+
+split_weighted_measure <- split(weighted_measurements, weighted_measurements$Group1)
+
+for(frame in split_weighted_measure){
+  
+  frame$Group2 <- reorder(as.factor(frame$Group2))
+  p <- ggplot(frame, aes(x=frame$Group2, y=Distance)) + geom_violin()+ geom_boxplot(width=0.1)
+  p<- p + stat_summary(fun.y=mean, geom="point", shape=23, size=2)
+  p<-p + stat_summary(fun.y=median, geom="point", size=2, color="red")
+  p <- p+geom_jitter(shape=16, position=position_jitter(0.2)) + xlab(ioi) + ylab("Weighted Unifrac Distance") + theme_bw() + labs(title = (as.character(paste0("Distance to ",frame$Group1[1]))))
+  print(p)
+  ggsave(paste0("weighted_unifrac_boxplot_",frame$Group1[1],".png"), plot=p,path=outdir)
+}
+```
+
+
+
+
+### 10.2 Unweighted boxplots
+
+```{r generated Unweighted boxplots, echo=FALSE, message=FALSE, warning=FALSE}
+unweighted_measurements <- read.csv("unweighted-sig/raw_data.tsv", sep="\t")
+
+split_data_frames <- split(unweighted_measurements, unweighted_measurements$Group1)
+
+
+for(frame in split_data_frames){
+  
+  frame$Group2 <- reorder(as.factor(frame$Group2))
+  p <- ggplot(frame, aes(x=frame$Group2, y=Distance)) + geom_violin()+ geom_boxplot(width=0.1)
+  p<- p + stat_summary(fun.y=mean, geom="point", shape=23, size=2)
+  p<-p + stat_summary(fun.y=median, geom="point", size=2, color="red")
+  p <- p+geom_jitter(shape=16, position=position_jitter(0.2)) + xlab(ioi) + ylab("Unweighted Unifrac Distance") + theme_bw() + labs(title = (as.character(paste0("Distance to ",frame$Group1[1]))))
+  print(p)
+  ggsave(paste0("unweighted_unifrac_boxplot_",frame$Group1[1],".png"), plot=p,path=outdir)
+}
+```
+
+
+
+
+## 11 UPGMA Plots
+### 11.1 UPGMA Plot for Weighted Unifrac Distance
+
+```{r UPGMA Plot of Weighted Unifrac Distance, echo=FALSE, fig.height=8, fig.width=10, message=FALSE, warning=FALSE}
+
+cycle_1 <- qza_to_phyloseq("table-dada2.qza","rooted-tree.qza","taxonomy.qza","metadata.tsv")
+w_unifrac <- UniFrac(cycle_1,weighted=TRUE)
+
+
+hclust_res <- hclust(w_unifrac, method="average")
+
+hclust_dend <- as.dendrogram(hclust_res)
+ddata <- dendro_data(hclust_dend, type="rectangle")
+p <- ggplot(segment(ddata)) +
+  geom_segment(aes(x=x,y=y, xend=xend, yend=yend)) +
+  coord_flip() +
+  scale_y_reverse(expand=c(0.2,0)) + 
+  geom_text(data=label(ddata),aes(x=x,y=y,label=label, hjust=0)) + 
+  theme(text=element_text(size = 12, face = "plain")) +
+  theme_minimal() + 
+  theme(axis.title.y = element_blank(), 
+        axis.text.y = element_blank(),
+        axis.ticks.y = element_blank(),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank()) +
+  ylab("Weighted Unifrac Distance") 
+  
+sample_data(cycle_1)[[ioi]] <- reorder(sample_data(cycle_1)[[ioi]])
+
+level <- "Phylum"
+#Select number of taxa at phylum level to plot
+topN <- 10
+
+#selects top n taxa and creates phyloseq object
+cycle_n_names <- sort(tapply(taxa_sums(cycle_1), tax_table(cycle_1)[,as.character(level)], sum), TRUE) [1:topN]
+cycle_n <- subset_taxa(cycle_1, get(level) %in% names(cycle_n_names))
+cycle_n_glom <- tax_glom(cycle_n, taxrank = level)
+
+#selects top n + 1 to the end of table
+rest_tax <- sort(tapply(taxa_sums(cycle_1), tax_table(cycle_1)[,as.character(level)], sum), TRUE) [topN+1:length(tax_table(cycle_1))]
+rest <- subset_taxa(cycle_1, get(level) %in% names(rest_tax))
+rest_glom <- tax_glom(rest, taxrank = level)
+
+#collapse all phyla not in top 10 into one taxon
+rest_merge <- merge_taxa(rest, taxa_names(rest))
+
+#create dummy taxonomy classification for collapsed taxa
+taxvec <- c("Other","Other","Other","Other","Other", "Other","Other")
+taxlist <- list(OTU1=parse_taxonomy_default(taxvec))
+tax_tab <- build_tax_table(taxlist)
+colnames(tax_tab) <- c("Kingdom","Phylum","Class","Order","Family","Genus","Species")
+rownames(tax_tab) <- rownames(tax_table(rest_merge))
+tax_table(rest_merge) <- tax_tab
+
+#attaches top n phyloseq object with the other phyloseq object
+merge_tax <- merge_phyloseq(tax_table(cycle_n), tax_table(rest_merge))
+merge_otu <- merge_phyloseq(otu_table(cycle_n), otu_table(rest_merge))
+merge_samp <- merge_phyloseq(sample_data(cycle_n), sample_data(rest_merge))
+
+merged <- merge_phyloseq(merge_tax, merge_otu, merge_samp)
+
+#calculates relative abundance based on sample provided and turns that into a dataframe for ggplot2 plotting
+cycle_1_phylum <- merged %>%
+  tax_glom(taxrank = level) %>%
+  transform_sample_counts(function(x) {x/sum(x)}) %>%
+  psmelt() %>%
+  arrange(Abundance) 
+
+cycle_1_phylum$Sample <- as.character(cycle_1_phylum$Sample)
+cycle_1_phylum$Sample <- factor(cycle_1_phylum$Sample, levels=label(ddata)$label)
+
+#ggplot2 stacked bar chart separated by sample in the metadata from qiime2
+by_sample <- ggplot(cycle_1_phylum, aes(x=Sample, y=Abundance, fill=fct_relevel(fct_reorder(cycle_1_phylum[[level]], Abundance),"Other"))) + 
+  geom_bar(stat= "identity") +
+  guides(fill=guide_legend(title=level))+
+  theme_minimal() +
+  xlab(element_blank())+
+  theme(axis.text.x = element_text(vjust=0.5, hjust=1))+
+  coord_flip() +
+  theme(text=element_text(size = 12,face = "plain"),axis.title.y = element_text(color="Black"), axis.text.y = element_text(color="Black")) + 
+  ylab("Relative Abundance at Phylum Level")
+  
+
+
+arr <- ggarrange(p, by_sample, nrow=1)
+weight_plot <- annotate_figure(arr,  top="UPGMA cluster tree based on Weighted Unifrac distance")
+weight_plot
+
+ggsave("UPGMA_weighted_unifrac_plot.png", plot=weight_plot, path=outdir)
+```
+
+
+
+
+### 11.2 UPGMA Plot for Unweighted Unifrac Distance
+
+```{r UPGMA Plot of Unweighted Unifrac Distances, echo=FALSE, fig.height=8, fig.width=10, message=FALSE, warning=FALSE}
+cycle_1 <- qza_to_phyloseq("table-dada2.qza","rooted-tree.qza","taxonomy.qza","metadata.tsv")
+u_unifrac <- UniFrac(cycle_1, weighted = FALSE)
+
+
+hclust_res <- hclust(u_unifrac, method="average")
+
+hclust_dend <- as.dendrogram(hclust_res)
+ddata <- dendro_data(hclust_dend, type="rectangle")
+p <- ggplot(segment(ddata)) +
+  geom_segment(aes(x=x,y=y, xend=xend, yend=yend)) +
+  coord_flip() +
+  scale_y_reverse(expand=c(0.2,0)) + 
+  geom_text(data=label(ddata),aes(x=x,y=y,label=label, hjust=0)) + 
+  theme(text=element_text(size = 12, face = "plain")) +
+  theme_minimal() + 
+  theme(axis.title.y = element_blank(), 
+        axis.text.y = element_blank(),
+        axis.ticks.y = element_blank(),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank()) +
+  ylab("Unweighted Unifrac Distance") 
+  
+sample_data(cycle_1)[[ioi]] <- reorder(sample_data(cycle_1)[[ioi]])
+
+level <- "Phylum"
+#Select number of taxa at phylum level to plot
+topN <- 10
+
+#selects top n taxa and creates phyloseq object
+cycle_n_names <- sort(tapply(taxa_sums(cycle_1), tax_table(cycle_1)[,as.character(level)], sum), TRUE) [1:topN]
+cycle_n <- subset_taxa(cycle_1, get(level) %in% names(cycle_n_names))
+cycle_n_glom <- tax_glom(cycle_n, taxrank = level)
+
+#selects top n + 1 to the end of table
+rest_tax <- sort(tapply(taxa_sums(cycle_1), tax_table(cycle_1)[,as.character(level)], sum), TRUE) [topN+1:length(tax_table(cycle_1))]
+rest <- subset_taxa(cycle_1, get(level) %in% names(rest_tax))
+rest_glom <- tax_glom(rest, taxrank = level)
+
+#collapse all phyla not in top 10 into one taxon
+rest_merge <- merge_taxa(rest, taxa_names(rest))
+
+#create dummy taxonomy classification for collapsed taxa
+taxvec <- c("Other","Other","Other","Other","Other", "Other","Other")
+taxlist <- list(OTU1=parse_taxonomy_default(taxvec))
+tax_tab <- build_tax_table(taxlist)
+colnames(tax_tab) <- c("Kingdom","Phylum","Class","Order","Family","Genus","Species")
+rownames(tax_tab) <- rownames(tax_table(rest_merge))
+tax_table(rest_merge) <- tax_tab
+
+#attaches top n phyloseq object with the other phyloseq object
+merge_tax <- merge_phyloseq(tax_table(cycle_n), tax_table(rest_merge))
+merge_otu <- merge_phyloseq(otu_table(cycle_n), otu_table(rest_merge))
+merge_samp <- merge_phyloseq(sample_data(cycle_n), sample_data(rest_merge))
+
+merged <- merge_phyloseq(merge_tax, merge_otu, merge_samp)
+
+#calculates relative abundance based on sample provided and turns that into a dataframe for ggplot2 plotting
+cycle_1_phylum <- merged %>%
+  tax_glom(taxrank = level) %>%
+  transform_sample_counts(function(x) {x/sum(x)}) %>%
+  psmelt() %>%
+  arrange(Abundance) 
+
+cycle_1_phylum$Sample <- as.character(cycle_1_phylum$Sample)
+cycle_1_phylum$Sample <- factor(cycle_1_phylum$Sample, levels=label(ddata)$label)
+
+#ggplot2 stacked bar chart separated by sample in the metadata from qiime2
+by_sample <- ggplot(cycle_1_phylum, aes(x=Sample, y=Abundance, fill=fct_relevel(fct_reorder(cycle_1_phylum[[level]], Abundance),"Other"))) + 
+  geom_bar(stat= "identity") +
+  guides(fill=guide_legend(title=level))+
+  theme_minimal() +
+  xlab(element_blank())+
+  theme(axis.text.x = element_text(vjust=0.5, hjust=1))+
+  coord_flip() +
+  theme(text=element_text(size = 12, face = "plain"),axis.title.x = element_text(color="Black"), axis.text.y = element_text(color="Black")) + 
+  ylab("Relative Abundance at Phylum Level")
+  
+
+
+arr <- ggarrange(p, by_sample, nrow=1)
+unweight_plot <- annotate_figure(arr,  top="UPGMA cluster tree based on Unweighted Unifrac distance")
+unweight_plot
+
+ggsave("UPGMA_unweighted_unifrac_plot.png", plot=unweight_plot, path=outdir)
+
+```
+
+
+
+
+## 12 Beta Diversity Statistics
+
+### 12.1 PERMANOVA Weighted Unifrac
+
+```{r Methods to do pairwise PERMANOVA comparisons, echo=FALSE, message=FALSE, warning=FALSE}
+pairwise_permanova <- function(dat, column_of_int, dissim){
+  all_comparisons <- unique(sample_data(dat)[[column_of_int]])
+  combos <- (t(combn(all_comparisons,2)))
+  p_res <- c()
+  
+  for(i in 1:dim(combos)[1]){
+  comp <- prune_samples(sample_data(dat)[[ioi]] %in% combos[i,], dat)
+  grp <- get_variable(comp, column_of_int)
+  
+  permanova <- adonis(distance(comp, dissim) ~ grp)
+  permanova <- tibble::tibble(permanova$aov.tab)
+  colnames(permanova)[5] <- "r^2"
+  colnames(permanova)[6] <- "p"
+  permanova_stats <- data.frame(as.character(combos[i,1]), as.character(combos[i,2]), permanova[1,])
+  colnames(permanova_stats)[1] <- "group1"
+  colnames(permanova_stats)[2] <- "group2"
+  data.frame(permanova_stats)
+  p_res <- rbind(p_res, permanova_stats)
+  
+  }
+  tmp_2 <- data.frame(p_res)
+  #colnames(tmp_2)<- c("group1","group2", "statistic", "permutations", "p")
+  result <- adjust_pvalue(tmp_2, p.col = "p", output.col = "p.adj",method = "BH")
+  result <- add_significance(result, p.col="p.adj",output.col = "p.signif",symbols =c("****", "***", "**", "$*$", "ns"))
+  res_df <- data.frame(result)
+  res_df <- res_df[mixedorder(res_df$group1),]
+  return(res_df)
+  
+}
+
+#out <- pairwise_anosim(cycle_1, ioi , dissim = "bray")
+#out
+```
+
+
+```{r Methods to do pairwise Unifrac PERMANOVA comparisons, echo=FALSE, message=FALSE, warning=FALSE}
+pairwise_permanova_uni <- function(dat, column_of_int, weight){
+  all_comparisons <- unique(sample_data(dat)[[column_of_int]])
+  
+  comb_tab <- (t(combn(all_comparisons,2)))
+  
+  p_res <- c()
+
+
+  for(i in 1:dim(comb_tab)[1]){
+    try <- sample_data(dat)[[ioi]]
+    #comp1 <- subset_samples(dat, eval(as.name(ioi)) %in% comb_tab[i,])
+    comp <- prune_samples(sample_data(dat)[[ioi]] %in% comb_tab[i,], dat)
+    grp <- get_variable(comp, column_of_int)
+  
+    tmp <- UniFrac(comp, weighted = weight)
+    permanova <- adonis(tmp ~ grp)
+    permanova <- tibble::tibble(permanova$aov.tab)
+    colnames(permanova)[5] <- "r^2"
+    colnames(permanova)[6] <- "p"
+    permanova_stats <- data.frame(as.character(comb_tab[i,1]), as.character(comb_tab[i,2]), permanova[1,])
+    colnames(permanova_stats)[1] <- "group1"
+    colnames(permanova_stats)[2] <- "group2"
+    data.frame(permanova_stats)
+    p_res <- rbind(p_res, permanova_stats)
+  
+  }
+  tmp_2 <- data.frame(p_res)
+  #colnames(tmp_2)<- c("group1","group2", "statistic", "permutations", "p")
+  result <- adjust_pvalue(tmp_2, p.col = "p", output.col = "p.adj",method = "BH")
+  result <- add_significance(result, p.col="p.adj",output.col = "p.signif",symbols =c("****", "***", "**", "$*$", "ns"))
+  res_df <- data.frame(result)
+  res_df <- res_df[mixedorder(res_df$group1),]
+  return(res_df)
+  
+}
+
+```
+
+
+```{r Weighted Unifrac PERMANOVA, echo=FALSE, message=FALSE, warning=FALSE}
+library(vegan)
+cycle_1 <- qza_to_phyloseq("table-dada2.qza","rooted-tree.qza","taxonomy.qza","metadata.tsv")
+sample_data(cycle_1)[[ioi]] <- reorder(sample_data(cycle_1)[[ioi]])
+# PERMANOVA of Weighted Unifrac
+u_unifrac <- UniFrac(cycle_1, weighted = T)
+grp <- get_variable(cycle_1, ioi)
+res <- adonis(u_unifrac ~ grp)
+res
+# Pairwise PERMANOVA of Weighted Unifrac
+test <- pairwise_permanova_uni(cycle_1, ioi, T)
+
+kable(test) %>% 
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
+```
+
+
+
+
+### 12.2 PERMANOVA Unweighted Unifrac 
+
+```{r Permanova results Weighted Unifrac from qiime, echo=FALSE, message=FALSE, warning=FALSE}
+cycle_1 <- qza_to_phyloseq("table-dada2.qza","rooted-tree.qza","taxonomy.qza","metadata.tsv")
+sample_data(cycle_1)[[ioi]] <- reorder(sample_data(cycle_1)[[ioi]])
+# PERMANOVA of Unweighted Unifrac
+u_unifrac <- UniFrac(cycle_1, weighted = F)
+grp <- get_variable(cycle_1, ioi)
+res <- adonis(u_unifrac ~ grp)
+res
+# Pairwise PERMANOVA of Unweighted Unifrac
+test <- pairwise_permanova_uni(cycle_1, ioi, F)
+kable(test) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
+```
+
+
+
+
+### 12.3 PERMANOVA Bray Curtis
+
+```{r Bray Curtis PERMANOVA, echo=FALSE, message=FALSE, warning=FALSE}
+cycle_1 <- qza_to_phyloseq("table-dada2.qza","rooted-tree.qza","taxonomy.qza","metadata.tsv")
+sample_data(cycle_1)[[ioi]] <- reorder(sample_data(cycle_1)[[ioi]])
+#PERMANOVA Bray Curtis
+grp <- get_variable(cycle_1, ioi)
+res <- adonis(distance(cycle_1, 'bray') ~ grp)
+res
+#PERMANOVA Bray Curtis Pairwise
+bray_pairwise <- pairwise_permanova(cycle_1,ioi,"bray")
+kable(bray_pairwise) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
+```
+
+
+
+
+### 12.4 PERMANOVA Jaccard 
+
+```{r Jaccard PERMANOVA, echo=FALSE, message=FALSE, warning=FALSE}
+cycle_1 <- qza_to_phyloseq("table-dada2.qza","rooted-tree.qza","taxonomy.qza","metadata.tsv")
+sample_data(cycle_1)[[ioi]] <- reorder(sample_data(cycle_1)[[ioi]])
+# PERMANOVA Jaccard distance
+grp <- get_variable(cycle_1, ioi)
+res <- adonis(distance(cycle_1, "jaccard") ~ grp)
+res
+# PERMANOVA Pairwise Jaccard 
+jaccard_pairwise <- pairwise_permanova(cycle_1, ioi, "jaccard")
+kable(jaccard_pairwise) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
+
+```
+
+
+
+
+### 12.5 ANOSIM
+
+```{r Method to do pairwise anosim comparisons, echo=FALSE, message=FALSE, warning=FALSE}
+pairwise_anosim <- function(dat, column_of_int, dissim){
+  all_comparisons <- unique(sample_data(dat)[[column_of_int]])
+  combos <- (t(combn(all_comparisons,2)))
+  p_res <- c()
+  
+  for(i in 1:dim(combos)[1]){
+  comp <- prune_samples(sample_data(dat)[[ioi]] %in% combos[i,], dat)
+  grp <- get_variable(comp, column_of_int)
+  
+  ano <- anosim(distance(comp, dissim), grp)
+  ano_stats <- c(as.character(combos[i,1]), as.character(combos[i,2]), round(ano$statistic,6), ano$permutations, ano$dissimilarity, round(ano$signif,3))
+  #tmp <- c(ano, as.character(item))
+  p_res <- rbind(p_res, ano_stats)
+  
+  }
+  tmp_2 <- data.frame(p_res)
+  colnames(tmp_2)<- c("group1", "group2", "statistic", "permutations", "dissimilarity", "p.val")
+  result <- adjust_pvalue(tmp_2, p.col = "p.val", output.col = "p.adjust",method = "BH")
+  result <- add_significance(result, p.col = "p.adjust", output.col = "p.signif",symbols =c("****", "***", "**", "$*$", "ns"))
+  res_df <- data.frame(result)
+  res_df <- res_df[mixedorder(res_df$group1),]
+  return(res_df)
+  
+}
+
+#out <- pairwise_anosim(cycle_1, ioi , dissim = "bray")
+#out
+
+pairwise_anosim_uni <- function(dat, column_of_int, weight){
+  all_comparisons <- unique(sample_data(dat)[[column_of_int]])
+  combos <- (t(combn(all_comparisons,2)))
+  p_res <- c()
+  
+  for(i in 1:dim(combos)[1]){
+  comp <- prune_samples(sample_data(dat)[[ioi]] %in% combos[i,], dat)
+  grp <- get_variable(comp, column_of_int)
+  
+  tmp <- UniFrac(comp, weighted = weight)
+  ano <- anosim(tmp, sample_data(comp)[[ioi]])
+  ano_stats <- c(as.character(combos[i,1]), as.character(combos[i,2]), round(ano$statistic,6), ano$permutations, ano$dissimilarity, round(ano$signif,3))
+  #tmp <- c(ano, as.character(item))
+  p_res <- rbind(p_res, ano_stats)
+  
+  }
+  tmp_2 <- data.frame(p_res)
+  colnames(tmp_2)<- c("group1","group2", "statistic", "permutations", "p")
+  result <- adjust_pvalue(tmp_2, p.col = "p", output.col = "p.adj",method = "BH")
+  result <- add_significance(result, p.col="p.adj",output.col = "p.signif",symbols =c("****", "***", "**", "$*$", "ns"))
+  res_df <- data.frame(result)
+  res_df <- res_df[mixedorder(res_df$group1),]
+  return(res_df)
+  
+}
+
+```
+
+
+```{r echo=FALSE, fig.height=8, fig.width=10, message=FALSE, warning=FALSE}
+cycle_1 <- qza_to_phyloseq("table-dada2.qza","rooted-tree.qza","taxonomy.qza","metadata.tsv")
+sample_data(cycle_1)[[ioi]] <- reorder(sample_data(cycle_1)[[ioi]])
+
+#Weighted Unifrac Anosim
+tmp <- UniFrac(cycle_1, weighted=T)
+res <- anosim(tmp, sample_data(cycle_1)[[ioi]])
+res
+
+
+#Weighted Unifrac Anosim Pairwise
+w_uni_pear <- pairwise_anosim_uni(cycle_1, ioi, T) 
+kable(w_uni_pear) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
+
+#Weighted Unifrac ANOSIM Plot
+w_uni_plot <- autoplot(res, notch=F) + theme_bw()+labs(title = "ANOSIM Weighted Unifrac") + xlab(ioi) + ylab("Rank Value")  + stat_pvalue_manual(w_uni_pear, label = "p.signif", y.position = max(res$dis.rank)-(.5*median(res$dis.rank)),step.increase = .03, tip.length = 0.01, guide="none") 
+w_uni_plot
+#Save image to disk
+ggsave("ANOSIM_weighted_unifrac_boxplot.png", plot = w_uni_plot,path = outdir)
+
+#Weighted Unifrac ANOSIM Plot No Bracket
+w_uni_plot_no_brac <- autoplot(res, notch=F) + theme_bw()+ aes(fill=res$class.vec) +labs(title = "ANOSIM Weighted Unifrac", fill=ioi)+ xlab(as.character(ioi)) + ylab("Rank Value")
+w_uni_plot_no_brac
+#Save image to disk
+ggsave("ANOSIM_weighted_unifrac_boxplot_no_signif.png", plot = w_uni_plot_no_brac,path = outdir)
+
+#Unweighted Unifrac
+tmp <- UniFrac(cycle_1, weighted = F)
+res <- anosim(tmp, sample_data(cycle_1)[[ioi]])
+res
+#Unweighted Unifrac Anosim Pairwise
+uw_uni_pair <- pairwise_anosim_uni(cycle_1, ioi, T)
+kable(uw_uni_pair) %>% 
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
+#Unweighted Unifrac ANOSIM plot
+uw_uni_plot <- autoplot(res,notch = F) +theme_bw() + labs(title = "ANOSIM Unweighted Unifrac") +
+  stat_pvalue_manual(uw_uni_pair, label="p.signif", y.position = max(res$dis.rank)-(.5*median(res$dis.rank)),step.increase = .03, tip.length = 0.01)+ xlab(as.character(ioi)) + ylab("Rank Value")
+uw_uni_plot
+#save to disk
+ggsave("ANOSIM_unweighted_unifrac_boxplot.png", plot=uw_uni_plot, path=outdir)
+#Unweighted Unifrac ANOSIM plot No bracket
+uw_uni_plot_no_brac <- autoplot(res,notch = F) +theme_bw() +aes(fill=res$class.vec)+ labs(title = "ANOSIM Unweighted Unifrac", fill=ioi) + xlab(as.character(ioi)) + ylab("Rank Value")
+uw_uni_plot_no_brac
+#save to disk
+ggsave("ANOSIM_unweighted_unifrac_boxplot_no_brackets.png", plot=uw_uni_plot_no_brac, path=outdir)
+
+#Bray Curtis Distance
+grp <- get_variable(cycle_1, ioi)
+ano <- anosim(distance(cycle_1, "bray"), grp)
+ano
+#Bray Curtis ANOSIM pairwise
+bray_pair <- pairwise_anosim(cycle_1, ioi, "bray")
+kable(bray_pair) %>% 
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
+#Bray Curtis ANOSIM plot
+bray_plot <- autoplot(ano, notch=F) + theme_bw() + labs(title ="ANOSIM Bray Curtis") + stat_pvalue_manual(bray_pair, label="p.signif", y.position = max(ano$dis.rank)-(.5*median(res$dis.rank)), step.increase = .03, tip.length = 0.01) + xlab(as.character(ioi)) + ylab("Rank Value")
+bray_plot
+#save to disk
+ggsave("ANOSIM_bray_curtis_boxplot.png", plot=bray_plot, path=outdir)
+#Bray Curtis ANOSIM plot No Bracket
+bray_plot_no_brac <- autoplot(ano, notch=F) + theme_bw() +aes(fill=ano$class.vec) + labs(title ="ANOSIM Bray Curtis", fill=ioi) + xlab(as.character(ioi)) + ylab("Rank Value")
+bray_plot_no_brac
+#save to disk
+ggsave("ANOSIM_bray_curtis_boxplot_no_bracket.png", plot=bray_plot_no_brac, path=outdir)
+
+#Jaccard Distance
+grp <- get_variable(cycle_1, ioi)
+ano <- anosim(distance(cycle_1, "jaccard"), grp)
+ano
+#Jaccard ANOSIM pairwise
+jaccard_pair <- pairwise_anosim(cycle_1, ioi, "jaccard")
+kable(jaccard_pair) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
+#Jaccard ANOSIM plot
+jaccard_plot <- autoplot(ano, notch =F) + theme_bw() + labs(title = "ANOSIM Jaccard") + stat_pvalue_manual(jaccard_pair, label = "p.signif", y.position = max(ano$dis.rank)-(.5*median(res$dis.rank)), step.increase = .03, tip.length = 0.01) + xlab(as.character(ioi)) + ylab("Rank Value")
+jaccard_plot
+#save to disk 
+ggsave("ANOSIM_jaccard_boxplot.png", plot=jaccard_plot, path = outdir)
+#Jaccard ANOSIM plot No Bracket
+jaccard_plot_no_brac <- autoplot(ano, notch =F) + theme_bw() +aes(fill=ano$class.vec) + labs(title = "ANOSIM Jaccard", fill=ioi) +  xlab(as.character(ioi)) + ylab("Rank Value")
+jaccard_plot_no_brac
+#save to disk 
+ggsave("ANOSIM_jaccard_boxplot_no_bracket.png", plot=jaccard_plot_no_brac, path = outdir)
+
+```
+
+
+
+
+### 12.6 Multi-response permutation procedure (MRPP)
+
+```{r Methods to do pairwise MRPP comparisons, echo=FALSE, message=FALSE, warning=FALSE}
+pairwise_MRPP <- function(dat, column_of_int, dissim){
+  all_comparisons <- unique(sample_data(dat)[[column_of_int]])
+  combos <- (t(combn(all_comparisons,2)))
+  p_res <- c()
+  
+  for(i in 1:dim(combos)[1]){
+  comp <- prune_samples(sample_data(dat)[[ioi]] %in% combos[i,], dat)
+  grp <- get_variable(comp, column_of_int)
+  
+  mrpp_res <- mrpp(distance(comp, dissim), grp)
+  mrpp_stats <- c(as.character(combos[i,1]), as.character(combos[i,2]), round(mrpp_res$delta,6), mrpp_res$permutations, mrpp_res$distance, round(mrpp_res$Pvalue,3))
+  #tmp <- c(ano, as.character(item))
+  p_res <- rbind(p_res, mrpp_stats)
+  
+  }
+  tmp_2 <- data.frame(p_res)
+  colnames(tmp_2)<- c("group1", "group2", "delta", "permutations", "dissimilarity", "p.val")
+  result <- adjust_pvalue(tmp_2, p.col = "p.val", output.col = "p.adjust",method = "BH")
+  result <- add_significance(result, p.col = "p.adjust", output.col = "p.signif",symbols =c("****", "***", "**", "$*$", "ns"))
+  res_df <- data.frame(result)
+  res_df <- res_df[mixedorder(res_df$group1),]
+  return(res_df)
+  
+}
+
+#out <- pairwise_anosim(cycle_1, ioi , dissim = "bray")
+#out
+
+pairwise_MRPP_uni <- function(dat, column_of_int, weight){
+  all_comparisons <- unique(sample_data(dat)[[column_of_int]])
+  combos <- (t(combn(all_comparisons,2)))
+  p_res <- c()
+  
+  for(i in 1:dim(combos)[1]){
+  comp <- prune_samples(sample_data(dat)[[ioi]] %in% combos[i,], dat)
+  grp <- get_variable(comp, column_of_int)
+  
+  tmp <- UniFrac(comp, weighted = weight)
+  mrpp_res <- mrpp(tmp, grp)
+  mrpp_stats <- c(as.character(combos[i,1]), as.character(combos[i,2]), round(mrpp_res$delta,6), mrpp_res$permutations, round(mrpp_res$Pvalue,3))
+  #tmp <- c(ano, as.character(item))
+  p_res <- rbind(p_res, mrpp_stats)
+  
+  }
+  tmp_2 <- data.frame(p_res)
+  colnames(tmp_2)<- c("group1","group2", "delta", "permutations", "p")
+  result <- adjust_pvalue(tmp_2, p.col = "p", output.col = "p.adj",method = "BH")
+  result <- add_significance(result, p.col="p.adj",output.col = "p.signif",symbols =c("****", "***", "**", "$*$", "ns"))
+  res_df <- data.frame(result)
+  res_df <- res_df[mixedorder(res_df$group1),]
+  return(res_df)
+  
+}
+```
+
+
+```{r MRPP analysis, echo=FALSE, message=FALSE, warning=FALSE}
+cycle_1 <- qza_to_phyloseq("table-dada2.qza","rooted-tree.qza","taxonomy.qza","metadata.tsv")
+sample_data(cycle_1)[[ioi]] <- reorder(as.factor(sample_data(cycle_1)[[ioi]]))
+
+# Weighted Unifrac
+w_uni <- UniFrac(cycle_1, weighted = T)
+print("MRPP based on Weighted Unifrac distance")
+grp <- get_variable(cycle_1, ioi)
+mrpp(w_uni, grouping =  grp)
+#MRPP pairwise Weighted Unifrac
+w_uni_res <- pairwise_MRPP_uni(cycle_1, ioi, T)
+kable(w_uni_res) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
+
+
+# Unweighted Unifrac
+u_uni <- UniFrac(cycle_1, weighted = F)
+grp <- get_variable(cycle_1, ioi)
+print("MRPP based on Unweighted Unifrac distance")
+mrpp(u_uni, grouping = grp)
+# MRPP pairwise Unweighted Unifrac
+u_uni_res <- pairwise_MRPP_uni(cycle_1, ioi, F)
+kable(u_uni_res) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
+
+# Bray Curtis
+print("MRPP based on Bray-Curtis distance")
+grp <- get_variable(cycle_1, ioi)
+mrpp(distance(cycle_1, "bray"), grouping =  grp)
+# MRPP pairwise Bray
+bray_res <- pairwise_MRPP(cycle_1, ioi, "bray")
+kable(bray_res) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
+
+jaccard <- qiime2R::read_qza("core-metrics-results/jaccard_distance_matrix.qza")
+# Jaccard 
+print("MRPP based on Jaccard distance")
+grp <- get_variable(cycle_1, ioi)
+mrpp(distance(cycle_1, "jaccard"), grouping =  grp)
+# MRPP pairwise Jaccard
+jaccard_res <- pairwise_MRPP(cycle_1, ioi, "jaccard")
+kable(jaccard_res) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
+
+
+```
+
+
+
+
+### 12.7 AMOVA
+
+```{r Methods to do pairwise AMOVA comparisons, echo=FALSE, message=FALSE, warning=FALSE}
+pairwise_AMOVA <- function(dat, column_of_int, dissim){
+  all_comparisons <- unique(sample_data(dat)[[column_of_int]])
+  combos <- (t(combn(all_comparisons,2)))
+  p_res <- c()
+  
+  for(i in 1:dim(combos)[1]){
+  comp <- prune_samples(sample_data(dat)[[ioi]] %in% combos[i,], dat)
+  grp <- get_variable(comp, column_of_int)
+  dist <- distance(comp, dissim)
+  amova_res <- pegas::amova(as.formula(dist ~ grp))
+  amova_stats <- c(as.character(combos[i,1]), as.character(combos[i,2]), round(amova_res$tab$MSD[1],6), dissim, round(amova_res$varcomp$P.value[1],3))
+  
+  p_res <- rbind(p_res, amova_stats)
+  
+  }
+  tmp_2 <- data.frame(p_res)
+  colnames(tmp_2)<- c("group1", "group2", "MSD","distance", "p.val")
+  result <- adjust_pvalue(tmp_2, p.col = "p.val", output.col = "p.adjust",method = "BH")
+  result <- add_significance(result, p.col = "p.adjust", output.col = "p.signif",symbols =c("****", "***", "**", "$*$", "ns"))
+  res_df <- data.frame(result)
+  res_df <- res_df[mixedorder(res_df$group1),]
+  return(res_df)
+  
+}
+
+#out <- pairwise_anosim(cycle_1, ioi , dissim = "bray")
+#out
+
+pairwise_AMOVA_uni <- function(dat, column_of_int, weight){
+  all_comparisons <- unique(sample_data(dat)[[column_of_int]])
+  combos <- (t(combn(all_comparisons,2)))
+  p_res <- c()
+  
+  for(i in 1:dim(combos)[1]){
+  comp <- prune_samples(sample_data(dat)[[ioi]] %in% combos[i,], dat)
+  grp <- get_variable(comp, column_of_int)
+  
+  tmp <- UniFrac(comp, weighted = weight)
+  amova_res <- pegas::amova(as.formula(tmp ~ grp))
+  amova_stats <- c(as.character(combos[i,1]), as.character(combos[i,2]),weight, round(amova_res$tab$MSD[1],6),  round(amova_res$varcomp$P.value[1],3))
+ 
+  p_res <- rbind(p_res, amova_stats)
+  
+  }
+  tmp_2 <- data.frame(p_res)
+  colnames(tmp_2)<- c("group1", "group2", "MSD","weighted", "p.val")
+  result <- adjust_pvalue(tmp_2, p.col = "p.val", output.col = "p.adj",method = "BH")
+  result <- add_significance(result, p.col="p.adj",output.col = "p.signif",symbols =c("****", "***", "**", "$*$", "ns"))
+  res_df <- data.frame(result)
+  res_df <- res_df[mixedorder(res_df$group1),]
+  return(res_df)
+  
+}
+```
+
+
+```{r AMOVA testing, echo=FALSE, message=FALSE, warning=FALSE}
+cycle_1 <- qza_to_phyloseq("table-dada2.qza","rooted-tree.qza","taxonomy.qza","metadata.tsv")
+sample_data(cycle_1)[[ioi]] <- reorder(as.factor(sample_data(cycle_1)[[ioi]]))
+
+#AMOVA Weighted Unifrac
+tmp <- UniFrac(cycle_1, weighted = T)
+w_uni_grp <- get_variable(cycle_1, ioi)
+res <- pegas::amova(tmp ~ w_uni_grp)
+res
+#AMOVA Weighted unifrac pairwise
+w_uni_pair <- pairwise_AMOVA_uni(cycle_1, ioi, T)
+kable(w_uni_pair) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
+
+#AMOVA Unweighted Unifrac
+tmp <- UniFrac(cycle_1, weighted=F)
+u_uni_grp <- get_variable(cycle_1, ioi)
+res <- pegas::amova(tmp ~ u_uni_grp)
+res
+#AMOVA Unweighted Unifrac pairwise
+u_uni_pair <- pairwise_AMOVA_uni(cycle_1, ioi, F)
+kable(u_uni_pair) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
+
+
+#AMOVA bray curtis
+dist <- distance(cycle_1, 'bray')
+bray_grp <- get_variable(cycle_1, ioi)
+res <- pegas::amova(as.formula(dist ~ bray_grp))
+res
+#AMOVA bray curtis pairwise
+bray_amova_pairwise <- pairwise_AMOVA(cycle_1, ioi, 'bray')
+kable(bray_amova_pairwise) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
+
+#AMOVA Jaccard 
+dist <- distance(cycle_1, 'jaccard')
+jaccard_grp <- get_variable(cycle_1, ioi)
+res <- pegas::amova(dist ~ jaccard_grp)
+res
+#AMOVA Jaccard Pairwise 
+jaccard_amova_pairwise <- pairwise_AMOVA(cycle_1, ioi, 'jaccard')
+kable(jaccard_amova_pairwise) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
+
+```
+
+
+
+
+## 13 Lefse
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+if(getOutputFormat() =='pdf_document'){
+  print("see end of report")
+}
+
+```
+
+```{r Lefse analysis Results, echo=FALSE, message=FALSE, warning=FALSE, fig.height=25, fig.width=10, out.height="85%", out.width="85%", fig.cap="\\newline{}"}
+
+if(getOutputFormat() == 'html_document') {
+  lefse_res_filenames <- list.files(pattern="*_res.png")
+
+  lefse_filenames <- mixedsort(lefse_res_filenames)
+
+  include_graphics(lefse_filenames)
+} 
+```
+
+
+```{r Lefse analysis Results pdf style, echo=FALSE, message=FALSE, warning=FALSE, out.height="85%",dpi=36, out.width="85%", fig.cap="\\newline{}"}
+if(getOutputFormat() =='pdf_document'){
+  print("see end of report")
+  lefse_res_filenames <- list.files(pattern="*_pdf_r.png")
+
+  lefse_filenames <- mixedsort(lefse_res_filenames)
+
+  include_graphics(lefse_filenames)
+}
+
+```
+
+
+```{r Lefse cladograms, echo=FALSE, message=FALSE, warning=FALSE, fig.height=25, fig.width=10, fig.pos='h', out.width="100%", fig.cap="\\newline{}"}
+
+if(getOutputFormat() == 'html_document') {
+  
+  lefse_clado_filenames <- list.files(pattern="*_cladogram.png")
+  
+  lefse_filenames <- mixedsort(lefse_clado_filenames)
+
+  include_graphics(lefse_filenames)
+} 
+
+if(getOutputFormat() =='pdf_document'){
+  print("see end of report")
+  lefse_clado_filenames <- list.files(pattern="*_pdf_qual_clad.png")
+  
+  lefse_filenames <- mixedsort(lefse_clado_filenames)
+
+  include_graphics(lefse_filenames)
+}
+
+```
+
+
+## 14 References
+
+Report Generation Resources
+
+R Core Team (2020). R: A language and environment for statistical computing. R Foundation for Statistical Computing, Vienna, Austria.URL https://www.R-project.org/.
+
+Yihui Xie (2021). knitr: A General-Purpose Package for Dynamic Report Generation in R. R package version 1.31.
+
+\
+
+[1 Stacked Bar Plot References][1 Species Distribution]
+
+---
+
+* Bolyen, E., Rideout, J.R., Dillon, M.R. et al. Reproducible, interactive, scalable and extensible microbiome data science using QIIME 2. Nat Biotechnol 37, 852–857 (2019). https://doi.org/10.1038/s41587-019-0209-9
+
+* qiime2R: Importing QIIME2 artifacts and associated data into R sessions. Jordan E Bisanz (2018) https://github.com/jbisanz/qiime2R.
+
+* phyloseq: An R package for reproducible interactive analysis and graphics of microbiome census data. Paul J. McMurdie and Susan Holmes (2013) PLoS ONE 8(4):e61217. 
+
+* Hadley Wickham (2021). forcats: Tools for Working with Categorical Variables (Factors). R package version 0.5.1.
+https://CRAN.R-project.org/package=forcats
+
+* H. Wickham. ggplot2: Elegant Graphics for Data Analysis. Springer-Verlag New York, 2016.
+
+\
+
+[2 Phylogenetic trees][2 Phylogentic Trees]
+
+---
+
+* export2graphlan.py (ver. 0.2.1 of 27 October 2018). Convert MetaPhlAn, LEfSe, and/or HUMAnN output to GraPhlAn input format. Authors: Francesco Asnicar 
+(f.asnicar@unitn.it)
+
+* Asnicar F, Weingart G, Tickle TL, Huttenhower C, Segata N. 2015. Compact graphical representation of phylogenetic data and metadata with GraPhlAn. PeerJ 3:e1029 https://doi.org/10.7717/peerj.1029
+
+\
+
+[3 Heatmap Plot][3 Species Abundance Heatmap]
+
+---
+
+* phyloseq_to_ampvis2.R Andersen K.S. (2019), GitHub gist, https://gist.github.com/KasperSkytte/8d0ca4206a66be7ff6d76fc4ab8e66c6 
+
+* ampvis2: an R package to analyse and visualise 16S rRNA amplicon  data. Andersen K.S., Kirkegaard R.H., Karst S.M., Albertsen M. (2018)  bioRxiv. doi: https://doi.org/10.1101/299537
+
+\
+
+[5 Alpha Diversity Plots][5 Alpha Diversity Plot]
+
+---
+
+* Alboukadel Kassambara (2020). rstatix: Pipe-Friendly Framework for Basic Statistical Tests. R package version 0.6.0. https://CRAN.R-project.org/package=rstatix
+
+* Alboukadel Kassambara (2020). ggpubr: 'ggplot2' Based Publication Ready Plots. R package version 0.4.0.  https://CRAN.R-project.org/package=ggpubr
+
+\
+
+[6 Beta Diversity Ordinations][6 Beta diversity]
+
+---
+
+* Charles A. Martin (2017). ggConvexHull: Add a convex hull geom to ggplot2. R package version 0.1.0. http://github.com/cmartin/ggConvexHull
+
+*  Legendre, P. and Gallagher, E.D. (2001). Ecologically meaningful transformations for ordination of
+species data. Oecologia 129, 271-280.
+
+\
+
+[7 Rarefaction Curve][7 Rarefaction Curves]
+
+---
+
+* Hadley Wickham (2007). Reshaping Data with the reshape Package. Journal of Statistical Software, 21(12), 1-20. URL http://www.jstatsoft.org/v21/i12/
+
+\
+
+[9 Unifrac Heatmap][9 Unifrac Heatmap]
+
+---
+
+* Raivo Kolde (2019). pheatmap: Pretty Heatmaps. R package version 1.0.12. https://CRAN.R-project.org/package=pheatmap
+
+\
+
+[11 UPGMA Plots][11 UPGMA Plots]
+
+---
+
+* Andrie de Vries and Brian D. Ripley (2020). ggdendro: Create Dendrograms and Tree Diagrams Using 'ggplot2'. R package version 0.1.22. https://CRAN.R-project.org/package=ggdendro
+
+* Sarkar, Deepayan (2008) Lattice: Multivariate Data Visualization with R. Springer, New York. ISBN 978-0-387-75968-5
+
+\
+
+[12 Beta Diversity Statistical Tests][12 Beta Diversity Statistics]
+
+---
+
+* Jari Oksanen, F. Guillaume Blanchet, Michael Friendly, Roeland Kindt, Pierre Legendre, Dan McGlinn, Peter R. Minchin, R. B. O'Hara, Gavin L. Simpson, Peter Solymos, M. Henry H. Stevens, Eduard Szoecs and Helene Wagner (2020). vegan: Community Ecology Package. R package version 2.5-7. https://CRAN.R-project.org/package=vegan
+
+* Kirill Müller and Hadley Wickham (2021). tibble: Simple Data Frames. R package version 3.0.6. https://CRAN.R-project.org/package=tibble
+
+* Gregory R. Warnes, Ben Bolker and Thomas Lumley (2020). gtools: Various R Programming Tools. R package version 3.8.2. https://CRAN.R-project.org/package=gtools
+
+* James M. Ward (2021). jamba: Jam Base Methods. R package version 0.0.61.900. http://github.com/jmw86069/jamba
+
+* Hao Zhu (2020). kableExtra: Construct Complex Table with 'kable' and Pipe Syntax. R package version 1.3.1. https://CRAN.R-project.org/package=kableExtra
+
+* Paradis E. 2010. pegas: an R package for population genetics with an integrated-modular approach. Bioinformatics 26: 419-420.
+
+\
+
+[13 Lefse][13 Lefse]
+
+---
+
+* Segata N, Izard J, Waldron L, Gevers D, Miropolsky L, Garrett WS, Huttenhower C. Metagenomic biomarker discovery and explanation. Genome Biol. 2011 Jun 24;12(6):R60. doi: 10.1186/gb-2011-12-6-r60. PMID: 21702898; PMCID: PMC3218848.
+
+* Hadley Wickham, Romain François, Lionel Henry and Kirill Müller (2021). dplyr: A Grammar of Data Manipulation. R package version 1.0.4. https://CRAN.R-project.org/package=dplyr
+
