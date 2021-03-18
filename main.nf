@@ -87,6 +87,9 @@ Channel
 Channel 
     .fromPath("${baseDir}/lefse_analysis.sh")
     .set{ ch_lefse_analysis_script }
+Channel
+    .fromPath("${baseDir}/report.Rmd")
+    .set{ ch_report_outline }
 
 process SetupPy2CondaEnv{
 
@@ -1245,6 +1248,7 @@ process GenerateReport{
     path "unweighted-sig/*" from ch_u_unifrac_beta_path
     path "weighted-sig/*" from ch_w_unifrac_beta_path
     path "result/*" from ch_lefse_results
+    file "report.Rmd" from ch_report_outline
 
 
 
