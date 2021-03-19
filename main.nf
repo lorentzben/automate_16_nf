@@ -1258,15 +1258,31 @@ process GenerateReport{
 
 
     output:
-    path "Figures/*" into ch_figures_from_report
-    file "report.html" into ch_figures
-    
-    
+    file "item_of_interest.csv" into ch_ioi_report_out
+    file "table-dada2.qza" into ch_table_report_out
+    file "rooted-tree.qza" into ch_tree_report_out
+    file "taxonomy.qza" into ch_tax_report_out
+    file metadata into ch_metadata_report_out
+    path "phylo_trees/*" into ch_phylo_report_out
+    path "shannon/*" into ch_shannon_report_out
+    path "simpson/*" into ch_simpson_report_out
+    path "chao1/*" into ch_chao_report_out
+    path "ace/*" into ch_ace_report_out
+    path "obs/*" into ch_obs_report_out
+    path "faith_pd/*" into ch_faith_report_out
+    path "core-metric-results/*" into ch_core_report_out
+    path "alpha-rareplot/*" into ch_alpha_report_out
+    path "unweighted-sig/*" into ch_unweighed_report_out
+    path "weighted-sig/*" into ch_weighted_report_out
+    path "result/*" into ch_lefse_report_out
+    file "report.Rmd" into ch_report_file_report_out
+    file "make_report.sh" into ch_script_report_out
+       
     script:
     """
     #!/usr/bin/env bash
      
-    bash make_report.sh
+    echo "all files copied!"
     """
 
 }
