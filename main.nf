@@ -96,12 +96,13 @@ Channel
     .set{ ch_report_bash_script }
 
 process SetupPy2CondaEnv{
-
+    //conda "${projectDir}/python2_env.yml"
+    conda "python2_env.yml"
+    
     input:
     file plot_clado from ch_clado_file
     file plot_res from ch_plot_res
-    //conda "${projectDir}/python2_env.yml"
-    conda "python2_env.yml"
+    
 
     shell:
     '''
@@ -1272,6 +1273,7 @@ process GenerateReport{
     #!/usr/bin/env bash
     echo "all files copied!"
     echo ${baseDir}/${params.outDir} > out.txt
+    cat out.txt
     """
 
 }
