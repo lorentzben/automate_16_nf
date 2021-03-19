@@ -1273,7 +1273,7 @@ process GenerateReport{
     """
     #!/usr/bin/env bash
     echo "all files copied!"
-    echo ${baseDir}/${params.outDir} > out.txt
+    echo ${baseDir}/${params.outdir} > out.txt
     cat out.txt
     """
 
