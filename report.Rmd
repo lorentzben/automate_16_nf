@@ -1735,6 +1735,7 @@ pairwise_permanova <- function(dat, column_of_int, dissim){
 
 
 ```{r Methods to do pairwise Unifrac PERMANOVA comparisons, echo=FALSE, message=FALSE, warning=FALSE}
+library(phyloseq)
 pairwise_permanova_uni <- function(dat, column_of_int, weight){
   all_comparisons <- unique(sample_data(dat)[[column_of_int]])
   
