@@ -1265,13 +1265,13 @@ process GenerateReport{
 
 
     output:
-    file "done.txt" into ch_done
+    file "out.txt" into ch_done
        
     script:
     """
     #!/usr/bin/env bash
     echo "all files copied!"
-    echo "done" > done.txt
+    echo ${baseDir}/${params.outDir} > out.txt
     """
 
 }
