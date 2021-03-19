@@ -91,6 +91,10 @@ Channel
     .fromPath("${baseDir}/report.Rmd")
     .set{ ch_report_outline }
 
+Channel
+    .fromPath("${baseDir}/make_report.sh")
+    .set{ ch_report_bash_script }
+
 process SetupPy2CondaEnv{
 
     input:
@@ -1249,6 +1253,7 @@ process GenerateReport{
     path "weighted-sig/*" from ch_w_unifrac_beta_path
     path "result/*" from ch_lefse_results
     file "report.Rmd" from ch_report_outline
+    file "make_report.sh" from ch_report_bash_script
 
 
 
@@ -1260,10 +1265,8 @@ process GenerateReport{
     script:
     """
     #!/usr/bin/env bash
-    
-    ls
-
-    Rscript -e "rmarkdown::render('report.Rmd', output_file='report.html', clean=TRUE)"
+     
+    bash make_report.sh
     """
 
 }
