@@ -1264,8 +1264,8 @@ process GenerateReport{
     """
     #!/usr/bin/env bash
     
-    mkdir ${params.outdir}/report
-    cp -rf * ${params.outdir}/report
+    mkdir ${baseDir}/${params.outdir}/report
+    cp -rf * ${baseDir}/${params.outdir}/report
     echo "all files copied!"
     cat "done" > done.txt
     """
