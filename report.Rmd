@@ -20,7 +20,7 @@ Sys.setenv(PKG_CONFIG_PATH = "/lib64/pkgconfig")
 ```
 
 ```{r list the files in dir}
-list.files()
+print(list.files())
 ```
 
 ```{r function to check how the document is being rendered, message=FALSE, warning=FALSE, include=FALSE}
