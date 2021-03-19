@@ -19,6 +19,10 @@ Sys.setenv(PKG_CONFIG_PATH = "/lib64/pkgconfig")
 #Sys.setenv(R_REMOTES_NO_ERRORS_FROM_WARNINGS="true")
 ```
 
+```{r list the files in dir}
+list.files()
+```
+
 ```{r function to check how the document is being rendered, message=FALSE, warning=FALSE, include=FALSE}
 getOutputFormat <- function() {
   output <- rmarkdown:::parse_yaml_front_matter(
@@ -112,9 +116,6 @@ library(ggConvexHull)
 <!-- core-metrics-results/weighted_unifrac_pcoa_results.qza -->
 <!-- alpha-rare/observed_otus.csv -->
 
-```{r}
-list.files()
-```
 
 
 ```{r parse item of interest and make outdir for figures, echo=FALSE, message=FALSE, warning=FALSE}
