@@ -468,20 +468,20 @@ ggsave("heatmap.png", plot=heatmap, path=outdir)
 
 
 ```{r read in cutoffs used by qiime, message=FALSE, warning=FALSE, include=FALSE}
-cutoffs = read.csv("cutoffs.csv",sep = ',',strip.white = TRUE)
+cutoffs = read.csv("./qiime/cutoffs.csv",sep = ',',strip.white = TRUE)
 #cutoffs = knitr::kable(cutoffs)
 cutoffs %>% kbl() %>% kable_styling(bootstrap_options = c("striped","condensed","responsive"))
 ```
 
 
 ```{r make data table for dada2 stats from qiime, message=FALSE, warning=FALSE, include=FALSE}
-dadastat = read.csv("dada2_stats.tsv",sep = '\t',strip.white = TRUE)
+dadastat = read.csv("./dada2_stats.tsv",sep = '\t',strip.white = TRUE)
 #dadastat_t = dadastat %>% kbl() %>% kable_classic(full_width = F)
 dadastat %>% kbl() %>% kable_styling(bootstrap_options = c("striped","condensed","responsive")) 
 ```
 
 ```{r table for sampling depth in qiime, message=FALSE, warning=FALSE, include=FALSE}
-depth = read.csv("sampling_depth.csv", sep=",")
+depth = read.csv("./qiime/sampling_depth.csv", sep=",")
 depth %>% kbl() %>% kable_styling(bootstrap_options = c("striped","condensed","responsive"))
 ```
 
@@ -491,12 +491,12 @@ depth %>% kbl() %>% kable_styling(bootstrap_options = c("striped","condensed","r
 ## 4 Alpha Diversity Table
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
-obs <- read.table("obs/metadata.tsv", header = TRUE)
-shannon <- read.table("shannon/metadata.tsv", header = TRUE)
-simpson <- read.table("simpson/metadata.tsv", header=TRUE)
-chao1 <- read.table("chao1/metadata.tsv", header=TRUE)
-ace <- read.table("ace/metadata.tsv", header=TRUE)
-faith_pd <- read.table("faith_pd/metadata.tsv", header=TRUE)
+obs <- read.table("./qiime/obs/metadata.tsv", header = TRUE)
+shannon <- read.table("./qiime/shannon/metadata.tsv", header = TRUE)
+simpson <- read.table("./qiime/simpson/metadata.tsv", header=TRUE)
+chao1 <- read.table("./qiime/chao1/metadata.tsv", header=TRUE)
+ace <- read.table("./qiime/ace/metadata.tsv", header=TRUE)
+faith_pd <- read.table("./qiime/faith_pd/metadata.tsv", header=TRUE)
 
 obs <- data.frame(obs[c('id','observed_otus')])
 shannon <- data.frame(shannon[c('id','shannon')])
@@ -524,7 +524,7 @@ kable(alpha_summary) %>%
 #subsets and plots observed features in a boxplot format
 ioi <- read.csv("item_of_interest.csv")
 ioi<-as.character(ioi)
-obs_vals = read.csv("./obs/metadata.tsv", sep='\t')
+obs_vals = read.csv("./qiime/obs/metadata.tsv", sep='\t')
 dims = dim(obs_vals)
 obs_vals <- data.frame(obs_vals[2:dims[1],])
 obs_vals[[ioi]] <- reorder(as.factor(obs_vals[[ioi]]))
@@ -547,7 +547,7 @@ ggsave("obs_violin_plot.png", plot=p, path=outdir)
 
 ```{r Kruskal-Wallace test for signifiance observed feat,results = "asis", echo=FALSE, message=FALSE, warning=FALSE}
 library("ggpubr")
-obs <- read.table("obs/metadata.tsv", header = TRUE)
+obs <- read.table("./qiime/obs/metadata.tsv", header = TRUE)
 obs_stat <- data.frame(obs[c('id',ioi,'observed_otus')])
 
 
@@ -585,7 +585,7 @@ ggsave("obs_boxplot_w_signif.png", plot=p, path=outdir)
 ### 5.2 Shannon
 
 ```{r alpha diversity plot of shannon diversity, echo=FALSE, message=FALSE, warning=FALSE}
-shannon_vals <- read.table("./shannon/metadata.tsv",sep = '\t', header = TRUE)
+shannon_vals <- read.table("./qiime/shannon/metadata.tsv",sep = '\t', header = TRUE)
 dims = dim(shannon_vals)
 shannon_vals <- data.frame(shannon_vals[2:dims[1],])
 shannon_vals[[ioi]] <- reorder(as.factor(shannon_vals[[ioi]]))
@@ -605,7 +605,7 @@ ggsave("shannon_violin_plot.png", plot=p, path=outdir)
 ```
 
 ```{r Kuskal-Wallace test for significance shannon,results = "asis", echo=FALSE, message=FALSE, warning=FALSE}
-shannon <- read.table("shannon/metadata.tsv", header = TRUE, sep='\t')
+shannon <- read.table("./qiime/shannon/metadata.tsv", header = TRUE, sep='\t')
 shannon_stat <- data.frame(shannon[c('id',ioi,'shannon')])
 
 form <- as.formula(paste0("shannon ~ ", ioi))
@@ -639,7 +639,7 @@ ggsave("shannon_boxplot_w_signif.png", plot=p, path=outdir)
 ### 5.3 Simpson
 
 ```{r alpha diversity plot of simpson diversity, echo=FALSE, message=FALSE, warning=FALSE}
-simpson_vals <- read.table("./simpson/metadata.tsv",sep = '\t', header = TRUE)
+simpson_vals <- read.table("./qiime/simpson/metadata.tsv",sep = '\t', header = TRUE)
 dims = dim(simpson_vals)
 simpson_vals <- data.frame(simpson_vals[2:dims[1],])
 simpson_vals[[ioi]] <- reorder(as.factor(simpson_vals[[ioi]]))
@@ -659,7 +659,7 @@ ggsave("simpson_violin_plot.png", plot=p, path=outdir)
 ```
 
 ```{r Kuskal-Wallace test for significance simpson,results = "asis", echo=FALSE, message=FALSE, warning=FALSE}
-simpson <- read.table("simpson/metadata.tsv", header = TRUE, sep='\t')
+simpson <- read.table("./qiime/simpson/metadata.tsv", header = TRUE, sep='\t')
 simpson_stat <- data.frame(simpson[c('id',ioi,'simpson')])
 
 form <- as.formula(paste0("simpson ~ ", ioi))
@@ -693,7 +693,7 @@ ggsave("simpson_boxplot_w_signif.png", plot=p, path=outdir)
 ### 5.4 Chao 1
 
 ```{r alpha diversity plot of Chao 1 diversity, echo=FALSE, message=FALSE, warning=FALSE}
-chao1_vals <- read.table("./chao1/metadata.tsv",sep = '\t', header = TRUE)
+chao1_vals <- read.table("./qiime/chao1/metadata.tsv",sep = '\t', header = TRUE)
 dims = dim(chao1_vals)
 chao1_vals <- data.frame(chao1_vals[2:dims[1],])
 chao1_vals[[ioi]] <- reorder(as.factor(chao1_vals[[ioi]]))
@@ -713,7 +713,7 @@ ggsave("chao1_violin_plot.png", plot=p, path=outdir)
 ```
 
 ```{r Kuskal-Wallace test for significance chao1,results = "asis", echo=FALSE, message=FALSE, warning=FALSE}
-chao1 <- read.table("chao1/metadata.tsv", header = TRUE, sep='\t')
+chao1 <- read.table("./qiime/chao1/metadata.tsv", header = TRUE, sep='\t')
 chao1_stat <- data.frame(chao1[c('id',ioi,'chao1')])
 
 form <- as.formula(paste0("chao1 ~ ", ioi))
@@ -747,7 +747,7 @@ ggsave("chao1_boxplot_w_signif.png", plot=p, path=outdir)
 ### 5.5 ACE
 
 ```{r alpha diversity plot of ACE diversity, echo=FALSE, message=FALSE, warning=FALSE}
-ace_vals <- read.table("./ace/metadata.tsv",sep = '\t', header = TRUE)
+ace_vals <- read.table("./qiime/ace/metadata.tsv",sep = '\t', header = TRUE)
 dims = dim(ace_vals)
 ace_vals <- data.frame(ace_vals[2:dims[1],])
 ace_vals[[ioi]] <- reorder(as.factor(ace_vals[[ioi]]))
@@ -767,7 +767,7 @@ ggsave("ace_violin_plot.png", plot=p, path=outdir)
 ```
 
 ```{r Kuskal-Wallace test for significance ace,results = "asis", echo=FALSE, message=FALSE, warning=FALSE}
-ace <- read.table("ace/metadata.tsv", header = TRUE, sep='\t')
+ace <- read.table("./qiime/ace/metadata.tsv", header = TRUE, sep='\t')
 ace_stat <- data.frame(ace[c('id',ioi,'ace')])
 
 form <- as.formula(paste0("ace ~ ", ioi))
@@ -801,7 +801,7 @@ ggsave("ace_boxplot_w_signif.png", plot=p, path=outdir)
 ### 5.6 Phylogenetic Distance Over The whole Tree
 
 ```{r alpha diversity plot of PD_whole_tree, echo=FALSE, message=FALSE, warning=FALSE}
-faith_pd_vals <- read.table("./faith_pd/metadata.tsv",sep = '\t', header = TRUE)
+faith_pd_vals <- read.table("./qiime/faith_pd/metadata.tsv",sep = '\t', header = TRUE)
 dims = dim(faith_pd_vals)
 faith_pd_vals <- data.frame(faith_pd_vals[2:dims[1],])
 faith_pd_vals[[ioi]] <- reorder(as.factor(faith_pd_vals[[ioi]]))
@@ -821,7 +821,7 @@ ggsave("faith_pd_violin_plot.png", plot=p, path=outdir)
 ```
 
 ```{r Kuskal-Wallace test for significance faith pd,results = "asis", echo=FALSE, message=FALSE, warning=FALSE}
-faith_pd <- read.table("faith_pd/metadata.tsv", header = TRUE, sep='\t')
+faith_pd <- read.table("./qiime/faith_pd/metadata.tsv", header = TRUE, sep='\t')
 faith_pd_stat <- data.frame(faith_pd[c('id',ioi,'faith_pd')])
 
 form <- as.formula(paste0("faith_pd ~ ", ioi))
@@ -1057,7 +1057,7 @@ numextract <- function(string){
   str_extract(string, "\\-*\\d+\\.*\\d*")
 }
 
-obs_rarefy <- read.csv("alpha-rareplot/observed_otus.csv")
+obs_rarefy <- read.csv("./qiime/alpha-rareplot/observed_otus.csv")
 samples <- obs_rarefy[1]
 one <- obs_rarefy[2:11]
 two <- obs_rarefy[12:21]
@@ -1465,7 +1465,7 @@ ggsave("beta_div_heatmap_Weighted_unifrac.png", plot=weight_heatmap, path=outdir
 ### 10.1 Weighted boxplots
 
 ```{r generated Weighted boxplots, echo=FALSE, message=FALSE, warning=FALSE}
-weighted_measurements <- read.csv("weighted-sig/raw_data.tsv", sep="\t")
+weighted_measurements <- read.csv("./qiime/weighted-sig/raw_data.tsv", sep="\t")
 
 split_weighted_measure <- split(weighted_measurements, weighted_measurements$Group1)
 
@@ -1487,7 +1487,7 @@ for(frame in split_weighted_measure){
 ### 10.2 Unweighted boxplots
 
 ```{r generated Unweighted boxplots, echo=FALSE, message=FALSE, warning=FALSE}
-unweighted_measurements <- read.csv("unweighted-sig/raw_data.tsv", sep="\t")
+unweighted_measurements <- read.csv("./qiime/unweighted-sig/raw_data.tsv", sep="\t")
 
 split_data_frames <- split(unweighted_measurements, unweighted_measurements$Group1)
 
