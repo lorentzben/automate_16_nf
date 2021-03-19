@@ -261,16 +261,20 @@ process VerifyManifest{
 }
 
 process CheckSinglePaired { 
+
+    publishDir "${params.outdir}/report", mode: 'copy'
+    //conda "${projectDir}/environment.yml"
+    conda "environment.yml"
     
     input: 
     file manifest from ch_single_pair
+    val ioi from ch_ioi_denoise_to_file
 
     output: 
     file 'manifest_format.txt' into manifest_type
     file 'data_type.txt' into dataType
+    file "item_of_interest.csv" into ch_ioi_file_out
 
-    //conda "${projectDir}/environment.yml"
-    conda "environment.yml"
 
     script:
     """
@@ -278,6 +282,14 @@ process CheckSinglePaired {
 
     import pandas as pd
     import os 
+
+    
+    with open('item_of_interest.csv', 'w', newline='') as csvfile:
+        fieldnames = ['item name']
+        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+
+        writer.writeheader()
+        writer.writerow({'item name': '${ioi}'})
 
     read_manifest = pd.read_table('${manifest}', index_col=0, sep='\t+', engine='python')
 
@@ -509,13 +521,14 @@ process Denoise {
     file seq_object from ch_qiime_denoise
     file("cutoffs.csv") from ch_cutoff_vals
     file("manifest_format.txt") from ch_manifest_type_denoise
-    val ioi from ch_ioi_denoise_to_file
+    
     
     output:
     file "rep-seqs-dada2.qza" into ch_rep_seqs
     file "table-dada2.qza" into ch_table
     file "stats-dada2.qza" into ch_dada2_stats
-    file "item_of_interest.csv" into ch_ioi_file_out
+    
+    
 
     //conda "${projectDir}/environment.yml"
     conda "environment.yml"
@@ -531,12 +544,6 @@ process Denoise {
 
     wd = Path.cwd()
 
-    with open('item_of_interest.csv', 'w', newline='') as csvfile:
-        fieldnames = ['item name']
-        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
-
-        writer.writeheader()
-        writer.writerow({'item name': '${ioi}'})
 
     seq_file = pd.read_table("manifest_format.txt")
     if seq_file.columns[0] == "SingleEndFastqManifestPhred33V2":
@@ -1263,9 +1270,6 @@ process GenerateReport{
     script:
     """
     #!/usr/bin/env bash
-    
-    mkdir ${baseDir}/${params.outdir}/report
-    cp -rf * ${baseDir}/${params.outdir}/report
     echo "all files copied!"
     echo "done" > done.txt
     """
