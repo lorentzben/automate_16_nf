@@ -134,14 +134,14 @@ outdir <- paste0("./",outdir_name)
 options(bitmapType='cairo')
 level = "Phylum"
 
-table-dada2 <- "./qiime/table-dada2.qza"
-rooted-tree <- "./qiime/rooted-tree.qza"
-taxonomy-file <- "./qiime/taxonomy.qza"
-metadata-file <- "./metadata.tsv"
+table_dada2 <- "./qiime/table-dada2.qza"
+rooted_tree <- "./qiime/rooted-tree.qza"
+taxonomy_file <- "./qiime/taxonomy.qza"
+metadata_file <- "./metadata.tsv"
 
 
 #Create phyloseq object from qiime objects
-cycle_1 <- qza_to_phyloseq(table-dada2,rooted-tree,taxonomy-file,metadata-file)
+cycle_1 <- qza_to_phyloseq(table_dada2,rooted_tree,taxonomy_file,metadata_file)
 
 #Select number of taxa at phylum level to plot
 topN <- 10
@@ -234,7 +234,7 @@ ggsave("stacked_bar_phylum_by_treatment.png", plot=by_treatment, path=outdir)
 level = "Genus"
 
 #Create phyloseq object from qiime objects
-cycle_1 <- qza_to_phyloseq(table-dada2,rooted-tree,taxonomy-file,metadata-file)
+cycle_1 <- qza_to_phyloseq(table_dada2,rooted_tree,taxonomy_file,metadata_file)
 
 #Select number of taxa at genus level to plot
 topN <- 10
@@ -325,7 +325,7 @@ ggsave("stacked_bar_genus_by_treatment.png", plot = by_treatment, path=outdir)
 level = "Species"
 
 #Create phyloseq object from qiime objects
-cycle_1 <- qza_to_phyloseq(table-dada2,rooted-tree,taxonomy-file,metadata-file)
+cycle_1 <- qza_to_phyloseq(table_dada2,rooted_tree,taxonomy_file,metadata_file)
 
 #Select number of taxa at species level to plot
 topN <- 10
@@ -446,7 +446,7 @@ if(getOutputFormat() =='pdf_document'){
 
 ```{r heatmap at the Genus level annotatted with item of interest, echo=FALSE, fig.height=10, fig.width=14, message=FALSE, warning=FALSE}
 devtools::source_gist("8d0ca4206a66be7ff6d76fc4ab8e66c6")
-cycle_1 <- qza_to_phyloseq(table-dada2,rooted-tree,taxonomy-file,metadata-file) 
+cycle_1 <- qza_to_phyloseq(table_dada2,rooted_tree,taxonomy_file,metadata_file) 
 cycle_1@sam_data[[ioi]] <- reorder(cycle_1@sam_data[[ioi]])
 
 cycle_1_amp <- phyloseq_to_ampvis2(cycle_1)
@@ -858,7 +858,7 @@ ggsave("faith_pd_boxplot_w_signif.png", plot=p, path=outdir)
 
 ```{r beta diversity plot of bray curtis measurement, echo=FALSE, message=FALSE, warning=FALSE}
 library(qiime2R)
-metadata<-read_q2metadata(metadata-file)
+metadata<-read_q2metadata(metadata_file)
 metadata[[ioi]] <- reorder(metadata[[ioi]])
 bray_pcoa <- qiime2R::read_qza("core-metrics-results/bray_curtis_pcoa_results.qza")
 shannon<-qiime2R::read_qza("core-metrics-results/shannon_vector.qza")
@@ -898,7 +898,7 @@ ggsave("bray_curtis_pcoa_ordination_no_polygon.png", plot=bray_curtis_no_poly, p
 ### 6.2 Jaccard ordination
 
 ```{r pcoa using Jaccard distance, echo=FALSE, message=FALSE, warning=FALSE}
-metadata<-read_q2metadata(metadata-file)
+metadata<-read_q2metadata(metadata_file)
 jaccard <- qiime2R::read_qza("core-metrics-results/jaccard_pcoa_results.qza")
 shannon<-qiime2R::read_qza("core-metrics-results/shannon_vector.qza")
 shannon <- shannon$data %>% rownames_to_column("SampleID")
@@ -942,7 +942,7 @@ ggsave("jaccard_pcoa_ordination_no_polygons.png", plot=jaccard_pcoa_no_polygon, 
 ### 6.3 Unweighted unifrac ordination
 
 ```{r unweighted unifrac pcoa ordination, echo=FALSE, message=FALSE, warning=FALSE}
-metadata<-read_q2metadata(metadata-file)
+metadata<-read_q2metadata(metadata_file)
 metadata[[ioi]] <- reorder(metadata[[ioi]])
 jaccard <- qiime2R::read_qza("core-metrics-results/unweighted_unifrac_pcoa_results.qza")
 shannon<-qiime2R::read_qza("core-metrics-results/shannon_vector.qza")
@@ -985,7 +985,7 @@ ggsave("unweighted_unifrac_pcoa_ordination_no_polygons.png", plot=unweight_unifr
 ### 6.4 Weighted unifrac ordination
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
-metadata<-read_q2metadata(metadata-file)
+metadata<-read_q2metadata(metadata_file)
 metadata[[ioi]] <- reorder(metadata[[ioi]])
 jaccard <- qiime2R::read_qza("core-metrics-results/weighted_unifrac_pcoa_results.qza")
 shannon<-qiime2R::read_qza("core-metrics-results/shannon_vector.qza")
@@ -1032,7 +1032,7 @@ ggsave("weighted_unifrac_pcoa_ordination_no_polygons.png", plot=weighted_unifrac
 ```{r PCA created by ampvis2, echo=FALSE, message=FALSE, warning=FALSE}
 devtools::source_gist("8d0ca4206a66be7ff6d76fc4ab8e66c6")
 
-cycle_1 <- qza_to_phyloseq(table-dada2,rooted-tree,taxonomy-file,metadata-file) 
+cycle_1 <- qza_to_phyloseq(table_dada2,rooted_tree,taxonomy_file,metadata_file) 
 cycle_1@sam_data[[ioi]] <- reorder(cycle_1@sam_data[[ioi]])
 cycle_1_amp <- phyloseq_to_ampvis2(cycle_1)
 
@@ -1413,7 +1413,7 @@ library(ampvis2)
 library(ggplot2)
 devtools::source_gist("8d0ca4206a66be7ff6d76fc4ab8e66c6")
 
-cycle_1 <- qza_to_phyloseq(table-dada2,rooted-tree,taxonomy-file,metadata-file) 
+cycle_1 <- qza_to_phyloseq(table_dada2,rooted_tree,taxonomy_file,metadata_file) 
 cycle_1_amp <- phyloseq_to_ampvis2(cycle_1)
 
 by_sample <- ampvis2::amp_rankabundance(cycle_1_amp, group_by = "SampleID") + theme(text=element_text(size = 20))
@@ -1437,7 +1437,7 @@ ggsave("rank_abundance_curve_by_treatemnt.png", plot=by_group, path=outdir)
 ## 9 Unifrac Heatmap 
 
 ```{r echo=FALSE,fig.height=8, fig.width=14, message=FALSE, warning=FALSE}
-metadata<-read_q2metadata(metadata-file)
+metadata<-read_q2metadata(metadata_file)
 metadata[[ioi]] <- reorder(metadata[[ioi]])
 w_unifrac_dist <- qiime2R::read_qza("core-metrics-results/weighted_unifrac_distance_matrix.qza")
 u_unifrac_dist <- qiime2R::read_qza("core-metrics-results/unweighted_unifrac_distance_matrix.qza")
@@ -1512,7 +1512,7 @@ for(frame in split_data_frames){
 
 ```{r UPGMA Plot of Weighted Unifrac Distance, echo=FALSE, fig.height=8, fig.width=10, message=FALSE, warning=FALSE}
 
-cycle_1 <- qza_to_phyloseq(table-dada2,rooted-tree,taxonomy-file,metadata-file)
+cycle_1 <- qza_to_phyloseq(table_dada2,rooted_tree,taxonomy_file,metadata_file)
 w_unifrac <- UniFrac(cycle_1,weighted=TRUE)
 
 
@@ -1604,7 +1604,7 @@ ggsave("UPGMA_weighted_unifrac_plot.png", plot=weight_plot, path=outdir)
 ### 11.2 UPGMA Plot for Unweighted Unifrac Distance
 
 ```{r UPGMA Plot of Unweighted Unifrac Distances, echo=FALSE, fig.height=8, fig.width=10, message=FALSE, warning=FALSE}
-cycle_1 <- qza_to_phyloseq(table-dada2,rooted-tree,taxonomy-file,metadata-file)
+cycle_1 <- qza_to_phyloseq(table_dada2,rooted_tree,taxonomy_file,metadata_file)
 u_unifrac <- UniFrac(cycle_1, weighted = FALSE)
 
 
@@ -1776,7 +1776,7 @@ pairwise_permanova_uni <- function(dat, column_of_int, weight){
 
 ```{r Weighted Unifrac PERMANOVA, echo=FALSE, message=FALSE, warning=FALSE}
 library(vegan)
-cycle_1 <- qza_to_phyloseq(table-dada2,rooted-tree,taxonomy-file,metadata-file)
+cycle_1 <- qza_to_phyloseq(table_dada2,rooted_tree,taxonomy_file,metadata_file)
 sample_data(cycle_1)[[ioi]] <- reorder(sample_data(cycle_1)[[ioi]])
 # PERMANOVA of Weighted Unifrac
 u_unifrac <- UniFrac(cycle_1, weighted = T)
@@ -1796,7 +1796,7 @@ kable(test) %>%
 ### 12.2 PERMANOVA Unweighted Unifrac 
 
 ```{r Permanova results Weighted Unifrac from qiime, echo=FALSE, message=FALSE, warning=FALSE}
-cycle_1 <- qza_to_phyloseq(table-dada2,rooted-tree,taxonomy-file,metadata-file)
+cycle_1 <- qza_to_phyloseq(table_dada2,rooted_tree,taxonomy_file,metadata_file)
 sample_data(cycle_1)[[ioi]] <- reorder(sample_data(cycle_1)[[ioi]])
 # PERMANOVA of Unweighted Unifrac
 u_unifrac <- UniFrac(cycle_1, weighted = F)
@@ -1815,7 +1815,7 @@ kable(test) %>%
 ### 12.3 PERMANOVA Bray Curtis
 
 ```{r Bray Curtis PERMANOVA, echo=FALSE, message=FALSE, warning=FALSE}
-cycle_1 <- qza_to_phyloseq(table-dada2,rooted-tree,taxonomy-file,metadata-file)
+cycle_1 <- qza_to_phyloseq(table_dada2,rooted_tree,taxonomy_file,metadata_file)
 sample_data(cycle_1)[[ioi]] <- reorder(sample_data(cycle_1)[[ioi]])
 #PERMANOVA Bray Curtis
 grp <- get_variable(cycle_1, ioi)
@@ -1833,7 +1833,7 @@ kable(bray_pairwise) %>%
 ### 12.4 PERMANOVA Jaccard 
 
 ```{r Jaccard PERMANOVA, echo=FALSE, message=FALSE, warning=FALSE}
-cycle_1 <- qza_to_phyloseq(table-dada2,rooted-tree,taxonomy-file,metadata-file)
+cycle_1 <- qza_to_phyloseq(table_dada2,rooted_tree,taxonomy_file,metadata_file)
 sample_data(cycle_1)[[ioi]] <- reorder(sample_data(cycle_1)[[ioi]])
 # PERMANOVA Jaccard distance
 grp <- get_variable(cycle_1, ioi)
@@ -1910,7 +1910,7 @@ pairwise_anosim_uni <- function(dat, column_of_int, weight){
 
 
 ```{r echo=FALSE, fig.height=8, fig.width=10, message=FALSE, warning=FALSE}
-cycle_1 <- qza_to_phyloseq(table-dada2,rooted-tree,taxonomy-file,metadata-file)
+cycle_1 <- qza_to_phyloseq(table_dada2,rooted_tree,taxonomy_file,metadata_file)
 sample_data(cycle_1)[[ioi]] <- reorder(sample_data(cycle_1)[[ioi]])
 
 #Weighted Unifrac Anosim
@@ -2059,7 +2059,7 @@ pairwise_MRPP_uni <- function(dat, column_of_int, weight){
 
 
 ```{r MRPP analysis, echo=FALSE, message=FALSE, warning=FALSE}
-cycle_1 <- qza_to_phyloseq(table-dada2,rooted-tree,taxonomy-file,metadata-file)
+cycle_1 <- qza_to_phyloseq(table_dada2,rooted_tree,taxonomy_file,metadata_file)
 sample_data(cycle_1)[[ioi]] <- reorder(as.factor(sample_data(cycle_1)[[ioi]]))
 
 # Weighted Unifrac
@@ -2168,7 +2168,7 @@ pairwise_AMOVA_uni <- function(dat, column_of_int, weight){
 
 
 ```{r AMOVA testing, echo=FALSE, message=FALSE, warning=FALSE}
-cycle_1 <- qza_to_phyloseq(table-dada2,rooted-tree,taxonomy-file,metadata-file)
+cycle_1 <- qza_to_phyloseq(table_dada2,rooted_tree,taxonomy_file,metadata_file)
 sample_data(cycle_1)[[ioi]] <- reorder(as.factor(sample_data(cycle_1)[[ioi]]))
 
 #AMOVA Weighted Unifrac
