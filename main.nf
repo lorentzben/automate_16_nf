@@ -283,6 +283,7 @@ process CheckSinglePaired {
 
     import pandas as pd
     import os 
+    import csv
 
     
     with open('item_of_interest.csv', 'w', newline='') as csvfile:
