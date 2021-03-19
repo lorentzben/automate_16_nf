@@ -595,7 +595,7 @@ shannon_boxplot
 
 ggsave("shannon_boxplot.png", plot=shannon_boxplot, path=outdir)
 
-p <- ggplot(shannon_vals, aes(x=shannon_vals[[ioi]], y=shannon)) + geom_violin()+ geom_boxplot(width=0.1)
+p <- ggplot(shannon_vals, aes(x=shannon_vals[[ioi]], y=shannon_entropy)) + geom_violin()+ geom_boxplot(width=0.1)
 p<- p + stat_summary(fun.y=mean, geom="point", shape=23, size=2)
 p<-p + stat_summary(fun.y=median, geom="point", size=2, color="red")
 p <- p+geom_jitter(shape=16, position=position_jitter(0.2)) + xlab(ioi) + ylab("Shannon") + theme_bw()
