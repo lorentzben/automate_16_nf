@@ -606,15 +606,15 @@ ggsave("shannon_violin_plot.png", plot=p, path=outdir)
 
 ```{r Kuskal-Wallace test for significance shannon,results = "asis", echo=FALSE, message=FALSE, warning=FALSE}
 shannon <- read.table("./qiime/shannon/metadata.tsv", header = TRUE, sep='\t')
-shannon_stat <- data.frame(shannon[c('id',ioi,'shannon')])
+shannon_stat <- data.frame(shannon[c('id',ioi,'shannon_entropy')])
 
-form <- as.formula(paste0("shannon ~ ", ioi))
+form <- as.formula(paste0("shannon_entropy ~ ", ioi))
 kruskal_table <- rstatix::kruskal_test(data = shannon_stat, formula =form)
 kruskal_table <- add_significance(kruskal_table, p.col="p",output.col = "p.signif",symbols =c("****", "***", "**", "$*$", "ns"))
 kable(kruskal_table) %>% 
   kable_styling(bootstrap_options = c("hover", "condensed", "responsive"))
 
-form = as.formula(paste0("shannon ~", ioi))
+form = as.formula(paste0("shannon_entropy ~", ioi))
 
 dunn_table <- rstatix::dunn_test(data = shannon_stat, formula = form, p.adjust.method = "holm")
 dunn_table<- add_significance(dunn_table, p.col="p.adj",output.col = "p.adj.signif",symbols =c("****", "***", "**", "$*$", "ns"))
@@ -623,7 +623,7 @@ kable(dunn_table) %>%
 
 dunn_table <- dunn_table  %>% add_xy_position()
 
-p <- ggplot(shannon_vals, aes(x=shannon_vals[[ioi]], y=shannon)) + geom_violin()+ geom_boxplot(width=0.1)
+p <- ggplot(shannon_vals, aes(x=shannon_vals[[ioi]], y=shannon_entropy)) + geom_violin()+ geom_boxplot(width=0.1)
 p<- p + stat_summary(fun.y=mean, geom="point", shape=23, size=2)
 p<-p + stat_summary(fun.y=median, geom="point", size=2, color="red")
 p <- p+geom_jitter(shape=16, position=position_jitter(0.2)) + xlab(ioi) + ylab("Shannon") + theme_bw()
