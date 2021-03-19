@@ -19,10 +19,6 @@ Sys.setenv(PKG_CONFIG_PATH = "/lib64/pkgconfig")
 #Sys.setenv(R_REMOTES_NO_ERRORS_FROM_WARNINGS="true")
 ```
 
-```{r list the files in dir}
-print(list.files())
-```
-
 ```{r function to check how the document is being rendered, message=FALSE, warning=FALSE, include=FALSE}
 getOutputFormat <- function() {
   output <- rmarkdown:::parse_yaml_front_matter(
@@ -119,7 +115,8 @@ library(ggConvexHull)
 
 
 ```{r parse item of interest and make outdir for figures, echo=FALSE, message=FALSE, warning=FALSE}
-print(getwd())
+nf_out <- read.table("out.txt")
+setwd(str(nf_out))
 #item of interest, comes from bash and python script that orchestrates everything
 ioi <- read.csv("item_of_interest.csv")
 ioi<-as.character(ioi)
