@@ -98,7 +98,7 @@ Channel
 process SetupPy2CondaEnv{
     //conda "${projectDir}/python2_env.yml"
     conda "python2_env.yml"
-    
+
     input:
     file plot_clado from ch_clado_file
     file plot_res from ch_plot_res
@@ -263,7 +263,7 @@ process VerifyManifest{
 
 process CheckSinglePaired { 
 
-    publishDir "${params.outdir}/report", mode: 'copy'
+    publishDir "${params.outdir}", mode: 'copy'
     //conda "${projectDir}/environment.yml"
     conda "environment.yml"
     
@@ -1237,7 +1237,7 @@ process ExportSetup{
 
 
 process GenerateReport{
-     publishDir "${params.outdir}/report", mode: 'move'
+     publishDir "${baseDir}", mode: 'move'
 
     //conda "${projectDir}/r_env.yml"
     conda "r_env.yml"
