@@ -499,7 +499,7 @@ ace <- read.table("./qiime/ace/metadata.tsv", header=TRUE)
 faith_pd <- read.table("./qiime/faith_pd/metadata.tsv", header=TRUE)
 
 obs <- data.frame(obs[c('id','observed_features')])
-shannon <- data.frame(shannon[c('id','shannon')])
+shannon <- data.frame(shannon[c('id','shannon_entropy')])
 simpson <- data.frame(simpson[c('id','simpson')])
 chao1 <- data.frame(chao1[c('id','chao1')])
 ace <- data.frame(ace[c("id","ace")])
@@ -589,8 +589,8 @@ shannon_vals <- read.table("./qiime/shannon/metadata.tsv",sep = '\t', header = T
 dims = dim(shannon_vals)
 shannon_vals <- data.frame(shannon_vals[2:dims[1],])
 shannon_vals[[ioi]] <- reorder(as.factor(shannon_vals[[ioi]]))
-shannon_vals$shannon <- as.numeric(as.character(shannon_vals$shannon))
-shannon_boxplot <- ggplot(shannon_vals, aes_string(x=ioi, y=shannon_vals$shannon, fill=ioi)) + geom_boxplot() + ylab("Shannon") + theme_bw() + xlab(ioi)
+shannon_vals$shannon_entropy <- as.numeric(as.character(shannon_vals$shannon_entropy))
+shannon_boxplot <- ggplot(shannon_vals, aes_string(x=ioi, y=shannon_vals$shannon_entropy, fill=ioi)) + geom_boxplot() + ylab("Shannon") + theme_bw() + xlab(ioi)
 shannon_boxplot
 
 ggsave("shannon_boxplot.png", plot=shannon_boxplot, path=outdir)
