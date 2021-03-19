@@ -1282,6 +1282,8 @@ process GenerateReport{
     """
     #!/usr/bin/env bash
     
+    mkdir ${publishDir}/report
+    cp -rf * ${publishDir}/report
     echo "all files copied!"
     """
 
