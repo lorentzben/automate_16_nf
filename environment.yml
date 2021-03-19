@@ -4,7 +4,8 @@
 name: automate_16s_nf
 channels:
 - qiime2
-- https://packages.qiime2.org/qiime2/staging/2021.4
+# this url will need to be updated as qiime changes
+- https://packages.qiime2.org/qiime2/2021.4/staged/
 - conda-forge
 - bioconda
 - defaults
