@@ -498,7 +498,7 @@ chao1 <- read.table("./qiime/chao1/metadata.tsv", header=TRUE)
 ace <- read.table("./qiime/ace/metadata.tsv", header=TRUE)
 faith_pd <- read.table("./qiime/faith_pd/metadata.tsv", header=TRUE)
 
-obs <- data.frame(obs[c('id','observed_otus')])
+obs <- data.frame(obs[c('id','observed_features')])
 shannon <- data.frame(shannon[c('id','shannon')])
 simpson <- data.frame(simpson[c('id','simpson')])
 chao1 <- data.frame(chao1[c('id','chao1')])
@@ -528,14 +528,14 @@ obs_vals = read.csv("./qiime/obs/metadata.tsv", sep='\t')
 dims = dim(obs_vals)
 obs_vals <- data.frame(obs_vals[2:dims[1],])
 obs_vals[[ioi]] <- reorder(as.factor(obs_vals[[ioi]]))
-obs_vals$observed_otus <- as.numeric(as.character(obs_vals$observed_otus))
-obs_boxplot <- ggplot(obs_vals, aes_string(x=ioi,y = obs_vals$observed_otus, fill=ioi)) + geom_boxplot() + ylab("Observed Features") +theme_bw()
+obs_vals$observed_features <- as.numeric(as.character(obs_vals$observed_features))
+obs_boxplot <- ggplot(obs_vals, aes_string(x=ioi,y = obs_vals$observed_features, fill=ioi)) + geom_boxplot() + ylab("Observed Features") +theme_bw()
 obs_boxplot 
 
 ggsave("obs_boxplot.png", plot=obs_boxplot, path=outdir)
 
 #plots obs values in a violin plot format 
-p <- ggplot(obs_vals, aes(x=obs_vals[[ioi]], y=observed_otus)) + geom_violin()+ geom_boxplot(width=0.1)
+p <- ggplot(obs_vals, aes(x=obs_vals[[ioi]], y=observed_features)) + geom_violin()+ geom_boxplot(width=0.1)
 p<- p + stat_summary(fun.y=mean, geom="point", shape=23, size=2)
 p<-p + stat_summary(fun.y=median, geom="point", size=2, color="red")
 p <- p+geom_jitter(shape=16, position=position_jitter(0.2)) + xlab(ioi) + ylab("Observed Features") + theme_bw()
@@ -548,18 +548,18 @@ ggsave("obs_violin_plot.png", plot=p, path=outdir)
 ```{r Kruskal-Wallace test for signifiance observed feat,results = "asis", echo=FALSE, message=FALSE, warning=FALSE}
 library("ggpubr")
 obs <- read.table("./qiime/obs/metadata.tsv", header = TRUE)
-obs_stat <- data.frame(obs[c('id',ioi,'observed_otus')])
+obs_stat <- data.frame(obs[c('id',ioi,'observed_features')])
 
 
 
-form <- as.formula(paste0("observed_otus ~ ", ioi))
+form <- as.formula(paste0("observed_features ~ ", ioi))
 kruskal_table <- rstatix::kruskal_test(data = obs_stat, formula = form)
 kruskal_table <- add_significance(kruskal_table, p.col="p",output.col = "p.signif",symbols =c("****", "***", "**", "$*$", "ns"))
 
 kable(kruskal_table) %>% 
   kable_styling(bootstrap_options = c("hover", "condensed", "responsive"))
 
-form = as.formula(paste0("observed_otus ~", ioi))
+form = as.formula(paste0("observed_features ~", ioi))
 
 dunn_table <- rstatix::dunn_test(data = obs_stat, formula = form, p.adjust.method = "holm") 
 dunn_table<- add_significance(dunn_table, p.col="p.adj",output.col = "p.adj.signif",symbols =c("****", "***", "**", "$*$", "ns"))
@@ -568,7 +568,7 @@ kable(dunn_table) %>%
 
 dunn_table <- dunn_table %>% add_xy_position()
 
-p <- ggplot(obs_vals, aes(x=obs_vals[[ioi]], y=observed_otus)) + geom_violin()+ geom_boxplot(width=0.1)
+p <- ggplot(obs_vals, aes(x=obs_vals[[ioi]], y=observed_features)) + geom_violin()+ geom_boxplot(width=0.1)
 p<- p + stat_summary(fun.y=mean, geom="point", shape=23, size=2)
 p<-p + stat_summary(fun.y=median, geom="point", size=2, color="red")
 p <- p+geom_jitter(shape=16, position=position_jitter(0.2)) + xlab(ioi) + ylab("Observed Features") + theme_bw()
@@ -1057,7 +1057,7 @@ numextract <- function(string){
   str_extract(string, "\\-*\\d+\\.*\\d*")
 }
 
-obs_rarefy <- read.csv("./qiime/alpha-rareplot/observed_otus.csv")
+obs_rarefy <- read.csv("./qiime/alpha-rareplot/observed_features.csv")
 samples <- obs_rarefy[1]
 one <- obs_rarefy[2:11]
 two <- obs_rarefy[12:21]
