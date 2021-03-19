@@ -1777,6 +1777,7 @@ pairwise_permanova_uni <- function(dat, column_of_int, weight){
 
 ```{r Weighted Unifrac PERMANOVA, echo=FALSE, message=FALSE, warning=FALSE}
 library(vegan)
+library(phyloseq)
 cycle_1 <- qza_to_phyloseq(table_dada2,rooted_tree,taxonomy_file,metadata_file)
 sample_data(cycle_1)[[ioi]] <- reorder(sample_data(cycle_1)[[ioi]])
 # PERMANOVA of Weighted Unifrac
