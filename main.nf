@@ -1229,7 +1229,7 @@ process ExportSetup{
 
 
 process GenerateReport{
-     publishDir "${params.outdir}/report", mode: 'copy'
+     publishDir "${params.outdir}/report", mode: 'move'
 
     //conda "${projectDir}/r_env.yml"
     conda "r_env.yml"
@@ -1281,7 +1281,7 @@ process GenerateReport{
     script:
     """
     #!/usr/bin/env bash
-    cp * .
+    
     echo "all files copied!"
     """
 
