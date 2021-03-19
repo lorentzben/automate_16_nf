@@ -112,6 +112,11 @@ library(ggConvexHull)
 <!-- core-metrics-results/weighted_unifrac_pcoa_results.qza -->
 <!-- alpha-rare/observed_otus.csv -->
 
+```{r}
+list.files()
+```
+
+
 ```{r parse item of interest and make outdir for figures, echo=FALSE, message=FALSE, warning=FALSE}
 print(getwd())
 #item of interest, comes from bash and python script that orchestrates everything

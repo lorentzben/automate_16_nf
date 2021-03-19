@@ -1260,7 +1260,8 @@ process GenerateReport{
     script:
     """
     #!/usr/bin/env bash
-    
+    cd ${workDir}
+    ls
     Rscript -e "rmarkdown::render('report.Rmd', output_file='report.html', clean=TRUE)"
     """
 
