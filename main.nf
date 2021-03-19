@@ -1281,7 +1281,7 @@ process GenerateReport{
     script:
     """
     #!/usr/bin/env bash
-     
+    cp * .
     echo "all files copied!"
     """
 
