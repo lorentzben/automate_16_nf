@@ -1858,13 +1858,13 @@ pairwise_anosim <- function(dat, column_of_int, dissim){
   p_res <- c()
   
   for(i in 1:dim(combos)[1]){
-  comp <- prune_samples(sample_data(dat)[[ioi]] %in% combos[i,], dat)
-  grp <- get_variable(comp, column_of_int)
+    comp <- prune_samples(sample_data(dat)[[ioi]] %in% combos[i,], dat)
+    grp <- get_variable(comp, column_of_int)
   
-  ano <- anosim(distance(comp, dissim), grp)
-  ano_stats <- c(as.character(combos[i,1]), as.character(combos[i,2]), round(ano$statistic,6), ano$permutations, ano$dissimilarity, round(ano$signif,3))
-  #tmp <- c(ano, as.character(item))
-  p_res <- rbind(p_res, ano_stats)
+    ano <- anosim(distance(comp, dissim), grp)
+    ano_stats <- c(as.character(combos[i,1]), as.character(combos[i,2]), round(ano$statistic,6), ano$permutations, ano$dissimilarity, round(ano$signif,3))
+    #tmp <- c(ano, as.character(item))
+    p_res <- rbind(p_res, ano_stats)
   
   }
   tmp_2 <- data.frame(p_res)
@@ -1886,14 +1886,14 @@ pairwise_anosim_uni <- function(dat, column_of_int, weight){
   p_res <- c()
   
   for(i in 1:dim(combos)[1]){
-  comp <- prune_samples(sample_data(dat)[[ioi]] %in% combos[i,], dat)
-  grp <- get_variable(comp, column_of_int)
+    comp <- prune_samples(sample_data(dat)[[ioi]] %in% combos[i,], dat)
+    grp <- get_variable(comp, column_of_int)
   
-  tmp <- UniFrac(comp, weighted = weight)
-  ano <- anosim(tmp, sample_data(comp)[[ioi]])
-  ano_stats <- c(as.character(combos[i,1]), as.character(combos[i,2]), round(ano$statistic,6), ano$permutations, ano$dissimilarity, round(ano$signif,3))
-  #tmp <- c(ano, as.character(item))
-  p_res <- rbind(p_res, ano_stats)
+    tmp <- UniFrac(comp, weighted = weight)
+    ano <- anosim(tmp, sample_data(comp)[[ioi]])
+    ano_stats <- c(as.character(combos[i,1]), as.character(combos[i,2]), round(ano$statistic,6), ano$permutations, ano$dissimilarity, round(ano$signif,3))
+    #tmp <- c(ano, as.character(item))
+    p_res <- rbind(p_res, ano_stats)
   
   }
   tmp_2 <- data.frame(p_res)
@@ -2008,13 +2008,13 @@ pairwise_MRPP <- function(dat, column_of_int, dissim){
   p_res <- c()
   
   for(i in 1:dim(combos)[1]){
-  comp <- prune_samples(sample_data(dat)[[ioi]] %in% combos[i,], dat)
-  grp <- get_variable(comp, column_of_int)
+    comp <- prune_samples(sample_data(dat)[[ioi]] %in% combos[i,], dat)
+    grp <- get_variable(comp, column_of_int)
   
-  mrpp_res <- mrpp(distance(comp, dissim), grp)
-  mrpp_stats <- c(as.character(combos[i,1]), as.character(combos[i,2]), round(mrpp_res$delta,6), mrpp_res$permutations, mrpp_res$distance, round(mrpp_res$Pvalue,3))
-  #tmp <- c(ano, as.character(item))
-  p_res <- rbind(p_res, mrpp_stats)
+    mrpp_res <- mrpp(distance(comp, dissim), grp)
+    mrpp_stats <- c(as.character(combos[i,1]), as.character(combos[i,2]), round(mrpp_res$delta,6), mrpp_res$permutations, mrpp_res$distance, round(mrpp_res$Pvalue,3))
+    #tmp <- c(ano, as.character(item))
+    p_res <- rbind(p_res, mrpp_stats)
   
   }
   tmp_2 <- data.frame(p_res)
@@ -2036,14 +2036,14 @@ pairwise_MRPP_uni <- function(dat, column_of_int, weight){
   p_res <- c()
   
   for(i in 1:dim(combos)[1]){
-  comp <- prune_samples(sample_data(dat)[[ioi]] %in% combos[i,], dat)
-  grp <- get_variable(comp, column_of_int)
+    comp <- prune_samples(sample_data(dat)[[ioi]] %in% combos[i,], dat)
+    grp <- get_variable(comp, column_of_int)
   
-  tmp <- UniFrac(comp, weighted = weight)
-  mrpp_res <- mrpp(tmp, grp)
-  mrpp_stats <- c(as.character(combos[i,1]), as.character(combos[i,2]), round(mrpp_res$delta,6), mrpp_res$permutations, round(mrpp_res$Pvalue,3))
-  #tmp <- c(ano, as.character(item))
-  p_res <- rbind(p_res, mrpp_stats)
+    tmp <- UniFrac(comp, weighted = weight)
+    mrpp_res <- mrpp(tmp, grp)
+    mrpp_stats <- c(as.character(combos[i,1]), as.character(combos[i,2]), round(mrpp_res$delta,6), mrpp_res$permutations, round(mrpp_res$Pvalue,3))
+    #tmp <- c(ano, as.character(item))
+    p_res <- rbind(p_res, mrpp_stats)
   
   }
   tmp_2 <- data.frame(p_res)
@@ -2117,13 +2117,13 @@ pairwise_AMOVA <- function(dat, column_of_int, dissim){
   p_res <- c()
   
   for(i in 1:dim(combos)[1]){
-  comp <- prune_samples(sample_data(dat)[[ioi]] %in% combos[i,], dat)
-  grp <- get_variable(comp, column_of_int)
-  dist <- distance(comp, dissim)
-  amova_res <- pegas::amova(as.formula(dist ~ grp))
-  amova_stats <- c(as.character(combos[i,1]), as.character(combos[i,2]), round(amova_res$tab$MSD[1],6), dissim, round(amova_res$varcomp$P.value[1],3))
+    comp <- prune_samples(sample_data(dat)[[ioi]] %in% combos[i,], dat)
+    grp <- get_variable(comp, column_of_int)
+    dist <- distance(comp, dissim)
+    amova_res <- pegas::amova(as.formula(dist ~ grp))
+    amova_stats <- c(as.character(combos[i,1]), as.character(combos[i,2]), round(amova_res$tab$MSD[1],6), dissim, round(amova_res$varcomp$P.value[1],3))
   
-  p_res <- rbind(p_res, amova_stats)
+    p_res <- rbind(p_res, amova_stats)
   
   }
   tmp_2 <- data.frame(p_res)
@@ -2145,14 +2145,14 @@ pairwise_AMOVA_uni <- function(dat, column_of_int, weight){
   p_res <- c()
   
   for(i in 1:dim(combos)[1]){
-  comp <- prune_samples(sample_data(dat)[[ioi]] %in% combos[i,], dat)
-  grp <- get_variable(comp, column_of_int)
+    comp <- prune_samples(sample_data(dat)[[ioi]] %in% combos[i,], dat)
+    grp <- get_variable(comp, column_of_int)
   
-  tmp <- UniFrac(comp, weighted = weight)
-  amova_res <- pegas::amova(as.formula(tmp ~ grp))
-  amova_stats <- c(as.character(combos[i,1]), as.character(combos[i,2]),weight, round(amova_res$tab$MSD[1],6),  round(amova_res$varcomp$P.value[1],3))
+    tmp <- UniFrac(comp, weighted = weight)
+    amova_res <- pegas::amova(as.formula(tmp ~ grp))
+    amova_stats <- c(as.character(combos[i,1]), as.character(combos[i,2]),weight, round(amova_res$tab$MSD[1],6),  round(amova_res$varcomp$P.value[1],3))
  
-  p_res <- rbind(p_res, amova_stats)
+    p_res <- rbind(p_res, amova_stats)
   
   }
   tmp_2 <- data.frame(p_res)
