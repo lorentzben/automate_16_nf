@@ -860,8 +860,8 @@ ggsave("faith_pd_boxplot_w_signif.png", plot=p, path=outdir)
 library(qiime2R)
 metadata<-read_q2metadata(metadata_file)
 metadata[[ioi]] <- reorder(metadata[[ioi]])
-bray_pcoa <- qiime2R::read_qza("./qiime/core-metrics-results/bray_curtis_pcoa_results.qza")
-shannon<-qiime2R::read_qza("./qiime/core-metrics-results/shannon_vector.qza")
+bray_pcoa <- qiime2R::read_qza("./qiime/core-metric-results/bray_curtis_pcoa_results.qza")
+shannon<-qiime2R::read_qza("./qiime/core-metric-results/shannon_vector.qza")
 shannon <- shannon$data %>% rownames_to_column("SampleID")
 
 
@@ -899,8 +899,8 @@ ggsave("bray_curtis_pcoa_ordination_no_polygon.png", plot=bray_curtis_no_poly, p
 
 ```{r pcoa using Jaccard distance, echo=FALSE, message=FALSE, warning=FALSE}
 metadata<-read_q2metadata(metadata_file)
-jaccard <- qiime2R::read_qza("./qiime/core-metrics-results/jaccard_pcoa_results.qza")
-shannon<-qiime2R::read_qza("./qiime/core-metrics-results/shannon_vector.qza")
+jaccard <- qiime2R::read_qza("./qiime/core-metric-results/jaccard_pcoa_results.qza")
+shannon<-qiime2R::read_qza("./qiime/core-metric-results/shannon_vector.qza")
 shannon <- shannon$data %>% rownames_to_column("SampleID")
 
 metadata[[ioi]] <- reorder(metadata[[ioi]])
@@ -944,8 +944,8 @@ ggsave("jaccard_pcoa_ordination_no_polygons.png", plot=jaccard_pcoa_no_polygon, 
 ```{r unweighted unifrac pcoa ordination, echo=FALSE, message=FALSE, warning=FALSE}
 metadata<-read_q2metadata(metadata_file)
 metadata[[ioi]] <- reorder(metadata[[ioi]])
-jaccard <- qiime2R::read_qza("./qiime/core-metrics-results/unweighted_unifrac_pcoa_results.qza")
-shannon<-qiime2R::read_qza("./qiime/core-metrics-results/shannon_vector.qza")
+jaccard <- qiime2R::read_qza("./qiime/core-metric-results/unweighted_unifrac_pcoa_results.qza")
+shannon<-qiime2R::read_qza("./qiime/core-metric-results/shannon_vector.qza")
 shannon <- shannon$data %>% rownames_to_column("SampleID")
 
 
@@ -987,8 +987,8 @@ ggsave("unweighted_unifrac_pcoa_ordination_no_polygons.png", plot=unweight_unifr
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
 metadata<-read_q2metadata(metadata_file)
 metadata[[ioi]] <- reorder(metadata[[ioi]])
-jaccard <- qiime2R::read_qza("./qiime/core-metrics-results/weighted_unifrac_pcoa_results.qza")
-shannon<-qiime2R::read_qza("./qiime/core-metrics-results/shannon_vector.qza")
+jaccard <- qiime2R::read_qza("./qiime/core-metric-results/weighted_unifrac_pcoa_results.qza")
+shannon<-qiime2R::read_qza("./qiime/core-metric-results/shannon_vector.qza")
 shannon <- shannon$data %>% rownames_to_column("SampleID")
 
 weighted_unifrac_pcoa <- jaccard$data$Vectors %>%
@@ -1439,8 +1439,8 @@ ggsave("rank_abundance_curve_by_treatemnt.png", plot=by_group, path=outdir)
 ```{r echo=FALSE,fig.height=8, fig.width=14, message=FALSE, warning=FALSE}
 metadata<-read_q2metadata(metadata_file)
 metadata[[ioi]] <- reorder(metadata[[ioi]])
-w_unifrac_dist <- qiime2R::read_qza("./qiime/core-metrics-results/weighted_unifrac_distance_matrix.qza")
-u_unifrac_dist <- qiime2R::read_qza("./qiime/core-metrics-results/unweighted_unifrac_distance_matrix.qza")
+w_unifrac_dist <- qiime2R::read_qza("./qiime/core-metric-results/weighted_unifrac_distance_matrix.qza")
+u_unifrac_dist <- qiime2R::read_qza("./qiime/core-metric-results/unweighted_unifrac_distance_matrix.qza")
 
 un_weight_matrix <- as.matrix(u_unifrac_dist$data)
 un_weight_matrix[lower.tri(un_weight_matrix)] <- NA
@@ -2092,7 +2092,7 @@ bray_res <- pairwise_MRPP(cycle_1, ioi, "bray")
 kable(bray_res) %>%
   kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
 
-jaccard <- qiime2R::read_qza("./qiime/core-metrics-results/jaccard_distance_matrix.qza")
+jaccard <- qiime2R::read_qza("./qiime/core-metric-results/jaccard_distance_matrix.qza")
 # Jaccard 
 print("MRPP based on Jaccard distance")
 grp <- get_variable(cycle_1, ioi)
