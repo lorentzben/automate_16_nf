@@ -1705,18 +1705,18 @@ pairwise_permanova <- function(dat, column_of_int, dissim){
   p_res <- c()
   
   for(i in 1:dim(combos)[1]){
-  comp <- prune_samples(sample_data(dat)[[ioi]] %in% combos[i,], dat)
-  grp <- get_variable(comp, column_of_int)
+    comp <- prune_samples(sample_data(dat)[[ioi]] %in% combos[i,], dat)
+    grp <- get_variable(comp, column_of_int)
   
-  permanova <- adonis(distance(comp, dissim) ~ grp)
-  permanova <- tibble::tibble(permanova$aov.tab)
-  colnames(permanova)[5] <- "r^2"
-  colnames(permanova)[6] <- "p"
-  permanova_stats <- data.frame(as.character(combos[i,1]), as.character(combos[i,2]), permanova[1,])
-  colnames(permanova_stats)[1] <- "group1"
-  colnames(permanova_stats)[2] <- "group2"
-  data.frame(permanova_stats)
-  p_res <- rbind(p_res, permanova_stats)
+    permanova <- adonis(distance(comp, dissim) ~ grp)
+    permanova <- tibble::tibble(permanova$aov.tab)
+    colnames(permanova)[5] <- "r^2"
+    colnames(permanova)[6] <- "p"
+    permanova_stats <- data.frame(as.character(combos[i,1]), as.character(combos[i,2]), permanova[1,])
+    colnames(permanova_stats)[1] <- "group1"
+    colnames(permanova_stats)[2] <- "group2"
+    data.frame(permanova_stats)
+    p_res <- rbind(p_res, permanova_stats)
   
   }
   tmp_2 <- data.frame(p_res)
