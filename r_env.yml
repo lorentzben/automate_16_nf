@@ -25,4 +25,4 @@ dependencies:
 - r-openssl=1.4.3
 - r-doparallel=1.0.16
 - r-plotly=4.9.3
-- r-adegenet=2.1.3
+- r-adegenet=2.1.2
