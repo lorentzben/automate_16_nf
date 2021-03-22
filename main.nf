@@ -1270,16 +1270,16 @@ process GenerateReport{
     file "out.txt" into ch_done
        
     script:
-    """
+    '''
     #!/usr/bin/env bash
     echo "all files copied!"
-    cd ${baseDir}
-    echo '${baseDir}' > out.txt
+    cd !{baseDir}
+    echo !{baseDir} > out.txt
     cp report.Rmd $(cat out.txt)
     cp make_report.sh $(cat out.txt)
     cd $(cat out.txt)
     bash make_report.sh
-    """
+    '''
 }
 
 
