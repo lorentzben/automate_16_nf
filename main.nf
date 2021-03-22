@@ -1275,10 +1275,12 @@ process GenerateReport{
     #!/usr/bin/env bash
     echo "all files copied!"
     cd !{baseDir}
+    echo $PWD
     echo !{baseDir}/!{params.outdir} > out.txt
     cp report.Rmd $(cat out.txt)
     cp make_report.sh $(cat out.txt)
     cd $(cat out.txt)
+    echo $PWD
     bash make_report.sh
     '''
 }
