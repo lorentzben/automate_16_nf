@@ -123,7 +123,7 @@ process SetupRPackages{
     script:
     """
     #!/usr/bin/env Rscript --vanilla
-    Sys.setenv(R_REMOTES_NO_ERRORS_FROM_WARNINGS="false")
+    Sys.setenv(R_REMOTES_NO_ERRORS_FROM_WARNINGS="true")
     if(!require(remotes)){install.packages("remotes",repos="http://cran.us.r-project.org")}
     if(!require(devtools)){install.packages("devtools",repos="http://cran.us.r-project.org")}
     if(!require(jamba)){remotes::install_github("jmw86069/jamba@0.0.6.900")}
