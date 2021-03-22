@@ -57,7 +57,7 @@ if(!require(devtools)) {install.packages("devtools",repos="http://cran.us.r-proj
 if(!require(ggdendro)){install.packages("ggendro",repos="http://cran.us.r-project.org")}
 if(!require(vegan)){install.packages("vegan",repos="http://cran.us.r-project.org", type="source")}
 if(!require(ape)){install.packages("ape",dep=TRUE,repos="http://cran.us.r-project.org", type="source")}
-if(!require(adegenet)){install.packages("adegenet",dep=TRUE,repos="http://cran.us.r-project.org", type="source")}
+if(!require(adegenet)){install.packages("adegenet",dep=FALSE,repos="http://cran.us.r-project.org", type="source")}
 if(!require(ade4)){install.packages("ade4",dep=TRUE,repos="http://cran.us.r-project.org", type="source")}
 if(!require(pegas)){install.packages("pegas",dep=TRUE,repos="http://cran.us.r-project.org", type="source")}
 
