@@ -20,7 +20,7 @@ dependencies:
 - r-pheatmap=1.0.12
 - r-rstatix=0.6.0
 - r-ggdendro=0.1.22
-- r-pegas=0.14
+- r-pegas=0.13
 - r-ggpubr=0.4.0
 - r-openssl=1.4.3
 - r-doparallel=1.0.16
