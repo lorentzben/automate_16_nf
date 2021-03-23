@@ -49,7 +49,7 @@ if(!require(gridExtra)) {install.packages("gridExtra",repos="http://cran.us.r-pr
 
 
 if(!require(pheatmap)){install.packages("pheatmap",repos="http://cran.us.r-project.org")}
-if(!require(rstatix)){installl.packages("rstatix",repos="http://cran.us.r-project.org")}
+if(!require(rstatix)){install.packages("rstatix",repos="http://cran.us.r-project.org")}
 # if(!require(knitr)){install.packages("knitr")}
 if(!require(tidyverse)){install.packages("tidyverse",repos="http://cran.us.r-project.org")}
 if(!require(ampvis2)){remotes::install_github("MadsAlbertsen/ampvis2")}
