@@ -62,8 +62,8 @@ if(!require(vegan)){install.packages("vegan",repos="http://cran.us.r-project.org
 #if(!require(pegas)){install.packages("pegas",dep=TRUE,repos="http://cran.us.r-project.org", type="source")}
 
 if(!require(ggvegan)){remotes::install_github("gavinsimpson/ggvegan")}
-if(!require(ggpubr)){install.packages("ggpubr")}
-if(!require(dplyr)){install.packages("dplyr")}
+if(!require(ggpubr)){install.packages("ggpubr",repos="http://cran.us.r-project.org", type="source")}
+if(!require(dplyr)){install.packages("dplyr",repos="http://cran.us.r-project.org", type="source")}
 if(!require(jamba)){remotes::install_github("jmw86069/jamba")}
 if(!require(ggConvexHull)){remotes::install_github("cmartin/ggConvexHull")}
 # library(remotes)
