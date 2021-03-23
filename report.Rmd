@@ -59,7 +59,7 @@ if(!require(rstatix)){install.packages("rstatix",repos="http://cran.us.r-project
 if(!require(tidyverse)){install.packages("tidyverse",repos="http://cran.us.r-project.org")}
 if(!require(ampvis2)){remotes::install_github("MadsAlbertsen/ampvis2")}
 if(!require(devtools)) {install.packages("devtools",repos="http://cran.us.r-project.org")}
-if(!require(ggdendro)){install.packages("ggendro",repos="http://cran.us.r-project.org", type="source")}
+if(!require(ggdendro)){install.packages("ggendro",repos="https://cloud.r-project.org/", type="source")}
 if(!require(vegan)){install.packages("vegan",repos="http://cran.us.r-project.org", type="source")}
 #if(!require(ape)){install.packages("ape",dep=TRUE,repos="http://cran.us.r-project.org", type="source")}
 #if(!require(adegenet)){install.packages("adegenet",dep=FALSE,repos="http://cran.us.r-project.org", type="source")}
