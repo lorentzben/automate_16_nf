@@ -14,9 +14,12 @@ output:
 <!-- then you take the stem of where the bin for that package is and replace it below -->
 
 ```{r handle lib errors, echo=FALSE, message=FALSE, warning=FALSE}
-Sys.setenv(LD_LIBRARY_PATH = "/lib64")
-Sys.setenv(PKG_CONFIG_PATH = "/lib64/pkgconfig")
+#Sys.setenv(LD_LIBRARY_PATH = "/lib64")
+#Sys.setenv(PKG_CONFIG_PATH = "/lib64/pkgconfig")
 #Sys.setenv(R_REMOTES_NO_ERRORS_FROM_WARNINGS="true")
+#install.packages("renv", repos="http://cran.us.r-project.org")
+library(renv)
+renv::init()
 ```
 
 ```{r function to check how the document is being rendered, message=FALSE, warning=FALSE, include=FALSE}
@@ -34,17 +37,12 @@ getOutputFormat <- function() {
 
 ```{r install/load libraries, message=FALSE, warning=FALSE, include=FALSE}
 if(!require(kableExtra)) {install.packages("kableExtra", repos="http://cran.us.r-project.org")}
-if(!require(remotes)){install.packages("remotes", repos="http://cran.us.r-project.org", type="source")}
+if(!require(remotes)){install.packages("remotes", repos="http://cran.us.r-project.org")}
 if(!require(ggplot2)) {remotes::install_github("tidyverse/ggplot2@v3.3.2")}
-if(!require(tidyverse)) {install.packages("tidyverse", repos="http://cran.us.r-project.org", type="source")}
-if(!require(usethis)) {install.packages("usethis", repos="http://cran.us.r-project.org", type="source")}
-if(!require(tibble)) {install.packages("tibble", repos="http://cran.us.r-project.org", type="source")}
-if(!require(openssl)) {install.packages("openssl", repos="http://cran.us.r-project.org", type="source")}
-if(!require(knitr)) {install.packages("knitr", repos="http://cran.us.r-project.org", type="source")}
+if(!require(tidyverse)) {install.packages("tidyverse", repos="http://cran.us.r-project.org")}
 
 
-
-if (!require("devtools", quietly = TRUE)){install.packages("devtools", repos="http://cran.us.r-project.org", type="source")}
+if (!require("devtools", quietly = TRUE)){install.packages("devtools", repos="http://cran.us.r-project.org")}
 if(!require(qiime2R)) {devtools::install_github("jbisanz/qiime2R")} # current version is 0.99.20
 if(!require(phyloseq)) {install.packages("phyloseq",repos="http://cran.us.r-project.org")}
 if(!require(gtools)) {install.packages("gtools",repos="http://cran.us.r-project.org")}
@@ -54,21 +52,21 @@ if(!require(gridExtra)) {install.packages("gridExtra",repos="http://cran.us.r-pr
 
 
 if(!require(pheatmap)){install.packages("pheatmap",repos="http://cran.us.r-project.org")}
-if(!require(rstatix)){install.packages("rstatix",repos="http://cran.us.r-project.org")}
+if(!require(rstatix)){installl.packages("rstatix",repos="http://cran.us.r-project.org")}
 # if(!require(knitr)){install.packages("knitr")}
 if(!require(tidyverse)){install.packages("tidyverse",repos="http://cran.us.r-project.org")}
 if(!require(ampvis2)){remotes::install_github("MadsAlbertsen/ampvis2")}
 if(!require(devtools)) {install.packages("devtools",repos="http://cran.us.r-project.org")}
-if(!require(ggdendro)){install.packages("ggendro",repos="https://cloud.r-project.org/", type="source", dep=TRUE)}
+if(!require(ggdendro)){install.packages("ggendro",repos="http://cran.us.r-project.org")}
 if(!require(vegan)){install.packages("vegan",repos="http://cran.us.r-project.org", type="source")}
 #if(!require(ape)){install.packages("ape",dep=TRUE,repos="http://cran.us.r-project.org", type="source")}
 #if(!require(adegenet)){install.packages("adegenet",dep=FALSE,repos="http://cran.us.r-project.org", type="source")}
 #if(!require(ade4)){install.packages("ade4",dep=TRUE,repos="http://cran.us.r-project.org", type="source")}
-#if(!require(pegas)){install.packages("pegas",dep=TRUE,repos="https://cloud.r-project.org/", type="source")}
+#if(!require(pegas)){install.packages("pegas",dep=TRUE,repos="http://cran.us.r-project.org", type="source")}
 
 if(!require(ggvegan)){remotes::install_github("gavinsimpson/ggvegan")}
-if(!require(ggpubr)){install.packages("ggpubr",repos="http://cran.us.r-project.org", type="source")}
-if(!require(dplyr)){install.packages("dplyr",repos="http://cran.us.r-project.org", type="source")}
+if(!require(ggpubr)){install.packages("ggpubr")}
+if(!require(dplyr)){install.packages("dplyr")}
 if(!require(jamba)){remotes::install_github("jmw86069/jamba")}
 if(!require(ggConvexHull)){remotes::install_github("cmartin/ggConvexHull")}
 # library(remotes)
@@ -125,6 +123,7 @@ library(ggConvexHull)
 
 ```{r parse item of interest and make outdir for figures, echo=FALSE, message=FALSE, warning=FALSE}
 #item of interest, comes from bash and python script that orchestrates everything
+wd <- getwd()
 ioi <- read.csv("item_of_interest.csv")
 ioi<-as.character(ioi)
 
@@ -423,29 +422,32 @@ ggsave("stacked_bar_species_by_treatment.png", plot=by_treatment, path=outdir)
 ## 2 Phylogentic Trees
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
-if(getOutputFormat() =='pdf_document'){
-  print("see end of report")
-}
+# if(getOutputFormat() =='pdf_document'){
+#   print("see end of report")
+# }
 
 ```
 
 
 ```{r phylo-tree", echo=FALSE, message=FALSE, warning=FALSE, fig.pos='h', out.width="100%", fig.cap="\\newline{}"}
-if(getOutputFormat() == 'html_document') {
-  tree_filenames <- list.files(pattern="graphlan/phylo_trees/image_.*_graph.png")
-  tree_filenames <- mixedsort(tree_filenames)
-
-  include_graphics(tree_filenames)
-} 
-
-if(getOutputFormat() =='pdf_document'){
-  print("see end of report")
-  tree_filenames <- list.files(pattern="graphlan/phylo_trees/image_.*_pdf_g.png")
+#if(getOutputFormat() == 'html_document') {
+  
+  tree_filenames <- list.files("./graphlan/phylo_trees",pattern="image_.*_graph.png",full.names=T)
   tree_filenames <- mixedsort(tree_filenames)
 
   include_graphics(tree_filenames)
   
-}
+#} 
+# 
+# if(getOutputFormat() =='pdf_document'){
+#   
+#   print("see end of report")
+#   tree_filenames <- list.files("./graphlan/phylo_trees",pattern="image_.*_pdf_g.png", full.names=T)
+#   tree_filenames <- mixedsort(tree_filenames)
+# 
+#   include_graphics(tree_filenames)
+#   
+# }
 ```
 
 
@@ -2230,56 +2232,64 @@ kable(jaccard_amova_pairwise) %>%
 ## 13 Lefse
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
-if(getOutputFormat() =='pdf_document'){
-  print("see end of report")
-}
+# if(getOutputFormat() =='pdf_document'){
+#   print("see end of report")
+# }
 
 ```
 
 ```{r Lefse analysis Results, echo=FALSE, message=FALSE, warning=FALSE, fig.height=25, fig.width=10, out.height="85%", out.width="85%", fig.cap="\\newline{}"}
 
-if(getOutputFormat() == 'html_document') {
-  lefse_res_filenames <- list.files(pattern="lefse/result/*_res.png")
+#if(getOutputFormat() == 'html_document') {
+
+  lefse_res_filenames <- list.files("lefse/result",pattern="*_res.png",full.names = T)
 
   lefse_filenames <- mixedsort(lefse_res_filenames)
 
   include_graphics(lefse_filenames)
-} 
+  
+#} 
 ```
 
 
 ```{r Lefse analysis Results pdf style, echo=FALSE, message=FALSE, warning=FALSE, out.height="85%",dpi=36, out.width="85%", fig.cap="\\newline{}"}
-if(getOutputFormat() =='pdf_document'){
-  print("see end of report")
-  lefse_res_filenames <- list.files(pattern="lefse/result/*_pdf_r.png")
-
-  lefse_filenames <- mixedsort(lefse_res_filenames)
-
-  include_graphics(lefse_filenames)
-}
+# if(getOutputFormat() =='pdf_document'){
+#   print("see end of report")
+#   
+#   lefse_res_filenames <- list.files("lefse/result",pattern="*_pdf_r.png",full.names=T)
+# 
+#   lefse_filenames <- mixedsort(lefse_res_filenames)
+# 
+#   include_graphics(lefse_filenames)
+#  
+# }
 
 ```
 
 
 ```{r Lefse cladograms, echo=FALSE, message=FALSE, warning=FALSE, fig.height=25, fig.width=10, fig.pos='h', out.width="100%", fig.cap="\\newline{}"}
 
-if(getOutputFormat() == 'html_document') {
+#if(getOutputFormat() == 'html_document') {
+ 
   
-  lefse_clado_filenames <- list.files(pattern="result/*_cladogram.png")
-  
-  lefse_filenames <- mixedsort(lefse_clado_filenames)
-
-  include_graphics(lefse_filenames)
-} 
-
-if(getOutputFormat() =='pdf_document'){
-  print("see end of report")
-  lefse_clado_filenames <- list.files(pattern="result/*_pdf_qual_clad.png")
+  lefse_clado_filenames <- list.files("lefse/result",pattern="*_cladogram.png",full.names=T)
   
   lefse_filenames <- mixedsort(lefse_clado_filenames)
 
   include_graphics(lefse_filenames)
-}
+  
+# } 
+# 
+# if(getOutputFormat() =='pdf_document'){
+#   print("see end of report")
+#   
+#   lefse_clado_filenames <- list.files("lefse/result",pattern="result/*_pdf_qual_clad.png",full.names=T)
+#   
+#   lefse_filenames <- mixedsort(lefse_clado_filenames)
+# 
+#   include_graphics(lefse_filenames)
+#   
+# }
 
 ```
 
