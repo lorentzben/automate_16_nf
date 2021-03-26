@@ -23,7 +23,7 @@ window.close()
 
 print("you chose: " +str( values))
 
-subprocess.run(['nextflow pull -r main lorentzben/automate_16_nf'])
+subprocess.run(['nextflow pull -r main lorentzben/automate_16_nf'], shell=True)
 
 os.chdir(str(values[0]))
 if values[6] :
