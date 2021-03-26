@@ -23,13 +23,13 @@ window.close()
 
 print("you chose: " +str( values))
 
-subprocess.run(['nextflow pull -r main lorentzben/automate_16_nf'], shell=True)
+
 
 os.chdir(str(values[0]))
 if values[6] :
-    result = subprocess.run(['nextflow run -r main lorentzben/automate_16_nf --input '+values[1]+" --metadata " +values[2]+" --manifest "+values[3]+" --itemOfInterest "+values[4]+" --outdir "+values[5]+ "--resume"], shell=True)
+    result = subprocess.run(['nextflow run ~/Documents/automate_16_nf/main.nf --input '+values[1]+" --metadata " +values[2]+" --manifest "+values[3]+" --itemOfInterest "+values[4]+" --outdir "+values[5]+ "--resume"], shell=True)
 else:
-    result = subprocess.run(['nextflow run -r main lorentzben/automate_16_nf --input '+values[1]+" --metadata " +values[2]+" --manifest "+values[3]+" --itemOfInterest "+values[4]+" --outdir "+values[5]], shell=True)
+    result = subprocess.run(['nextflow run ~/Documents/automate_16_nf/main.nf --input '+values[1]+" --metadata " +values[2]+" --manifest "+values[3]+" --itemOfInterest "+values[4]+" --outdir "+values[5]], shell=True)
 
 if result.returncode != 0:
     print("error")
