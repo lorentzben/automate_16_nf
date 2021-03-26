@@ -22,6 +22,9 @@ event, values = window.read()
 window.close()
 
 print("you chose: " +str( values))
+
+subprocess.ruN(['nextflow pull -r main lorentzben/automate_16_nf'])
+
 os.chdir(str(values[0]))
 if values[6] :
     result = subprocess.run(['nextflow run -r main lorentzben/automate_16_nf --input '+values[1]+" --metadata " +values[2]+" --manifest "+values[3]+" --itemOfInterest "+values[4]+" --outdir "+values[5]+ "--resume"], shell=True)
