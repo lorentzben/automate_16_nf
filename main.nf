@@ -849,7 +849,7 @@ process AssignTaxonomy{
     """
 }
 
-process CalcRareDeth{
+process CalcRareDepth{
     publishDir "${params.outdir}/qiime", mode: 'copy'
 
     conda "${projectDir}/environment.yml"
