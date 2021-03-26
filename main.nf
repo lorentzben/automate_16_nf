@@ -14,8 +14,7 @@ def helpMessage(){
         --itemOfInterest [str]      Item of interest, group defining treatment vs control or longitudinal variable
         -name [str]                   Name for the analysis run, if not provided nextflow will generate one 
         --outdir [file]               The output directory where the results will be saved 
-        --email [email]               Set this parameter to your e-mail address to get a summary e-mail with details of the run sent to you when the workflow exits
-	    --email_on_fail [email]       Same as --email, except only send mail if the workflow is not successful
+        
         
         
 
