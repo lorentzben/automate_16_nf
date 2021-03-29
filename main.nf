@@ -95,8 +95,8 @@ Channel
     .set{ ch_report_bash_script }
 
 process SetupPy2CondaEnv{
-    conda "${projectDir}/python2_env.yml"
-    //conda "python2_env.yml"
+    //conda "${projectDir}/python2_env.yml"
+    conda "python2_env.yml"
 
     input:
     file plot_clado from ch_clado_file
