@@ -116,8 +116,8 @@ process SetupPy2CondaEnv{
 
 //I removed Biocmanager and Microbiome, so if a function breaks, thats why. 
 process SetupRPackages{
-    conda "${projectDir}/r_env.yml"
-    //conda "r_env.yml"
+    //conda "${projectDir}/r_env.yml"
+    conda "r_env.yml"
     output:
     file "set.txt" into ch_r_wait
     script:
@@ -150,8 +150,8 @@ process VerifyManifest{
     /*this is in place for local deployment, but the server does not give access to the dir for some reason
     The change is nessecary to do nextflow run -r main lorentzben/automate_16_nf
     */
-    conda "${projectDir}/environment.yml"
-    //conda "environment.yml"
+    //conda "${projectDir}/environment.yml"
+    conda "environment.yml"
 
     script:
     """
@@ -267,8 +267,8 @@ process VerifyManifest{
 process CheckSinglePaired { 
 
     publishDir "${params.outdir}", mode: 'copy'
-    conda "${projectDir}/environment.yml"
-    //conda "environment.yml"
+    //conda "${projectDir}/environment.yml"
+    conda "environment.yml"
     
     input: 
     file manifest from ch_single_pair
@@ -334,8 +334,8 @@ process CheckSinglePaired {
 process GenerateSeqObject{
 
     publishDir "${params.outdir}/qiime", mode: 'copy'
-    conda "${projectDir}/environment.yml"
-    //conda "environment.yml"
+    //conda "${projectDir}/environment.yml"
+    conda "environment.yml"
 
     input: 
     file manifest from ch_make_qiime
@@ -371,8 +371,8 @@ process QualControl{
     file('demux_summary/*') into ch_qiime_qual
     file seq_obj into ch_qiime_denoise
 
-    conda "${projectDir}/environment.yml"
-    //conda "environment.yml"
+    //conda "${projectDir}/environment.yml"
+    conda "environment.yml"
 
     script:
     """
@@ -401,8 +401,8 @@ process FindCutoffs{
     file("cutoffs.csv") into ch_cutoff_vals
     file("manifest_format.txt") into ch_manifest_type_denoise
 
-    conda "${projectDir}/environment.yml"
-    //conda "environment.yml"
+    //conda "${projectDir}/environment.yml"
+    conda "environment.yml"
 
     script:
     """
@@ -535,8 +535,8 @@ process Denoise {
     
     
 
-    conda "${projectDir}/environment.yml"
-    //conda "environment.yml"
+    //conda "${projectDir}/environment.yml"
+    conda "environment.yml"
 
     script:
     """
@@ -601,8 +601,8 @@ process FeatureVisualization{
     file "rep-seqs-dada2.qza" into ch_rep_seq_tree_gen
     file "table-dada2.qza" into ch_alpha_div_table
 
-    conda "${projectDir}/environment.yml"
-    //conda "environment.yml"
+    //conda "${projectDir}/environment.yml"
+    conda "environment.yml"
 
     script:
     """
@@ -626,8 +626,8 @@ process FeatureVisualization{
 process TreeConstruction{
     publishDir "${params.outdir}/qiime", mode: 'copy'
 
-    conda "${projectDir}/environment.yml"
-    //conda "environment.yml"
+    //conda "${projectDir}/environment.yml"
+    conda "environment.yml"
     
     input:
     file "rep-seqs-dada2.qza" from ch_rep_seq_tree_gen
@@ -655,8 +655,8 @@ process TreeConstruction{
 process ExportTable{
     publishDir "${params.outdir}/qiime", mode: 'copy'
 
-    conda "${projectDir}/environment.yml"
-    //conda "environment.yml"
+    //conda "${projectDir}/environment.yml"
+    conda "environment.yml"
     
     input:
     file "table.qzv" from ch_table_viz_obj
@@ -680,8 +680,8 @@ process ExportTable{
 process DetermineDepth{
     publishDir "${params.outdir}/qiime", mode: 'copy'
 
-    conda "${projectDir}/environment.yml"
-    //conda "environment.yml"
+    //conda "${projectDir}/environment.yml"
+    conda "environment.yml"
 
     input:
     path "table_viz/*" from ch_table_viz_dir
@@ -741,8 +741,8 @@ process DetermineDepth{
 process AlphaDiversityMeasure{
     publishDir "${params.outdir}/qiime", mode: 'copy'
 
-    conda "${projectDir}/environment.yml"
-    //conda "environment.yml"
+    //conda "${projectDir}/environment.yml"
+    conda "environment.yml"
 
     input:
     file metadata from ch_alpha_metadata
@@ -813,8 +813,8 @@ process AssignTaxonomy{
     //TODO change out the classifier for the 515 only one 
     publishDir "${params.outdir}/qiime", mode: 'copy'
 
-    conda "${projectDir}/environment.yml"
-    //conda "environment.yml"
+    //conda "${projectDir}/environment.yml"
+    conda "environment.yml"
 
     input:
     file "rep-seqs-dada2.qza" from ch_rep_seq_classify
@@ -854,8 +854,8 @@ process AssignTaxonomy{
 process CalcRareDepth{
     publishDir "${params.outdir}/qiime", mode: 'copy'
 
-    conda "${projectDir}/environment.yml"
-    //conda "environment.yml"
+    //conda "${projectDir}/environment.yml"
+    conda "environment.yml"
 
     input:
     path "table_viz/*" from ch_table_viz_dir_rare
@@ -882,8 +882,8 @@ process CalcRareDepth{
 process RareCurveCalc{
     publishDir "${params.outdir}/qiime", mode: 'copy'
 
-    conda "${projectDir}/environment.yml"
-    //conda "environment.yml"
+    //conda "${projectDir}/environment.yml"
+    conda "environment.yml"
 
     input:
     file "rare_depth.txt" from ch_rare_curve_depth
@@ -922,8 +922,8 @@ process RareCurveCalc{
 process AlphaDiversitySignificance{
     publishDir "${params.outdir}/qiime", mode: 'copy'
 
-    conda "${projectDir}/environment.yml"
-    //conda "environment.yml"
+    //conda "${projectDir}/environment.yml"
+    conda "environment.yml"
 
     input:
     file metadata from ch_metadata_alpha_sig
@@ -1005,8 +1005,8 @@ process AlphaDiversitySignificance{
 process BetaDiversitySignificance{
     publishDir "${params.outdir}/qiime", mode: 'copy'
 
-    conda "${projectDir}/environment.yml"
-    //conda "environment.yml"
+    //conda "${projectDir}/environment.yml"
+    conda "environment.yml"
 
     input:
     val ioi from ch_ioi_beta_sig
@@ -1048,8 +1048,8 @@ process BetaDiversitySignificance{
 process GeneratePhylogeneticTrees{
     publishDir "${params.outdir}/graphlan", mode: 'copy'
 
-    conda "${projectDir}/environment.yml"
-    //conda "environment.yml"
+    //conda "${projectDir}/environment.yml"
+    conda "environment.yml"
 
     input:
     file metadata from ch_metadata_phylo_tree
@@ -1160,8 +1160,8 @@ process GeneratePhylogeneticTrees{
 process LefseFormat {
     publishDir "${params.outdir}/lefse", mode: 'copy'
 
-    conda "${projectDir}/r_env.yml"
-    //conda "r_env.yml"
+    //conda "${projectDir}/r_env.yml"
+    conda "r_env.yml"
     input:
     val ioi from ch_ioi_lefse
     file "table-dada2.qza" from ch_table_lefse
@@ -1193,8 +1193,8 @@ process LefseFormat {
 process LefseAnalysis{
     publishDir "${params.outdir}/lefse", mode: 'copy'
 
-    conda "${projectDir}/python2_env.yml"
-    //conda "python2_env.yml"
+    //conda "${projectDir}/python2_env.yml"
+    conda "python2_env.yml"
 
     input:
     path "combos/*" from ch_paired_lefse_format
@@ -1214,8 +1214,8 @@ process LefseAnalysis{
 process ExportSetup{
     publishDir "${params.outdir}", mode: 'copy'
 
-    conda "${projectDir}/environment.yml"
-    //conda "environment.yml"
+    //conda "${projectDir}/environment.yml"
+    conda "environment.yml"
 
     input:
     file "stats-dada2.qzv" from ch_dada_stats_export
@@ -1243,8 +1243,8 @@ process ExportSetup{
 process GenerateReport{
      publishDir "${baseDir}", mode: 'move'
 
-    conda "${projectDir}/r_env.yml"
-    //conda "r_env.yml"
+    //conda "${projectDir}/r_env.yml"
+    conda "r_env.yml"
 
     input:
     file "item_of_interest.csv" from ch_ioi_file_out
