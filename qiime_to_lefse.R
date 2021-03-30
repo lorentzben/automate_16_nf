@@ -1,6 +1,6 @@
 #! /usr/bin/env Rscript --vanilla
-if(!require(dplyr)){install.packages("dplyr")}
-if(!require(tibble)) {install.packages("tibble")}
+if(!require(dplyr)){install.packages("dplyr",repos="http://cran.us.r-project.org")}
+if(!require(tibble)) {install.packages("tibble",repos="http://cran.us.r-project.org")}
 if(!require(qiime2R)) {devtools::install_github("jbisanz/qiime2R")} # current version is 0.99.20
 if(!require(phyloseq)) {install.packages("phyloseq",repos="http://cran.us.r-project.org")}
 if(!require(jamba)){remotes::install_github("jmw86069/jamba")}
