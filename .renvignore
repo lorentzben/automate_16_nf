@@ -1,0 +1,5 @@
+# ignore all non R files
+*.py
+*.csv
+*.html
+*.pdf

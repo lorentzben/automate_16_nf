@@ -1,4 +1,6 @@
 #! /usr/bin/env Rscript --vanilla
+if(!require(renv)) {install.packages("renv",repos="http://cran.us.r-project.org")}
+renv::init()
 if(!require(dplyr)){install.packages("dplyr",repos="http://cran.us.r-project.org")}
 if(!require(tibble)) {install.packages("tibble",repos="http://cran.us.r-project.org")}
 if(!require(qiime2R)) {devtools::install_github("jbisanz/qiime2R")} # current version is 0.99.20
