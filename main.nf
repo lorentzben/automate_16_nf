@@ -124,6 +124,7 @@ process SetupRPackages{
     """
     #!/usr/bin/env Rscript --vanilla
     #Sys.setenv(R_REMOTES_NO_ERRORS_FROM_WARNINGS="true")
+    if(!require(rmarkdown)) {install.packages("rmarkdown", repos="http://cran.us.r-project.org")}
     if(!require(renv)) {install.packages("renv",repos="http://cran.us.r-project.org")}
     renv::init()
     if(!require(remotes)){install.packages("remotes",repos="http://cran.us.r-project.org")}
