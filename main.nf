@@ -96,7 +96,8 @@ Channel
 
 process SetupPy2CondaEnv{
     //conda "${projectDir}/python2_env.yml"
-    conda "python2_env.yml"
+    //conda "python2_env.yml"
+    container "lorentzb/py2_env"
 
     input:
     file plot_clado from ch_clado_file
@@ -117,7 +118,8 @@ process SetupPy2CondaEnv{
 //I removed Biocmanager and Microbiome, so if a function breaks, thats why. 
 process SetupRPackages{
     //conda "${projectDir}/r_env.yml"
-    conda "r_env.yml"
+    //conda "r_env.yml"
+    container "lorentzb/r_env"
     output:
     file "set.txt" into ch_r_wait
     script:
@@ -152,7 +154,8 @@ process VerifyManifest{
     The change is nessecary to do nextflow run -r main lorentzben/automate_16_nf
     */
     //conda "${projectDir}/environment.yml"
-    conda "environment.yml"
+    //conda "environment.yml"
+    container "lorentzb/automate_16_nf"
 
     script:
     """
@@ -269,7 +272,8 @@ process CheckSinglePaired {
 
     publishDir "${params.outdir}", mode: 'copy'
     //conda "${projectDir}/environment.yml"
-    conda "environment.yml"
+    //conda "environment.yml"
+    container "lorentzb/automate_16_nf"
     
     input: 
     file manifest from ch_single_pair
@@ -336,7 +340,8 @@ process GenerateSeqObject{
 
     publishDir "${params.outdir}/qiime", mode: 'copy'
     //conda "${projectDir}/environment.yml"
-    conda "environment.yml"
+    //conda "environment.yml"
+    container "lorentzb/automate_16_nf"
 
     input: 
     file manifest from ch_make_qiime
@@ -373,7 +378,8 @@ process QualControl{
     file seq_obj into ch_qiime_denoise
 
     //conda "${projectDir}/environment.yml"
-    conda "environment.yml"
+    //conda "environment.yml"
+    container "lorentzb/automate_16_nf"
 
     script:
     """
@@ -403,7 +409,8 @@ process FindCutoffs{
     file("manifest_format.txt") into ch_manifest_type_denoise
 
     //conda "${projectDir}/environment.yml"
-    conda "environment.yml"
+    //conda "environment.yml"
+    container "lorentzb/automate_16_nf"
 
     script:
     """
@@ -537,7 +544,8 @@ process Denoise {
     
 
     //conda "${projectDir}/environment.yml"
-    conda "environment.yml"
+    //conda "environment.yml"
+    container "lorentzb/automate_16_nf"
 
     script:
     """
@@ -603,7 +611,8 @@ process FeatureVisualization{
     file "table-dada2.qza" into ch_alpha_div_table
 
     //conda "${projectDir}/environment.yml"
-    conda "environment.yml"
+    //conda "environment.yml"
+    container "lorentzb/automate_16_nf"
 
     script:
     """
@@ -628,7 +637,8 @@ process TreeConstruction{
     publishDir "${params.outdir}/qiime", mode: 'copy'
 
     //conda "${projectDir}/environment.yml"
-    conda "environment.yml"
+    //conda "environment.yml"
+    container "lorentzb/automate_16_nf"
     
     input:
     file "rep-seqs-dada2.qza" from ch_rep_seq_tree_gen
@@ -657,7 +667,8 @@ process ExportTable{
     publishDir "${params.outdir}/qiime", mode: 'copy'
 
     //conda "${projectDir}/environment.yml"
-    conda "environment.yml"
+    //conda "environment.yml"
+    container "lorentzb/automate_16_nf"
     
     input:
     file "table.qzv" from ch_table_viz_obj
@@ -682,7 +693,8 @@ process DetermineDepth{
     publishDir "${params.outdir}/qiime", mode: 'copy'
 
     //conda "${projectDir}/environment.yml"
-    conda "environment.yml"
+    //conda "environment.yml"
+    container "lorentzb/automate_16_nf"
 
     input:
     path "table_viz/*" from ch_table_viz_dir
@@ -743,7 +755,8 @@ process AlphaDiversityMeasure{
     publishDir "${params.outdir}/qiime", mode: 'copy'
 
     //conda "${projectDir}/environment.yml"
-    conda "environment.yml"
+    //conda "environment.yml"
+    container "lorentzb/automate_16_nf"
 
     input:
     file metadata from ch_alpha_metadata
@@ -815,7 +828,8 @@ process AssignTaxonomy{
     publishDir "${params.outdir}/qiime", mode: 'copy'
 
     //conda "${projectDir}/environment.yml"
-    conda "environment.yml"
+    //conda "environment.yml"
+    container "lorentzb/automate_16_nf"
 
     input:
     file "rep-seqs-dada2.qza" from ch_rep_seq_classify
@@ -856,7 +870,8 @@ process CalcRareDepth{
     publishDir "${params.outdir}/qiime", mode: 'copy'
 
     //conda "${projectDir}/environment.yml"
-    conda "environment.yml"
+    //conda "environment.yml"
+    container "lorentzb/automate_16_nf"
 
     input:
     path "table_viz/*" from ch_table_viz_dir_rare
@@ -884,7 +899,8 @@ process RareCurveCalc{
     publishDir "${params.outdir}/qiime", mode: 'copy'
 
     //conda "${projectDir}/environment.yml"
-    conda "environment.yml"
+    //conda "environment.yml"
+    container "lorentzb/automate_16_nf"
 
     input:
     file "rare_depth.txt" from ch_rare_curve_depth
@@ -924,7 +940,8 @@ process AlphaDiversitySignificance{
     publishDir "${params.outdir}/qiime", mode: 'copy'
 
     //conda "${projectDir}/environment.yml"
-    conda "environment.yml"
+    //conda "environment.yml"
+    container "lorentzb/automate_16_nf"
 
     input:
     file metadata from ch_metadata_alpha_sig
@@ -1007,7 +1024,8 @@ process BetaDiversitySignificance{
     publishDir "${params.outdir}/qiime", mode: 'copy'
 
     //conda "${projectDir}/environment.yml"
-    conda "environment.yml"
+    //conda "environment.yml"
+    container "lorentzb/automate_16_nf"
 
     input:
     val ioi from ch_ioi_beta_sig
@@ -1050,7 +1068,8 @@ process GeneratePhylogeneticTrees{
     publishDir "${params.outdir}/graphlan", mode: 'copy'
 
     //conda "${projectDir}/environment.yml"
-    conda "environment.yml"
+    //conda "environment.yml"
+    container "lorentzb/automate_16_nf"
 
     input:
     file metadata from ch_metadata_phylo_tree
@@ -1162,7 +1181,9 @@ process LefseFormat {
     publishDir "${params.outdir}/lefse", mode: 'copy'
 
     //conda "${projectDir}/r_env.yml"
-    conda "r_env.yml"
+    //conda "r_env.yml"
+    container "lorentzb/r_env"
+
     input:
     val ioi from ch_ioi_lefse
     file "table-dada2.qza" from ch_table_lefse
@@ -1195,7 +1216,8 @@ process LefseAnalysis{
     publishDir "${params.outdir}/lefse", mode: 'copy'
 
     //conda "${projectDir}/python2_env.yml"
-    conda "python2_env.yml"
+    //conda "python2_env.yml"
+    container "lorentzb/py2_env"
 
     input:
     path "combos/*" from ch_paired_lefse_format
@@ -1216,7 +1238,8 @@ process ExportSetup{
     publishDir "${params.outdir}", mode: 'copy'
 
     //conda "${projectDir}/environment.yml"
-    conda "environment.yml"
+    //conda "environment.yml"
+    container "lorentzb/automate_16_nf"
 
     input:
     file "stats-dada2.qzv" from ch_dada_stats_export
@@ -1245,7 +1268,8 @@ process GenerateReport{
      publishDir "${baseDir}", mode: 'move'
 
     //conda "${projectDir}/r_env.yml"
-    conda "r_env.yml"
+    //conda "r_env.yml"
+    container "lorentzb/r_env"
 
     input:
     file "item_of_interest.csv" from ch_ioi_file_out
