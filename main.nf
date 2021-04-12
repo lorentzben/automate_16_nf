@@ -362,7 +362,7 @@ process GenerateSeqObject{
     '''
     DAT=$(head !{data_type})
     MANI=$(head !{manifest_format})
-    module load  QIIME2/2020.11
+    #module load  QIIME2/2020.11
     qiime tools import \
     --type $DAT\
     --input-path !{manifest} \
