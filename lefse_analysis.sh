@@ -1,4 +1,11 @@
 #!/usr/bin/env bash
+
+    
+LEFSE=$(which lefse.py)
+LEFSE_DIR=${LEFSE::-8}
+cp plot_res.py $LEFSE_DIR
+cp plot_cladogram.py $LEFSE_DIR
+
 cd combos
 lefse_files=`ls *lefse_formatted.txt`
 for eachfile in $lefse_files

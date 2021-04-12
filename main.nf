@@ -94,6 +94,7 @@ Channel
     .fromPath("${baseDir}/make_report.sh")
     .set{ ch_report_bash_script }
 
+/*
 process SetupPy2CondaEnv{
     //conda "${projectDir}/python2_env.yml"
     //conda "python2_env.yml"
@@ -114,17 +115,32 @@ process SetupPy2CondaEnv{
     '''
 
 }
+*/
 
 //I removed Biocmanager and Microbiome, so if a function breaks, thats why. 
 process SetupRPackages{
     //conda "${projectDir}/r_env.yml"
-    //conda "r_env.yml"
-    container "lorentzb/r_interact"
+    conda "r_env.yml"
+
+    //container "lorentzb/r_interact:latest"
+
     output:
     file "set.txt" into ch_r_wait
     script:
     """
-    Rscript --vanilla setup_r.R 
+    #!/usr/bin/env Rscript --vanilla
+    #Sys.setenv(R_REMOTES_NO_ERRORS_FROM_WARNINGS="true")
+    if(!require(rmarkdown)) {install.packages("rmarkdown", repos="http://cran.us.r-project.org")}
+    if(!require(renv)) {install.packages("renv",repos="http://cran.us.r-project.org")}
+    renv::init()
+    if(!require(remotes)){install.packages("remotes",repos="http://cran.us.r-project.org")}
+    if(!require(devtools)){install.packages("devtools",repos="http://cran.us.r-project.org")}
+    if(!require(jamba)){remotes::install_github("jmw86069/jamba@0.0.6.900")}
+    remotes::install_github("tidyverse/ggplot2@v3.3.2")
+    remotes::install_github("vegandevs/vegan@v2.5-7")
+    if(!require(ampvis2)){remotes::install_github("MadsAlbertsen/ampvis2@2.6.8")}
+    if(!require(ggvegan)){remotes::install_github("gavinsimpson/ggvegan@4bc6ee9945dd9229ed486409c0acab9413b8c9af")}
+    if(!require(ggConvexHull)){remotes::install_github("cmartin/ggConvexHull@660f4094da44dd500c3c0684b9c5c20c21ee823a")}
     
     cat('done',file='set.txt', sep='\n')
     """
@@ -1210,6 +1226,8 @@ process LefseAnalysis{
     input:
     path "combos/*" from ch_paired_lefse_format
     file "lefse_analysis.sh" from ch_lefse_analysis_script
+    file plot_clado from ch_clado_file
+    file plot_res from ch_plot_res
 
     output:
     path "result/*" into ch_lefse_results
