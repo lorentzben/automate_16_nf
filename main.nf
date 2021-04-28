@@ -121,7 +121,7 @@ process SetupPy2CondaEnv{
 process SetupRPackages{
     //conda "${projectDir}/r_env.yml"
     conda "r_env.yml"
-
+    label 'r'
     //container "lorentzb/r_interact:latest"
 
     output:
