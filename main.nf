@@ -98,7 +98,7 @@ Channel
 process SetupPy2CondaEnv{
     //conda "${projectDir}/python2_env.yml"
     //conda "python2_env.yml"
-    container "lorentzb/py2_env"
+    process.container "lorentzb/py2_env"
 
     input:
     file plot_clado from ch_clado_file
@@ -122,7 +122,7 @@ process SetupRPackages{
     //conda "${projectDir}/r_env.yml"
     conda "r_env.yml"
 
-    //container "lorentzb/r_interact:latest"
+    //process.container "lorentzb/r_interact:latest"
 
     output:
     file "set.txt" into ch_r_wait
@@ -159,7 +159,7 @@ process VerifyManifest{
     */
     //conda "${projectDir}/environment.yml"
     //conda "environment.yml"
-    container "lorentzb/automate_16_nf"
+    process.container "docker://lorentzb/automate_16_nf"
 
     script:
     """
@@ -277,7 +277,7 @@ process CheckSinglePaired {
     publishDir "${params.outdir}", mode: 'copy'
     //conda "${projectDir}/environment.yml"
     //conda "environment.yml"
-    container "lorentzb/automate_16_nf"
+    process.container "docker://lorentzb/automate_16_nf"
     
     input: 
     file manifest from ch_single_pair
@@ -345,7 +345,7 @@ process GenerateSeqObject{
     publishDir "${params.outdir}/qiime", mode: 'copy'
     //conda "${projectDir}/environment.yml"
     //conda "environment.yml"
-    container "lorentzb/automate_16_nf"
+    process.container "docker://lorentzb/automate_16_nf"
 
     input: 
     file manifest from ch_make_qiime
@@ -383,7 +383,7 @@ process QualControl{
 
     //conda "${projectDir}/environment.yml"
     //conda "environment.yml"
-    container "lorentzb/automate_16_nf"
+    process.container "docker://lorentzb/automate_16_nf"
 
     script:
     """
@@ -414,7 +414,7 @@ process FindCutoffs{
 
     //conda "${projectDir}/environment.yml"
     //conda "environment.yml"
-    container "lorentzb/automate_16_nf"
+    process.container "docker://lorentzb/automate_16_nf"
 
     script:
     """
@@ -549,7 +549,7 @@ process Denoise {
 
     //conda "${projectDir}/environment.yml"
     //conda "environment.yml"
-    container "lorentzb/automate_16_nf"
+    process.container "docker://lorentzb/automate_16_nf"
 
     script:
     """
@@ -616,7 +616,7 @@ process FeatureVisualization{
 
     //conda "${projectDir}/environment.yml"
     //conda "environment.yml"
-    container "lorentzb/automate_16_nf"
+    process.container "docker://lorentzb/automate_16_nf"
 
     script:
     """
@@ -642,7 +642,7 @@ process TreeConstruction{
 
     //conda "${projectDir}/environment.yml"
     //conda "environment.yml"
-    container "lorentzb/automate_16_nf"
+    process.container "docker://lorentzb/automate_16_nf"
     
     input:
     file "rep-seqs-dada2.qza" from ch_rep_seq_tree_gen
@@ -672,7 +672,7 @@ process ExportTable{
 
     //conda "${projectDir}/environment.yml"
     //conda "environment.yml"
-    container "lorentzb/automate_16_nf"
+    process.container "docker://lorentzb/automate_16_nf"
     
     input:
     file "table.qzv" from ch_table_viz_obj
@@ -698,7 +698,7 @@ process DetermineDepth{
 
     //conda "${projectDir}/environment.yml"
     //conda "environment.yml"
-    container "lorentzb/automate_16_nf"
+    process.container "docker://lorentzb/automate_16_nf"
 
     input:
     path "table_viz/*" from ch_table_viz_dir
@@ -760,7 +760,7 @@ process AlphaDiversityMeasure{
 
     //conda "${projectDir}/environment.yml"
     //conda "environment.yml"
-    container "lorentzb/automate_16_nf"
+    process.container "docker://lorentzb/automate_16_nf"
 
     input:
     file metadata from ch_alpha_metadata
@@ -833,7 +833,7 @@ process AssignTaxonomy{
 
     //conda "${projectDir}/environment.yml"
     //conda "environment.yml"
-    container "lorentzb/automate_16_nf"
+    process.container "docker://lorentzb/automate_16_nf"
 
     input:
     file "rep-seqs-dada2.qza" from ch_rep_seq_classify
@@ -875,7 +875,7 @@ process CalcRareDepth{
 
     //conda "${projectDir}/environment.yml"
     //conda "environment.yml"
-    container "lorentzb/automate_16_nf"
+    process.container "docker://lorentzb/automate_16_nf"
 
     input:
     path "table_viz/*" from ch_table_viz_dir_rare
@@ -904,7 +904,7 @@ process RareCurveCalc{
 
     //conda "${projectDir}/environment.yml"
     //conda "environment.yml"
-    container "lorentzb/automate_16_nf"
+    process.container "docker://lorentzb/automate_16_nf"
 
     input:
     file "rare_depth.txt" from ch_rare_curve_depth
@@ -945,7 +945,7 @@ process AlphaDiversitySignificance{
 
     //conda "${projectDir}/environment.yml"
     //conda "environment.yml"
-    container "lorentzb/automate_16_nf"
+    process.container "docker://lorentzb/automate_16_nf"
 
     input:
     file metadata from ch_metadata_alpha_sig
@@ -1029,7 +1029,7 @@ process BetaDiversitySignificance{
 
     //conda "${projectDir}/environment.yml"
     //conda "environment.yml"
-    container "lorentzb/automate_16_nf"
+    process.container "docker://lorentzb/automate_16_nf"
 
     input:
     val ioi from ch_ioi_beta_sig
@@ -1073,7 +1073,7 @@ process GeneratePhylogeneticTrees{
 
     //conda "${projectDir}/environment.yml"
     //conda "environment.yml"
-    container "lorentzb/automate_16_nf"
+    process.container "docker://lorentzb/automate_16_nf"
 
     input:
     file metadata from ch_metadata_phylo_tree
@@ -1186,7 +1186,7 @@ process LefseFormat {
 
     //conda "${projectDir}/r_env.yml"
     //conda "r_env.yml"
-    container "lorentzb/r_interact"
+    process.container "docker://lorentzb/r_interact"
 
     input:
     val ioi from ch_ioi_lefse
@@ -1221,7 +1221,7 @@ process LefseAnalysis{
 
     //conda "${projectDir}/python2_env.yml"
     //conda "python2_env.yml"
-    container "lorentzb/py2_env"
+    process.container "docker://lorentzb/py2_env"
 
     input:
     path "combos/*" from ch_paired_lefse_format
@@ -1245,7 +1245,7 @@ process ExportSetup{
 
     //conda "${projectDir}/environment.yml"
     //conda "environment.yml"
-    container "lorentzb/automate_16_nf"
+    process.container "docker://lorentzb/automate_16_nf"
 
     input:
     file "stats-dada2.qzv" from ch_dada_stats_export
@@ -1275,7 +1275,7 @@ process GenerateReport{
 
     //conda "${projectDir}/r_env.yml"
     //conda "r_env.yml"
-    container "lorentzb/r_interact"
+    process.container "docker://lorentzb/r_interact"
 
     input:
     file "item_of_interest.csv" from ch_ioi_file_out
