@@ -1276,6 +1276,7 @@ process GenerateReport{
     //conda "${projectDir}/r_env.yml"
     //conda "r_env.yml"
     container "docker://lorentzb/r_interact"
+    label
 
     input:
     file "item_of_interest.csv" from ch_ioi_file_out
