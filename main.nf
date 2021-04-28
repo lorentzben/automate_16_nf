@@ -158,8 +158,8 @@ process VerifyManifest{
     The change is nessecary to do nextflow run -r main lorentzben/automate_16_nf
     */
     //conda "${projectDir}/environment.yml"
-    conda "environment.yml"
-    //container "lorentzb/automate_16_nf"
+    //conda "environment.yml"
+    container "lorentzb/automate_16_nf"
 
     script:
     """
