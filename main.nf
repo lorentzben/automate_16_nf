@@ -1110,7 +1110,7 @@ process GeneratePhylogeneticTrees{
         --i-table table-dada2.qza \
         --m-metadata-file ${metadata} \
         --p-where  " '${ioi}' = ' '''+item+''' ' "  \
-        --o-filtered-table '+item+'-filtered-table.qza'''
+        --o-filtered-table '''+item+'''-filtered-table.qza'''
 
         result = subprocess.run([filter_command], shell=True)
 
