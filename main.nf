@@ -120,9 +120,9 @@ process SetupPy2CondaEnv{
 //I removed Biocmanager and Microbiome, so if a function breaks, thats why. 
 process SetupRPackages{
     //conda "${projectDir}/r_env.yml"
-    conda "r_env.yml"
-    label 'r'
-    //container "lorentzb/r_interact:latest"
+    //conda "r_env.yml"
+    //label 'r'
+    container "docker://lorentzb/r_interact"
 
     output:
     file "set.txt" into ch_r_wait
