@@ -48,4 +48,5 @@ On setup, you will need to download one of the classifiers I generated below, or
 [Qiime Guide to Train Custom Classifer](https://docs.qiime2.org/2021.2/tutorials/feature-classifier/)
 I have a script in this repo that will also generate the files above, however it takes about 12 hours to run. 
 
+For the item of interest and related column in the metadata file, QIIME will not let filenames use the '_' character so they should be replaced by the '-' or alternate character. 
 
