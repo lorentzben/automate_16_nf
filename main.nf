@@ -1099,7 +1099,7 @@ process GeneratePhylogeneticTrees{
     metadata_table = metadata_table.drop([0,1])
 
     ioi_set = set(metadata_table[\"${ioi}\"])
-    ioi = ${ioi}
+    ioi = '${ioi}'
 
     subprocess.run(['mkdir phylo_trees'], shell=True)
 
