@@ -1107,11 +1107,11 @@ process GeneratePhylogeneticTrees{
     for item in ioi_set:
 
         # filters/splits the feature table based on the current ioi
-        filter_command = '''qiime feature-table filter-samples \
+        filter_command = 'qiime feature-table filter-samples \
         --i-table table-dada2.qza \
         --m-metadata-file ${metadata} \
-        --p-where " '''+ioi+''' \"  = \" '''+item+''' "\
-        --o-filtered-table '''+item+'''-filtered-table.qza'''
+        --p-where "\" '+ioi+'\"   = \" '+item+' "\" \
+        --o-filtered-table '+item+'-filtered-table.qza'
 
         result = subprocess.run([filter_command], shell=True)
 
