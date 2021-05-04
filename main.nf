@@ -1109,7 +1109,7 @@ process GeneratePhylogeneticTrees{
         filter_command = '''qiime feature-table filter-samples \
         --i-table table-dada2.qza \
         --m-metadata-file ${metadata} \
-        --p-where '''+${ioi}+'''  = '''+item+'''  \
+        --p-where ${ioi}  = '''+item+'''  \
         --o-filtered-table '''+item+'''-filtered-table.qza'''
 
         result = subprocess.run([filter_command], shell=True)
