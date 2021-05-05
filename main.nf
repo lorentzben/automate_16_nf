@@ -1088,18 +1088,18 @@ process GeneratePhylogeneticTrees{
     file "taxonomy.qza" into ch_tax_lefse
     
 
-    shell:
-    '''
+    script:
+    """
     #!/usr/bin/env python3
     import subprocess
     import pandas as pd
     import numpy as np 
 
-    metadata_table= pd.read_table(\"!{metadata}\", sep='\t')
+    metadata_table= pd.read_table(\"${metadata}\", sep='\t')
     metadata_table = metadata_table.drop([0,1])
 
-    ioi_set = set(metadata_table[\"!{ioi}\"])
-    ioi = '!{ioi}'
+    ioi_set = set(metadata_table[\"${ioi}\"])
+    ioi = '${ioi}'
 
     subprocess.run(['mkdir phylo_trees'], shell=True)
 
@@ -1107,12 +1107,15 @@ process GeneratePhylogeneticTrees{
     for item in ioi_set:
 
         # filters/splits the feature table based on the current ioi
-        filter_command = "qiime feature-table filter-samples \
-        --i-table table-dada2.qza \
-        --m-metadata-file !{metadata} \
-        --p-where "\" + ioi + \"=\"  + item + \""  \
-        --o-filtered-table "+item+"-filtered-table.qza"
+        #filter_command = "qiime feature-table filter-samples \
+        #--i-table table-dada2.qza \
+        #--m-metadata-file ${metadata} \
+        #--p-where "\" + ioi + \"=\"  + item + \""  \
+        #--o-filtered-table "+item+"-filtered-table.qza"
 
+        #result = subprocess.run([filter_command], shell=True)
+
+        filter_command = "python3 filter_samples.py -m ${metadata} -i ${ioi} -c "+item
         result = subprocess.run([filter_command], shell=True)
 
         # adds taxonomic info needed for plotting
@@ -1178,7 +1181,7 @@ process GeneratePhylogeneticTrees{
 
         result = subprocess.run([rename_pdf_image], shell=True)
         
-    '''
+    """
 
 }
 
