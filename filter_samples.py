@@ -18,6 +18,9 @@ def filter_command(metadata_fi, item_of_int, current):
 
     result = subprocess.run([filter_command], shell=True)
 
+    with open('result.txt', 'w', newline='') as txtfile:
+        txtfile.write(result)
+
 def main(arg):
     filter_command(arg.metadata, arg.ioi, arg.current)
 
