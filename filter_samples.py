@@ -6,6 +6,7 @@ import argparse
 import subprocess
 import pandas as pd
 import numpy as np 
+import time
 
 def filter_command(metadata_fi, item_of_int, current): 
 
@@ -15,6 +16,10 @@ def filter_command(metadata_fi, item_of_int, current):
     --m-metadata-file " +metadata_fi+" \
     --p-where \" ' "+ item_of_int +" ' = ' "+ current +" ' \" \
     --o-filtered-table "+current+"-filtered-table.qza"
+
+    print(filter_command)
+    #TODO Remove after debugging
+    time.sleep(60)
 
     result = subprocess.run([filter_command], shell=True)
 
