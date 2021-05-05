@@ -102,6 +102,10 @@ Channel
     .fromPath("${baseDir}/init_and_refresh.R")
     .set{ ch_r_init }
 
+Channel
+    .fromPath("${baseDir}/renv.lock")
+    .set{ ch_r_lock }
+
 /*
 process SetupPy2CondaEnv{
     //conda "${projectDir}/python2_env.yml"
@@ -1206,6 +1210,7 @@ process LefseFormat {
     file "qiime_to_lefse.R" from ch_lefse_format_script
     file "set.txt" from ch_r_wait
     file "init_and_refresh.R" from ch_r_init
+    file "renv.lock" from ch_r_lock
     
 
     output:
