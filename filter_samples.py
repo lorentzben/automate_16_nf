@@ -3,15 +3,18 @@
 import os
 from os import path
 import argparse
+import subprocess
+import pandas as pd
+import numpy as np 
 
 def filter_command(metadata_fi, item_of_int, current): 
 
     # filters/splits the feature table based on the current ioi
     filter_command = "qiime feature-table filter-samples \
     --i-table table-dada2.qza \
-    --m-metadata-file !{metadata} \
-    --p-where " + ioi + "="  + item + "  \
-    --o-filtered-table "+item+"-filtered-table.qza"
+    --m-metadata-file " +metadata_fi+" \
+    --p-where " + item_of_int + "="  + current + "  \
+    --o-filtered-table "+current+"-filtered-table.qza"
 
     result = subprocess.run([filter_command], shell=True)
 

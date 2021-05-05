@@ -83,6 +83,10 @@ Channel
     .fromPath("${baseDir}/qiime_to_lefse.R")
     .set { ch_lefse_format_script }
 
+Channel
+    .fromPath("${baseDir}/filter_samples.py")
+    .set{ ch_filter_script }
+
 Channel 
     .fromPath("${baseDir}/lefse_analysis.sh")
     .set{ ch_lefse_analysis_script }
@@ -1081,6 +1085,7 @@ process GeneratePhylogeneticTrees{
     file "table-dada2.qza" from ch_table_phylo_tree
     file "taxonomy.qza" from ch_taxonomy_phylo_tree
     file "graph.sh" from ch_graph_script
+    file "filter_samples.py" from ch_filter_script
 
     output:
     path "phylo_trees/*" into ch_png_phylo_tree
