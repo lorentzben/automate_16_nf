@@ -1099,6 +1099,7 @@ process GeneratePhylogeneticTrees{
     import subprocess
     import pandas as pd
     import numpy as np 
+    import time
 
     metadata_table= pd.read_table(\"${metadata}\", sep='\t')
     metadata_table = metadata_table.drop([0,1])
@@ -1112,19 +1113,14 @@ process GeneratePhylogeneticTrees{
     for item in ioi_set:
 
         # filters/splits the feature table based on the current ioi
-        #filter_command = "qiime feature-table filter-samples \
-        #--i-table table-dada2.qza \
-        #--m-metadata-file ${metadata} \
-        #--p-where "\" + ioi + \"=\"  + item + \""  \
-        #--o-filtered-table "+item+"-filtered-table.qza"
-
-        #result = subprocess.run([filter_command], shell=True)
-
+        
         filter_command = "python3 filter_samples.py -m ${metadata} -i ${ioi} -c "+item
         result = subprocess.run([filter_command], shell=True)
 
+        time.sleep(2)
+
         # adds taxonomic info needed for plotting
-        collapse_command = ' qiime taxa collapse \
+        collapse_command = 'qiime taxa collapse \
         --i-table '+item+'-filtered-table.qza \
         --o-collapsed-table collapse-'+item+'-table.qza \
         --p-level 7 \
