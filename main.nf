@@ -98,6 +98,10 @@ Channel
     .fromPath("${baseDir}/make_report.sh")
     .set{ ch_report_bash_script }
 
+Channel
+    .fromPath("${baseDir}/init_and_refresh.R")
+    .set{ ch_r_init }
+
 /*
 process SetupPy2CondaEnv{
     //conda "${projectDir}/python2_env.yml"
@@ -1201,6 +1205,7 @@ process LefseFormat {
     file metadata from ch_metadata_lefse
     file "qiime_to_lefse.R" from ch_lefse_format_script
     file "set.txt" from ch_r_wait
+    file "init_and_refresh.R" from ch_r_init
     
 
     output:
@@ -1215,6 +1220,7 @@ process LefseFormat {
     """
     #!/usr/bin/env bash
     mkdir combos
+    Rscript init_and_refresh.R
     cp ${metadata} "metadata.tsv"
     Rscript qiime_to_lefse.R ${ioi}
     mv lefse_formatted.txt combos/
