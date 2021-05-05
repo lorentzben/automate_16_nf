@@ -17,9 +17,7 @@ def filter_command(metadata_fi, item_of_int, current):
     --p-where \" ' "+ item_of_int +" ' = ' "+ current +" ' \" \
     --o-filtered-table "+current+"-filtered-table.qza"
 
-    print(filter_command)
-    #TODO Remove after debugging
-    time.sleep(60)
+    
 
     result = subprocess.run([filter_command], shell=True)
 
