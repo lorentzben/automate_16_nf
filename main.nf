@@ -1095,11 +1095,11 @@ process GeneratePhylogeneticTrees{
     import pandas as pd
     import numpy as np 
 
-    metadata_table= pd.read_table(\"${metadata}\", sep='\t')
+    metadata_table= pd.read_table(\"!{metadata}\", sep='\t')
     metadata_table = metadata_table.drop([0,1])
 
-    ioi_set = set(metadata_table[\"${ioi}\"])
-    ioi = '${ioi}'
+    ioi_set = set(metadata_table[\"!{ioi}\"])
+    ioi = '!{ioi}'
 
     subprocess.run(['mkdir phylo_trees'], shell=True)
 
@@ -1109,7 +1109,7 @@ process GeneratePhylogeneticTrees{
         # filters/splits the feature table based on the current ioi
         filter_command = "qiime feature-table filter-samples \
         --i-table table-dada2.qza \
-        --m-metadata-file ${metadata} \
+        --m-metadata-file !{metadata} \
         --p-where " + ioi + "=" ' + item + ' "  \
         --o-filtered-table "+item+"-filtered-table.qza"
 
