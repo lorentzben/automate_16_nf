@@ -1088,7 +1088,7 @@ process GeneratePhylogeneticTrees{
     file "taxonomy.qza" into ch_tax_lefse
     
 
-    script:
+    shell:
     '''
     #!/usr/bin/env python3
     import subprocess
