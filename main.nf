@@ -1089,7 +1089,7 @@ process GeneratePhylogeneticTrees{
     
 
     script:
-    """
+    '''
     #!/usr/bin/env python3
     import subprocess
     import pandas as pd
@@ -1178,7 +1178,7 @@ process GeneratePhylogeneticTrees{
 
         result = subprocess.run([rename_pdf_image], shell=True)
         
-    """
+    '''
 
 }
 
