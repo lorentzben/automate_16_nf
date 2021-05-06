@@ -19,6 +19,7 @@ output:
 #Sys.setenv(R_REMOTES_NO_ERRORS_FROM_WARNINGS="true")
 if(!require(renv)){install.packages("renv", repos="http://cran.us.r-project.org")}
 library(renv)
+renv::settings$snapshot.type("all")
 renv::init()
 ```
 
@@ -36,39 +37,39 @@ getOutputFormat <- function() {
 ```
 
 ```{r install/load libraries, message=FALSE, warning=FALSE, include=FALSE}
-if(!require(kableExtra)) {install.packages("kableExtra", repos="http://cran.us.r-project.org")}
-if(!require(remotes)){install.packages("remotes", repos="http://cran.us.r-project.org")}
-if(!require(ggplot2)) {remotes::install_github("tidyverse/ggplot2@v3.3.2")}
-if(!require(tidyverse)) {install.packages("tidyverse", repos="http://cran.us.r-project.org")}
+if(!require(kableExtra)) {renv::install("kableExtra")}
+if(!require(remotes)){renv::install("remotes")}
+if(!require(ggplot2)) {renv::install("tidyverse/ggplot2@v3.3.2")}
+if(!require(tidyverse)) {renv::install("tidyverse")}
 
 
-if (!require("devtools", quietly = TRUE)){install.packages("devtools", repos="http://cran.us.r-project.org")}
-if(!require(qiime2R)) {devtools::install_github("jbisanz/qiime2R")} # current version is 0.99.20
-if(!require(phyloseq)) {install.packages("phyloseq",repos="http://cran.us.r-project.org")}
-if(!require(gtools)) {install.packages("gtools",repos="http://cran.us.r-project.org")}
-if(!require(reshape2)) {install.packages("reshape2",repos="http://cran.us.r-project.org")}
-if(!require(forcats)) {install.packages("forcats",repos="http://cran.us.r-project.org")}
-if(!require(gridExtra)) {install.packages("gridExtra",repos="http://cran.us.r-project.org")}
+if (!require("devtools", quietly = TRUE)){renv::install("devtools")}
+if(!require(qiime2R)) {renv::install("jbisanz/qiime2R")} # current version is 0.99.20
+if(!require(phyloseq)) {renv::install("phyloseq")}
+if(!require(gtools)) {renv::install("gtools")}
+if(!require(reshape2)) {renv::install("reshape2")}
+if(!require(forcats)) {renv::install("forcats")}
+if(!require(gridExtra)) {renv::install("gridExtra")}
 
 
-if(!require(pheatmap)){install.packages("pheatmap",repos="http://cran.us.r-project.org")}
-if(!require(rstatix)){installl.packages("rstatix",repos="http://cran.us.r-project.org")}
-# if(!require(knitr)){install.packages("knitr")}
-if(!require(tidyverse)){install.packages("tidyverse",repos="http://cran.us.r-project.org")}
-if(!require(ampvis2)){remotes::install_github("MadsAlbertsen/ampvis2")}
-if(!require(devtools)) {install.packages("devtools",repos="http://cran.us.r-project.org")}
-if(!require(ggdendro)){install.packages("ggendro",repos="http://cran.us.r-project.org")}
-if(!require(vegan)){install.packages("vegan",repos="http://cran.us.r-project.org", type="source")}
-#if(!require(ape)){install.packages("ape",dep=TRUE,repos="http://cran.us.r-project.org", type="source")}
-#if(!require(adegenet)){install.packages("adegenet",dep=FALSE,repos="http://cran.us.r-project.org", type="source")}
-#if(!require(ade4)){install.packages("ade4",dep=TRUE,repos="http://cran.us.r-project.org", type="source")}
-#if(!require(pegas)){install.packages("pegas",dep=TRUE,repos="http://cran.us.r-project.org", type="source")}
+if(!require(pheatmap)){renv::install("pheatmap")}
+if(!require(rstatix)){renv::install("rstatix")}
+# if(!require(knitr)){renv::install("knitr")}
+if(!require(tidyverse)){renv::install("tidyverse")}
+if(!require(ampvis2)){renv::install("MadsAlbertsen/ampvis2")}
+if(!require(devtools)) {renv::install("devtools")}
+if(!require(ggdendro)){renv::install("ggendro")}
+if(!require(vegan)){renv::install("vegan", type="source")}
+#if(!require(ape)){renv::install("ape")}
+#if(!require(adegenet)){renv::install("adegenet")}
+#if(!require(ade4)){renv::install("ade4")}
+#if(!require(pegas)){renv::install("pegas")}
 
-if(!require(ggvegan)){remotes::install_github("gavinsimpson/ggvegan")}
-if(!require(ggpubr)){install.packages("ggpubr")}
-if(!require(dplyr)){install.packages("dplyr")}
-if(!require(jamba)){remotes::install_github("jmw86069/jamba")}
-if(!require(ggConvexHull)){remotes::install_github("cmartin/ggConvexHull")}
+if(!require(ggvegan)){renv::install("gavinsimpson/ggvegan")}
+if(!require(ggpubr)){renv::install("ggpubr")}
+if(!require(dplyr)){renv::install("dplyr")}
+if(!require(jamba)){renv::install("jmw86069/jamba")}
+if(!require(ggConvexHull)){renv::install("cmartin/ggConvexHull")}
 # library(remotes)
 library(openssl)
 library(gtools)
