@@ -6,11 +6,19 @@
 #if(!require(qiime2R)) {devtools::install_github("jbisanz/qiime2R")} # current version is 0.99.20
 #if(!require(phyloseq)) {install.packages("phyloseq",repos="http://cran.us.r-project.org")}
 #if(!require(jamba)){remotes::install_github("jmw86069/jamba@0.0.6.900")}
+if(!require(renv)) {install.packages("renv",repos="http://cran.us.r-project.org")}
+renv::init()
+if(!require(dplyr)){renv::install("dplyr")}
+if(!require(tibble)) {renv::install("tibble")}
+if(!require(qiime2R)) {renv::install("jbisanz/qiime2R")} # current version is 0.99.20
+if(!require(phyloseq)) {renv::install("phyloseq"}
+if(!require(jamba)){renv::install("jmw86069/jamba@0.0.6.900")}
 library(dplyr)
 library(tibble)
 library(qiime2R)
 library(phyloseq)
 library(jamba)
+
 
 args = commandArgs(trailingOnly=TRUE)
 if (length(args)==0) {
