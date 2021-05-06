@@ -11,7 +11,7 @@ renv::init()
 if(!require(dplyr)){renv::install("dplyr")}
 if(!require(tibble)) {renv::install("tibble")}
 if(!require(qiime2R)) {renv::install("jbisanz/qiime2R")} # current version is 0.99.20
-if(!require(phyloseq)) {renv::install("phyloseq"}
+if(!require(phyloseq)) {renv::install("phyloseq")}
 if(!require(jamba)){renv::install("jmw86069/jamba@0.0.6.900")}
 library(dplyr)
 library(tibble)
