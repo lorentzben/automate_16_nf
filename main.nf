@@ -902,7 +902,7 @@ process CalcRareDepth{
     import numpy as np 
 
     sample_freq = pd.read_csv("table_viz/sample-frequency-detail.csv")
-    depth = sample_freq.median()[0]
+    depth = round(sample_freq.mean()[0]*.26)
 
     with open("rare_depth.txt",'w') as file:
         file.write(str(int(depth)))
