@@ -134,7 +134,7 @@ process SetupRPackages{
     //conda "${projectDir}/r_env.yml"
     //conda "r_env.yml"
     //label 'r'
-    container "docker://lorentzb/r_hand"
+    container "docker://lorentzb/r_latest"
 
     output:
     file "set.txt" into ch_r_wait
@@ -1199,7 +1199,7 @@ process LefseFormat {
 
     //conda "${projectDir}/r_env.yml"
     //conda "r_env.yml"
-    container "docker://lorentzb/r_hand"
+    container "docker://lorentzb/r_latest"
 
     input:
     val ioi from ch_ioi_lefse
@@ -1291,7 +1291,7 @@ process GenerateReport{
 
     //conda "${projectDir}/r_env.yml"
     //conda "r_env.yml"
-    container "docker://lorentzb/r_hand"
+    container "docker://lorentzb/r_latest"
     label 'r'
 
     input:
