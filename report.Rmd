@@ -1791,7 +1791,7 @@ pairwise_permanova_uni <- function(dat, column_of_int, weight){
 library(vegan)
 library(phyloseq)
 cycle_1 <- qza_to_phyloseq(table_dada2,rooted_tree,taxonomy_file,metadata_file)
-sample_data(cycle_1)[[ioi]] <- reorder(sample_data(cycle_1)[[ioi]])
+sample_data(cycle_1)[[ioi]] <- factor(sample_data(cycle_1)[[ioi]], levels=mixedsort(as.character(unique(sample_data(cycle_1)[[ioi]]))))
 # PERMANOVA of Weighted Unifrac
 u_unifrac <- UniFrac(cycle_1, weighted = T)
 grp <- get_variable(cycle_1, ioi)
@@ -1811,7 +1811,7 @@ kable(test) %>%
 
 ```{r Permanova results Weighted Unifrac from qiime, echo=FALSE, message=FALSE, warning=FALSE}
 cycle_1 <- qza_to_phyloseq(table_dada2,rooted_tree,taxonomy_file,metadata_file)
-sample_data(cycle_1)[[ioi]] <- reorder(sample_data(cycle_1)[[ioi]])
+sample_data(cycle_1)[[ioi]] <- factor(sample_data(cycle_1)[[ioi]], levels=mixedsort(as.character(unique(sample_data(cycle_1)[[ioi]]))))
 # PERMANOVA of Unweighted Unifrac
 u_unifrac <- UniFrac(cycle_1, weighted = F)
 grp <- get_variable(cycle_1, ioi)
@@ -1829,7 +1829,7 @@ kable(test) %>%
 
 ```{r Bray Curtis PERMANOVA, echo=FALSE, message=FALSE, warning=FALSE}
 cycle_1 <- qza_to_phyloseq(table_dada2,rooted_tree,taxonomy_file,metadata_file)
-sample_data(cycle_1)[[ioi]] <- reorder(sample_data(cycle_1)[[ioi]])
+sample_data(cycle_1)[[ioi]] <- factor(sample_data(cycle_1)[[ioi]], levels=mixedsort(as.character(unique(sample_data(cycle_1)[[ioi]]))))
 #PERMANOVA Bray Curtis
 grp <- get_variable(cycle_1, ioi)
 res <- adonis(distance(cycle_1, 'bray') ~ grp)
@@ -1847,7 +1847,7 @@ kable(bray_pairwise) %>%
 
 ```{r Jaccard PERMANOVA, echo=FALSE, message=FALSE, warning=FALSE}
 cycle_1 <- qza_to_phyloseq(table_dada2,rooted_tree,taxonomy_file,metadata_file)
-sample_data(cycle_1)[[ioi]] <- reorder(sample_data(cycle_1)[[ioi]])
+sample_data(cycle_1)[[ioi]] <- factor(sample_data(cycle_1)[[ioi]], levels=mixedsort(as.character(unique(sample_data(cycle_1)[[ioi]]))))
 # PERMANOVA Jaccard distance
 grp <- get_variable(cycle_1, ioi)
 res <- adonis(distance(cycle_1, "jaccard") ~ grp)
@@ -1924,7 +1924,7 @@ pairwise_anosim_uni <- function(dat, column_of_int, weight){
 
 ```{r echo=FALSE, fig.height=8, fig.width=10, message=FALSE, warning=FALSE}
 cycle_1 <- qza_to_phyloseq(table_dada2,rooted_tree,taxonomy_file,metadata_file)
-sample_data(cycle_1)[[ioi]] <- reorder(sample_data(cycle_1)[[ioi]])
+sample_data(cycle_1)[[ioi]] <- factor(sample_data(cycle_1)[[ioi]], levels=mixedsort(as.character(unique(sample_data(cycle_1)[[ioi]]))))
 
 #Weighted Unifrac Anosim
 tmp <- UniFrac(cycle_1, weighted=T)
@@ -2073,7 +2073,7 @@ pairwise_MRPP_uni <- function(dat, column_of_int, weight){
 
 ```{r MRPP analysis, echo=FALSE, message=FALSE, warning=FALSE}
 cycle_1 <- qza_to_phyloseq(table_dada2,rooted_tree,taxonomy_file,metadata_file)
-sample_data(cycle_1)[[ioi]] <- reorder(as.factor(sample_data(cycle_1)[[ioi]]))
+sample_data(cycle_1)[[ioi]] <- factor(sample_data(cycle_1)[[ioi]], levels=mixedsort(as.character(unique(sample_data(cycle_1)[[ioi]]))))
 
 # Weighted Unifrac
 w_uni <- UniFrac(cycle_1, weighted = T)
@@ -2182,7 +2182,7 @@ pairwise_AMOVA_uni <- function(dat, column_of_int, weight){
 
 ```{r AMOVA testing, echo=FALSE, message=FALSE, warning=FALSE}
 cycle_1 <- qza_to_phyloseq(table_dada2,rooted_tree,taxonomy_file,metadata_file)
-sample_data(cycle_1)[[ioi]] <- reorder(as.factor(sample_data(cycle_1)[[ioi]]))
+sample_data(cycle_1)[[ioi]] <- factor(sample_data(cycle_1)[[ioi]], levels=mixedsort(as.character(unique(sample_data(cycle_1)[[ioi]]))))
 
 #AMOVA Weighted Unifrac
 tmp <- UniFrac(cycle_1, weighted = T)

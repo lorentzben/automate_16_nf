@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+eval "$(conda shell.bash hook)"
+conda activate python2
     
 LEFSE=$(which lefse.py)
 LEFSE_DIR=${LEFSE::-8}
