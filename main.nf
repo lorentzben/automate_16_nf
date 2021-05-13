@@ -1320,8 +1320,8 @@ process GenerateReport{
     output:
     file "out.txt" into ch_done
        
-    script:
-    '''
+    shell:
+    ''''
     #!/usr/bin/env bash
     echo "all files copied!"
     cd !{baseDir}
