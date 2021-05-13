@@ -70,6 +70,7 @@ if(!require(ggpubr)){renv::install("ggpubr")}
 if(!require(dplyr)){renv::install("dplyr")}
 if(!require(jamba)){renv::install("jmw86069/jamba")}
 if(!require(ggConvexHull)){renv::install("cmartin/ggConvexHull")}
+if(!require(PERMANOVA)){renv::install("PERMANOVA")}
 # library(remotes)
 library(openssl)
 library(gtools)
@@ -96,6 +97,7 @@ library(ggpubr)
 library(dplyr)
 library(jamba)
 library(ggConvexHull)
+library(PERMANOVA)
 ```
 <!-- input files required:  -->
 <!-- item_of_interest.csv -->
