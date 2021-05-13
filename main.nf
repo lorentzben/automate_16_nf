@@ -1328,8 +1328,6 @@ process GenerateReport{
     cd !{baseDir}
     echo $PWD
     echo ' !{baseDir}/!{params.outdir} ' > out.txt
-    
-    echo ":)" > done.txt
     '''
 }
 
