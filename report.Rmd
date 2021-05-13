@@ -880,6 +880,7 @@ shannon <- shannon$data %>% rownames_to_column("SampleID")
 
 
 bray_curtis <- bray_pcoa$data$Vectors %>%
+  dplyr::select(SampleID, PC1, PC2) %>%
   left_join(metadata) %>%
   left_join(shannon) %>%
   ggplot(aes_string(x="PC1", y="PC2", color=ioi))+
@@ -889,6 +890,7 @@ bray_curtis <- bray_pcoa$data$Vectors %>%
   scale_color_discrete(name=ioi)
 
 bray_curtis_no_poly <- bray_pcoa$data$Vectors %>%
+  dplyr::select(SampleID, PC1, PC2) %>%
   left_join(metadata) %>%
   left_join(shannon) %>%
   ggplot(aes_string(x="PC1", y="PC2", color=ioi))+
