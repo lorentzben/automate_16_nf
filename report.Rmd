@@ -920,7 +920,7 @@ shannon <- shannon$data %>% rownames_to_column("SampleID")
 metadata[[ioi]] <- reorder(metadata[[ioi]])
 
 jaccard_pcoa <- jaccard$data$Vectors %>%
-  select(SampleID, PC1, PC2) %>%
+  dplyr::select(SampleID, PC1, PC2) %>%
   left_join(metadata) %>%
   left_join(shannon) %>%
   ggplot(aes_string(x="PC1", y="PC2", color=ioi))+
@@ -931,7 +931,7 @@ jaccard_pcoa <- jaccard$data$Vectors %>%
   scale_color_discrete(name=ioi)
 
 jaccard_pcoa_no_polygon <- jaccard$data$Vectors %>%
-  select(SampleID, PC1, PC2) %>%
+  dplyr::select(SampleID, PC1, PC2) %>%
   left_join(metadata) %>%
   left_join(shannon) %>%
   ggplot(aes_string(x="PC1", y="PC2", color=ioi))+
@@ -964,7 +964,7 @@ shannon <- shannon$data %>% rownames_to_column("SampleID")
 
 
 unweight_unifrac_pcoa <- jaccard$data$Vectors %>%
-  select(SampleID, PC1, PC2) %>%
+  dplyr::select(SampleID, PC1, PC2) %>%
   left_join(metadata) %>%
   left_join(shannon) %>%
   ggplot(aes_string(x="PC1", y="PC2", color=ioi))+
@@ -978,7 +978,7 @@ unweight_unifrac_pcoa
 ggsave("unweighted_unifrac_pcoa_ordination.png", plot=unweight_unifrac_pcoa, path=outdir)
 
 unweight_unifrac_pcoa_no_polygon <- jaccard$data$Vectors %>%
-  select(SampleID, PC1, PC2) %>%
+  dplyr::select(SampleID, PC1, PC2) %>%
   left_join(metadata) %>%
   left_join(shannon) %>%
   ggplot(aes_string(x="PC1", y="PC2", color=ioi))+
@@ -1006,13 +1006,13 @@ shannon<-qiime2R::read_qza("./qiime/core-metric-results/shannon_vector.qza")
 shannon <- shannon$data %>% rownames_to_column("SampleID")
 
 weighted_unifrac_pcoa <- jaccard$data$Vectors %>%
-  select(SampleID, PC1, PC2) %>%
+  dplyr::select(SampleID, PC1, PC2) %>%
   left_join(metadata) %>%
   left_join(shannon)
 
 
 weighted_unifrac_pcoa <- jaccard$data$Vectors %>%
-  select(SampleID, PC1, PC2) %>%
+  dplyr::select(SampleID, PC1, PC2) %>%
   left_join(metadata) %>%
   left_join(shannon) %>%
   ggplot(aes_string(x="PC1", y="PC2", color=ioi))+
@@ -1026,7 +1026,7 @@ weighted_unifrac_pcoa
 ggsave("weighted_unifrac_pcoa_ordination.png", plot=weighted_unifrac_pcoa, path=outdir)
 
 weighted_unifrac_pcoa_no_polygon <- jaccard$data$Vectors %>%
-  select(SampleID, PC1, PC2) %>%
+  dplyr::select(SampleID, PC1, PC2) %>%
   left_join(metadata) %>%
   left_join(shannon) %>%
   ggplot(aes_string(x="PC1", y="PC2", color=ioi))+
