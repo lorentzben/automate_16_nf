@@ -1324,10 +1324,11 @@ process GenerateReport{
     '''
     #!/usr/bin/env bash
     echo "all files copied!"
+    echo ":)" > done.txt
     cd !{baseDir}
     echo $PWD
     echo ' !{baseDir}/!{params.outdir} ' > out.txt
-    cd !{workDir}
+    
     echo ":)" > done.txt
     '''
 }
