@@ -1789,7 +1789,7 @@ pairwise_permanova_uni <- function(dat, column_of_int, weight){
 ```
 
 
-```{r Weighted Unifrac PERMANOVA, message=FALSE, warning=FALSE, include=FALSE}
+```{r Weighted Unifrac PERMANOVA, echo=FALSE, message=TRUE, warning=FALSE, results='markup'}
 library(PERMANOVA)
 
 cycle_1 <- qza_to_phyloseq(table_dada2,rooted_tree,taxonomy_file,metadata_file)
@@ -1800,12 +1800,12 @@ u_unifrac <- UniFrac(cycle_1, weighted = T,)
 
 res <- PERMANOVA::PerMANOVA.Simple(D = as.matrix(u_unifrac), grupo = cycle_1@sam_data[[ioi]])
 
-print(data.frame(data.frame(res$Inicial),res$pval))
+message(data.frame(data.frame(res$Inicial),res$pval))
 
 # Pairwise PERMANOVA of Weighted Unifrac
 test <- pairwise_permanova_uni(cycle_1, ioi, T)
 
-kable(test) %>% 
+message(kable(test)) %>% 
   kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
 
 
