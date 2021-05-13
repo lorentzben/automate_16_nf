@@ -1532,7 +1532,7 @@ w_unifrac <- UniFrac(cycle_1,weighted=TRUE)
 
 hclust_res <- hclust(w_unifrac, method="average")
 
-hclust_dend <- as.dendrogram(hclust_res)
+hclust_dend <- as.dendro(hclust_res)
 ddata <- dendro_data(hclust_dend, type="rectangle")
 p <- ggplot(segment(ddata)) +
   geom_segment(aes(x=x,y=y, xend=xend, yend=yend)) +
@@ -1624,7 +1624,7 @@ u_unifrac <- UniFrac(cycle_1, weighted = FALSE)
 
 hclust_res <- hclust(u_unifrac, method="average")
 
-hclust_dend <- as.dendrogram(hclust_res)
+hclust_dend <- as.dendro(hclust_res)
 ddata <- dendro_data(hclust_dend, type="rectangle")
 p <- ggplot(segment(ddata)) +
   geom_segment(aes(x=x,y=y, xend=xend, yend=yend)) +
