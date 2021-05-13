@@ -1539,7 +1539,7 @@ p <- ggplot(segment(ddata)) +
   geom_segment(aes(x=x,y=y, xend=xend, yend=yend)) +
   coord_flip() +
   scale_y_reverse(expand=c(0.2,0)) + 
-  geom_text(data=label(ddata),aes(x=x,y=y,label=label, hjust=0)) + 
+  geom_text(data=ddata$labels,aes(x=x,y=y,label=label, hjust=0)) + 
   theme(text=element_text(size = 12, face = "plain")) +
   theme_minimal() + 
   theme(axis.title.y = element_blank(), 
@@ -1631,7 +1631,7 @@ p <- ggplot(segment(ddata)) +
   geom_segment(aes(x=x,y=y, xend=xend, yend=yend)) +
   coord_flip() +
   scale_y_reverse(expand=c(0.2,0)) + 
-  geom_text(data=label(ddata),aes(x=x,y=y,label=label, hjust=0)) + 
+  geom_text(data=ddata$labels,aes(x=x,y=y,label=label, hjust=0)) + 
   theme(text=element_text(size = 12, face = "plain")) +
   theme_minimal() + 
   theme(axis.title.y = element_blank(), 
