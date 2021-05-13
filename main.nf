@@ -1318,7 +1318,7 @@ process GenerateReport{
 
 
     output:
-    file "out.txt" into ch_done
+    file "done.txt" into ch_done
        
     shell:
     '''
@@ -1326,7 +1326,9 @@ process GenerateReport{
     echo "all files copied!"
     cd !{baseDir}
     echo $PWD
-    echo ' !{baseDir}/!{params.outdir} '> out.txt
+    echo ' !{baseDir}/!{params.outdir} ' > out.txt
+    cd !{workDir}
+    echo ":)" > done.txt
     '''
 }
 
