@@ -1726,7 +1726,7 @@ pairwise_permanova <- function(dat, column_of_int, dissim){
   
     perma <- PERMANOVA::PerMANOVA.Simple(D = as.matrix(distance(comp, dissim)) , grupo = grp)
     permanova <- tibble::tibble(data.frame(perma$Inicial))
-    permanova_stats <- data.frame(as.character(comb_tab[i,1]), as.character(comb_tab[i,2]), permanova[1,], perma$pval)
+    permanova_stats <- data.frame(as.character(combos[i,1]), as.character(combos[i,2]), permanova[1,], perma$pval)
     colnames(permanova_stats)[1] <- "group1"
     colnames(permanova_stats)[2] <- "group2"
     colnames(permanova_stats)[10] <- "p"
