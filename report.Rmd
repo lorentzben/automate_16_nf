@@ -1591,7 +1591,8 @@ cycle_1_phylum <- merged %>%
   arrange(Abundance) 
 
 cycle_1_phylum$Sample <- as.character(cycle_1_phylum$Sample)
-cycle_1_phylum$Sample <- factor(cycle_1_phylum$Sample, levels=label(ddata)$label)
+cycle_1_phylum$Sample <- factor(cycle_1_phylum$Sample, levels=ddata$labels$label)
+
 
 #ggplot2 stacked bar chart separated by sample in the metadata from qiime2
 by_sample <- ggplot(cycle_1_phylum, aes(x=Sample, y=Abundance, fill=fct_relevel(fct_reorder(cycle_1_phylum[[level]], Abundance),"Other"))) + 
@@ -1683,7 +1684,7 @@ cycle_1_phylum <- merged %>%
   arrange(Abundance) 
 
 cycle_1_phylum$Sample <- as.character(cycle_1_phylum$Sample)
-cycle_1_phylum$Sample <- factor(cycle_1_phylum$Sample, levels=label(ddata)$label)
+cycle_1_phylum$Sample <- factor(cycle_1_phylum$Sample, levels=ddata$labels$label)
 
 #ggplot2 stacked bar chart separated by sample in the metadata from qiime2
 by_sample <- ggplot(cycle_1_phylum, aes(x=Sample, y=Abundance, fill=fct_relevel(fct_reorder(cycle_1_phylum[[level]], Abundance),"Other"))) + 
