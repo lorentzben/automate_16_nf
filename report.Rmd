@@ -1,13 +1,13 @@
 ---
 title: "16s Analysis Report"
 output:
+  pdf_document:
+    
+    
+    df_print: kable
   html_document:
     df_print: kable
     smart: false
-  pdf_document:
-    df_print: kable
-    
-    
 ---
 <!-- This is sometimes nessecary, it will manifest with a unable to load shared object '/usr/local/lib/R/ error -->
 <!-- you can run ldconfig -p|grep $BROKEN_PACKAGE -->
@@ -1720,13 +1720,12 @@ pairwise_permanova <- function(dat, column_of_int, dissim){
     comp <- prune_samples(sample_data(dat)[[ioi]] %in% combos[i,], dat)
     grp <- get_variable(comp, column_of_int)
   
-    permanova <- adonis(distance(comp, dissim) ~ grp)
-    permanova <- tibble::tibble(permanova$aov.tab)
-    colnames(permanova)[5] <- "r^2"
-    colnames(permanova)[6] <- "p"
-    permanova_stats <- data.frame(as.character(combos[i,1]), as.character(combos[i,2]), permanova[1,])
+    perma <- PERMANOVA::PerMANOVA.Simple(D = as.matrix(distance(comp, dissim)) , grupo = grp)
+    permanova <- tibble::tibble(data.frame(perma$Inicial))
+    permanova_stats <- data.frame(as.character(comb_tab[i,1]), as.character(comb_tab[i,2]), permanova[1,], perma$pval)
     colnames(permanova_stats)[1] <- "group1"
     colnames(permanova_stats)[2] <- "group2"
+    colnames(permanova_stats)[10] <- "p"
     data.frame(permanova_stats)
     p_res <- rbind(p_res, permanova_stats)
   
@@ -1763,13 +1762,12 @@ pairwise_permanova_uni <- function(dat, column_of_int, weight){
     grp <- get_variable(comp, column_of_int)
   
     tmp <- UniFrac(comp, weighted = weight)
-    permanova <- adonis(tmp ~ grp)
-    permanova <- tibble::tibble(permanova$aov.tab)
-    colnames(permanova)[5] <- "r^2"
-    colnames(permanova)[6] <- "p"
-    permanova_stats <- data.frame(as.character(comb_tab[i,1]), as.character(comb_tab[i,2]), permanova[1,])
+    perma <- PERMANOVA::PerMANOVA.Simple(D = as.matrix(tmp), grupo = grp)
+    permanova <- tibble::tibble(data.frame(perma$Inicial))
+    permanova_stats <- data.frame(as.character(comb_tab[i,1]), as.character(comb_tab[i,2]), permanova[1,], perma$pval)
     colnames(permanova_stats)[1] <- "group1"
     colnames(permanova_stats)[2] <- "group2"
+    colnames(permanova_stats)[10] <- "p"
     data.frame(permanova_stats)
     p_res <- rbind(p_res, permanova_stats)
   
@@ -1788,24 +1786,26 @@ pairwise_permanova_uni <- function(dat, column_of_int, weight){
 
 
 ```{r Weighted Unifrac PERMANOVA, echo=FALSE, message=FALSE, warning=FALSE}
-library(vegan)
-library(phyloseq)
+library(PERMANOVA)
+
 cycle_1 <- qza_to_phyloseq(table_dada2,rooted_tree,taxonomy_file,metadata_file)
 sample_data(cycle_1)[[ioi]] <- factor(sample_data(cycle_1)[[ioi]], levels=mixedsort(as.character(unique(sample_data(cycle_1)[[ioi]]))))
+
 # PERMANOVA of Weighted Unifrac
-u_unifrac <- UniFrac(cycle_1, weighted = T)
-grp <- get_variable(cycle_1, ioi)
-res <- adonis(u_unifrac ~ grp)
-res
+u_unifrac <- UniFrac(cycle_1, weighted = T,)
+
+res <- PERMANOVA::PerMANOVA.Simple(D = as.matrix(u_unifrac), grupo = cycle_1@sam_data[[ioi]])
+
+data.frame(data.frame(res$Inicial),res$pval)
+
 # Pairwise PERMANOVA of Weighted Unifrac
 test <- pairwise_permanova_uni(cycle_1, ioi, T)
 
 kable(test) %>% 
   kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
+
+
 ```
-
-
-
 
 ### 12.2 PERMANOVA Unweighted Unifrac 
 
@@ -1815,8 +1815,11 @@ sample_data(cycle_1)[[ioi]] <- factor(sample_data(cycle_1)[[ioi]], levels=mixeds
 # PERMANOVA of Unweighted Unifrac
 u_unifrac <- UniFrac(cycle_1, weighted = F)
 grp <- get_variable(cycle_1, ioi)
-res <- adonis(u_unifrac ~ grp)
-res
+
+res <- PERMANOVA::PerMANOVA.Simple(D = as.matrix(u_unifrac), grupo = cycle_1@sam_data[[ioi]])
+
+data.frame(data.frame(res$Inicial),res$pval)
+
 # Pairwise PERMANOVA of Unweighted Unifrac
 test <- pairwise_permanova_uni(cycle_1, ioi, F)
 kable(test) %>%
@@ -1832,8 +1835,10 @@ cycle_1 <- qza_to_phyloseq(table_dada2,rooted_tree,taxonomy_file,metadata_file)
 sample_data(cycle_1)[[ioi]] <- factor(sample_data(cycle_1)[[ioi]], levels=mixedsort(as.character(unique(sample_data(cycle_1)[[ioi]]))))
 #PERMANOVA Bray Curtis
 grp <- get_variable(cycle_1, ioi)
-res <- adonis(distance(cycle_1, 'bray') ~ grp)
-res
+
+res <- PERMANOVA::PerMANOVA.Simple(D = as.matrix(distance(cycle_1, 'bray',)) , grupo = cycle_1@sam_data[[ioi]])
+data.frame(data.frame(res$Inicial),res$pval)
+
 #PERMANOVA Bray Curtis Pairwise
 bray_pairwise <- pairwise_permanova(cycle_1,ioi,"bray")
 kable(bray_pairwise) %>%
@@ -1850,8 +1855,9 @@ cycle_1 <- qza_to_phyloseq(table_dada2,rooted_tree,taxonomy_file,metadata_file)
 sample_data(cycle_1)[[ioi]] <- factor(sample_data(cycle_1)[[ioi]], levels=mixedsort(as.character(unique(sample_data(cycle_1)[[ioi]]))))
 # PERMANOVA Jaccard distance
 grp <- get_variable(cycle_1, ioi)
-res <- adonis(distance(cycle_1, "jaccard") ~ grp)
-res
+
+res <- PERMANOVA::PerMANOVA.Simple(D = as.matrix(distance(cycle_1, 'jaccard',)) , grupo = cycle_1@sam_data[[ioi]])
+data.frame(data.frame(res$Inicial),res$pval)
 # PERMANOVA Pairwise Jaccard 
 jaccard_pairwise <- pairwise_permanova(cycle_1, ioi, "jaccard")
 kable(jaccard_pairwise) %>%
