@@ -1714,7 +1714,7 @@ ggsave("UPGMA_unweighted_unifrac_plot.png", plot=unweight_plot, path=outdir)
 
 ### 12.1 PERMANOVA Weighted Unifrac
 
-```{r Methods to do pairwise PERMANOVA comparisons, echo=FALSE, message=FALSE, warning=FALSE}
+```{r Methods to do pairwise PERMANOVA comparisons, message=FALSE, warning=FALSE, include=FALSE}
 pairwise_permanova <- function(dat, column_of_int, dissim){
   all_comparisons <- unique(sample_data(dat)[[column_of_int]])
   combos <- (t(combn(all_comparisons,2)))
@@ -1749,7 +1749,7 @@ pairwise_permanova <- function(dat, column_of_int, dissim){
 ```
 
 
-```{r Methods to do pairwise Unifrac PERMANOVA comparisons, echo=FALSE, message=FALSE, warning=FALSE}
+```{r Methods to do pairwise Unifrac PERMANOVA comparisons, message=FALSE, warning=FALSE, include=FALSE}
 library(phyloseq)
 pairwise_permanova_uni <- function(dat, column_of_int, weight){
   all_comparisons <- unique(sample_data(dat)[[column_of_int]])
@@ -1789,7 +1789,7 @@ pairwise_permanova_uni <- function(dat, column_of_int, weight){
 ```
 
 
-```{r Weighted Unifrac PERMANOVA, echo=FALSE, message=FALSE, warning=FALSE}
+```{r Weighted Unifrac PERMANOVA, message=FALSE, warning=FALSE, include=FALSE}
 library(PERMANOVA)
 
 cycle_1 <- qza_to_phyloseq(table_dada2,rooted_tree,taxonomy_file,metadata_file)
@@ -1800,7 +1800,7 @@ u_unifrac <- UniFrac(cycle_1, weighted = T,)
 
 res <- PERMANOVA::PerMANOVA.Simple(D = as.matrix(u_unifrac), grupo = cycle_1@sam_data[[ioi]])
 
-data.frame(data.frame(res$Inicial),res$pval)
+print(data.frame(data.frame(res$Inicial),res$pval))
 
 # Pairwise PERMANOVA of Weighted Unifrac
 test <- pairwise_permanova_uni(cycle_1, ioi, T)
@@ -1813,7 +1813,7 @@ kable(test) %>%
 
 ### 12.2 PERMANOVA Unweighted Unifrac 
 
-```{r Permanova results Weighted Unifrac from qiime, echo=FALSE, message=FALSE, warning=FALSE}
+```{r Permanova results Weighted Unifrac from qiime, message=FALSE, warning=FALSE, include=FALSE}
 cycle_1 <- qza_to_phyloseq(table_dada2,rooted_tree,taxonomy_file,metadata_file)
 sample_data(cycle_1)[[ioi]] <- factor(sample_data(cycle_1)[[ioi]], levels=mixedsort(as.character(unique(sample_data(cycle_1)[[ioi]]))))
 # PERMANOVA of Unweighted Unifrac
@@ -1822,7 +1822,7 @@ grp <- get_variable(cycle_1, ioi)
 
 res <- PERMANOVA::PerMANOVA.Simple(D = as.matrix(u_unifrac), grupo = cycle_1@sam_data[[ioi]])
 
-data.frame(data.frame(res$Inicial),res$pval)
+print(data.frame(data.frame(res$Inicial),res$pval))
 
 # Pairwise PERMANOVA of Unweighted Unifrac
 test <- pairwise_permanova_uni(cycle_1, ioi, F)
@@ -1834,14 +1834,14 @@ kable(test) %>%
 
 ### 12.3 PERMANOVA Bray Curtis
 
-```{r Bray Curtis PERMANOVA, echo=FALSE, message=FALSE, warning=FALSE}
+```{r Bray Curtis PERMANOVA, message=FALSE, warning=FALSE, include=FALSE}
 cycle_1 <- qza_to_phyloseq(table_dada2,rooted_tree,taxonomy_file,metadata_file)
 sample_data(cycle_1)[[ioi]] <- factor(sample_data(cycle_1)[[ioi]], levels=mixedsort(as.character(unique(sample_data(cycle_1)[[ioi]]))))
 #PERMANOVA Bray Curtis
 grp <- get_variable(cycle_1, ioi)
 
 res <- PERMANOVA::PerMANOVA.Simple(D = as.matrix(distance(cycle_1, 'bray',)) , grupo = cycle_1@sam_data[[ioi]])
-data.frame(data.frame(res$Inicial),res$pval)
+print(data.frame(data.frame(res$Inicial),res$pval))
 
 #PERMANOVA Bray Curtis Pairwise
 bray_pairwise <- pairwise_permanova(cycle_1,ioi,"bray")
@@ -1854,14 +1854,14 @@ kable(bray_pairwise) %>%
 
 ### 12.4 PERMANOVA Jaccard 
 
-```{r Jaccard PERMANOVA, echo=FALSE, message=FALSE, warning=FALSE}
+```{r Jaccard PERMANOVA, message=FALSE, warning=FALSE, include=FALSE}
 cycle_1 <- qza_to_phyloseq(table_dada2,rooted_tree,taxonomy_file,metadata_file)
 sample_data(cycle_1)[[ioi]] <- factor(sample_data(cycle_1)[[ioi]], levels=mixedsort(as.character(unique(sample_data(cycle_1)[[ioi]]))))
 # PERMANOVA Jaccard distance
 grp <- get_variable(cycle_1, ioi)
 
 res <- PERMANOVA::PerMANOVA.Simple(D = as.matrix(distance(cycle_1, 'jaccard',)) , grupo = cycle_1@sam_data[[ioi]])
-data.frame(data.frame(res$Inicial),res$pval)
+print(data.frame(data.frame(res$Inicial),res$pval))
 # PERMANOVA Pairwise Jaccard 
 jaccard_pairwise <- pairwise_permanova(cycle_1, ioi, "jaccard")
 kable(jaccard_pairwise) %>%
