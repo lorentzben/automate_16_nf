@@ -1827,7 +1827,7 @@ perma_pairwise <- kable(test) %>%
 
 
 ```{r print weighted unifrac PERMANOVA, echo=FALSE, message=FALSE, warning=FALSE}
-print(perma_res)
+perma_res
   
 
 perma_pairwise
@@ -1843,9 +1843,9 @@ sample_data(cycle_1)[[ioi]] <- factor(sample_data(cycle_1)[[ioi]], levels=ioi_or
 u_unifrac <- UniFrac(cycle_1, weighted = F)
 grp <- get_variable(cycle_1, ioi)
 
-perma_res <- PERMANOVA::PerMANOVA.Simple(D = as.matrix(u_unifrac), grupo = cycle_1@sam_data[[ioi]])
+res <- PERMANOVA::PerMANOVA.Simple(D = as.matrix(u_unifrac), grupo = cycle_1@sam_data[[ioi]])
 
-print(data.frame(data.frame(res$Inicial),res$pval))
+perma_res <- data.frame(data.frame(res$Inicial),res$pval)
 
 # Pairwise PERMANOVA of Unweighted Unifrac
 test <- pairwise_permanova_uni(cycle_1, ioi, F)
@@ -1854,7 +1854,7 @@ perma_pairwise <- kable(test) %>%
 ```
 
 ```{r print unweighted unifrac PERMANOVA, echo=FALSE, message=FALSE, warning=FALSE}
-print(perma_res)
+perma_res
 
 perma_pairwise
 
@@ -1870,8 +1870,8 @@ sample_data(cycle_1)[[ioi]] <- factor(sample_data(cycle_1)[[ioi]], levels=ioi_or
 #PERMANOVA Bray Curtis
 grp <- get_variable(cycle_1, ioi)
 
-perma_res <- PERMANOVA::PerMANOVA.Simple(D = as.matrix(distance(cycle_1, 'bray',)) , grupo = cycle_1@sam_data[[ioi]])
-print(data.frame(data.frame(res$Inicial),res$pval))
+res <- PERMANOVA::PerMANOVA.Simple(D = as.matrix(distance(cycle_1, 'bray',)) , grupo = cycle_1@sam_data[[ioi]])
+perma_res <- data.frame(data.frame(res$Inicial),res$pval)
 
 #PERMANOVA Bray Curtis Pairwise
 bray_pairwise <- pairwise_permanova(cycle_1,ioi,"bray")
@@ -1880,7 +1880,7 @@ pairwise_perma <- kable(bray_pairwise) %>%
 ```
 
 ```{r print bray PERMANOVA, echo=FALSE, message=FALSE, warning=FALSE}
-print(perma_res)
+perma_res
 
 pairwise_perma
 
