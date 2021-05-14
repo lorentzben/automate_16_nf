@@ -1827,7 +1827,8 @@ perma_pairwise <- kable(test) %>%
 
 
 ```{r print weighted unifrac PERMANOVA, echo=FALSE, message=FALSE, warning=FALSE}
-perma_res
+kable(perma_res)%>% 
+  kable_styling(bootstrap_options = c("hover", "condensed", "responsive"))
 
 perma_pairwise
 
@@ -1853,9 +1854,10 @@ kable(test) %>%
 ```
 
 ```{r print unweighted unifrac PERMANOVA, echo=FALSE, message=FALSE, warning=FALSE}
-print(perma_res)
+kable(perma_res)%>% 
+  kable_styling(bootstrap_options = c("hover", "condensed", "responsive"))
 
-print(perma_pairwise)
+perma_pairwise
 
 ```
 
@@ -1879,10 +1881,10 @@ pairwise_perma <- kable(bray_pairwise) %>%
 ```
 
 ```{r print bray PERMANOVA, echo=FALSE, message=FALSE, warning=FALSE}
-print(perma_res)
+kable(perma_res)%>% 
+  kable_styling(bootstrap_options = c("hover", "condensed", "responsive"))
 
-print(perma_pairwise)
-
+perma_pairwise
 
 ```
 
@@ -1905,9 +1907,10 @@ pairwise_perma <- kable(jaccard_pairwise) %>%
 ```
 
 ```{r print jaccard PERMANOVA, echo=FALSE, message=FALSE, warning=FALSE}
-print(perma_res)
+kable(perma_res)%>% 
+  kable_styling(bootstrap_options = c("hover", "condensed", "responsive"))
 
-print(perma_pairwise)
+perma_pairwise
 
 
 ```
