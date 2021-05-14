@@ -662,7 +662,7 @@ ggsave("shannon_boxplot_w_signif.png", plot=p, path=outdir)
 simpson_vals <- read.table("./qiime/simpson/metadata.tsv",sep = '\t', header = TRUE)
 dims = dim(simpson_vals)
 simpson_vals <- data.frame(simpson_vals[2:dims[1],])
-simpson_vals[[ioi]] <- factor(simpson_vals[[ioi]],levels=ioi_order)
+simpson_vals[[ioi]] <- factor(simpson_vals[[ioi]],levels=ioi_ord)
 simpson_vals$simpson <- as.numeric(as.character(simpson_vals$simpson))
 simpson_boxplot <- ggplot(simpson_vals, aes_string(x=simpson_vals[[ioi]], y=simpson_vals$simpson, fill=ioi)) + geom_boxplot() + ylab("Simpson") + theme_bw() + xlab(ioi)
 simpson_boxplot
