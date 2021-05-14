@@ -14,9 +14,7 @@ def helpMessage(){
         --itemOfInterest [str]        Item of interest, group defining treatment vs control or longitudinal variable
         -name [str]                   Name for the analysis run, if not provided nextflow will generate one 
         --outdir [file]               The output directory where the results will be saved 
-        
-        
-        
+
 
     """.stripIndent()
 }
@@ -140,6 +138,7 @@ process SetupRPackages{
 
     output:
     file "set.txt" into ch_r_wait
+
     script:
     """
     #!/usr/bin/env Rscript --vanilla
@@ -170,7 +169,8 @@ process VerifyManifest{
     file metadata from ch_meta_veri
     val ioi from ch_ioi_veri
 
-    output "order_item_of_interest_csv" into ch_format_ioi_order
+    output:
+    "order_item_of_interest_csv" into ch_format_ioi_order
 
     /*this is in place for local deployment, but the server does not give access to the dir for some reason
     The change is nessecary to do nextflow run -r main lorentzben/automate_16_nf
