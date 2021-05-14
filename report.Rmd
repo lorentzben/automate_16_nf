@@ -130,6 +130,10 @@ wd <- getwd()
 ioi <- read.csv("item_of_interest.csv")
 ioi<-as.character(ioi)
 
+ioi_ord <- read.csv("order_item_of_interest.csv")
+colnames(ioi_ord) <- ioi
+ioi_ord <- as.list(ioi_ord)[[ioi]]
+
 outdir_name <- "Figures"
 if(!dir.exists(paste0("./",outdir_name))) {dir.create(paste0("./",outdir_name))}
 outdir <- paste0("./",outdir_name)
@@ -214,7 +218,7 @@ cy_phylum <- merged %>%
   psmelt() %>%
   arrange(Abundance)
 
-cy_phylum$Sample <- reorder(as.factor(cy_phylum$Sample))
+cy_phylum$Sample <- factor(cy_phylum$Sample, levels=ioi_ord)
 
 #ggplot2 stacked bar chart separated by item of interet in the metadata from qiime2 identified by user
 by_treatment <- ggplot(cy_phylum, aes(x=Sample, y=Abundance, fill=fct_relevel(fct_reorder(cy_phylum[[level]],Abundance),"Other"))) + 
@@ -306,7 +310,7 @@ cy_genus <- merged %>%
   psmelt() %>%
   arrange(Abundance)
 
-cy_genus$Sample <- reorder(as.factor(cy_genus$Sample))
+cy_genus$Sample <- factor(cy_genus$Sample, levels=ioi_ord)
 
 #ggplot figure of stacked bar chart separated by treatment
 by_treatment <- ggplot(cy_genus, aes(x=Sample, y=Abundance, fill=fct_relevel(fct_reorder(cy_genus[[level]],Abundance),"Other"))) + 
@@ -398,7 +402,7 @@ cy_species <- merged %>%
   psmelt() %>%
   arrange(Abundance)
 
-cy_species$Sample <- reorder(as.factor(cy_species$Sample))
+cy_species$Sample <- factor(cy_species$Sample, levels=ioi_ord)
 
 #ggplot stacked bar chart separated by treatment
 by_treatment <- ggplot(cy_species, aes(x=Sample, y=Abundance, fill=fct_relevel(fct_reorder(cy_species[[level]],Abundance),"Other"))) + 
@@ -461,7 +465,7 @@ ggsave("stacked_bar_species_by_treatment.png", plot=by_treatment, path=outdir)
 ```{r heatmap at the Genus level annotatted with item of interest, echo=FALSE, fig.height=10, fig.width=14, message=FALSE, warning=FALSE}
 devtools::source_gist("8d0ca4206a66be7ff6d76fc4ab8e66c6")
 cycle_1 <- qza_to_phyloseq(table_dada2,rooted_tree,taxonomy_file,metadata_file) 
-cycle_1@sam_data[[ioi]] <- reorder(cycle_1@sam_data[[ioi]])
+cycle_1@sam_data[[ioi]] <- factor(cycle_1@sam_data[[ioi]], levels= ioi_ord)
 
 cycle_1_amp <- phyloseq_to_ampvis2(cycle_1)
 
@@ -541,7 +545,7 @@ ioi<-as.character(ioi)
 obs_vals = read.csv("./qiime/obs/metadata.tsv", sep='\t')
 dims = dim(obs_vals)
 obs_vals <- data.frame(obs_vals[2:dims[1],])
-obs_vals[[ioi]] <- reorder(as.factor(obs_vals[[ioi]]))
+obs_vals[[ioi]] <- factor(obs_vals[[ioi]], levels=ioi_ord)
 obs_vals$observed_features <- as.numeric(as.character(obs_vals$observed_features))
 obs_boxplot <- ggplot(obs_vals, aes_string(x=ioi,y = obs_vals$observed_features, fill=ioi)) + geom_boxplot() + ylab("Observed Features") +theme_bw()
 obs_boxplot 
@@ -564,7 +568,7 @@ library("ggpubr")
 obs <- read.table("./qiime/obs/metadata.tsv", header = TRUE)
 obs_stat <- data.frame(obs[c('id',ioi,'observed_features')])
 
-
+obs_vals[[ioi]] <- factor(obs_vals[[ioi]], levels=ioi_ord)
 
 form <- as.formula(paste0("observed_features ~ ", ioi))
 kruskal_table <- rstatix::kruskal_test(data = obs_stat, formula = form)
@@ -602,7 +606,7 @@ ggsave("obs_boxplot_w_signif.png", plot=p, path=outdir)
 shannon_vals <- read.table("./qiime/shannon/metadata.tsv",sep = '\t', header = TRUE)
 dims = dim(shannon_vals)
 shannon_vals <- data.frame(shannon_vals[2:dims[1],])
-shannon_vals[[ioi]] <- reorder(as.factor(shannon_vals[[ioi]]))
+shannon_vals[[ioi]] <- factor(shannon_vals[[ioi]], levels=ioi_ord)
 shannon_vals$shannon_entropy <- as.numeric(as.character(shannon_vals$shannon_entropy))
 shannon_boxplot <- ggplot(shannon_vals, aes_string(x=ioi, y=shannon_vals$shannon_entropy, fill=ioi)) + geom_boxplot() + ylab("Shannon") + theme_bw() + xlab(ioi)
 shannon_boxplot
@@ -621,6 +625,8 @@ ggsave("shannon_violin_plot.png", plot=p, path=outdir)
 ```{r Kuskal-Wallace test for significance shannon,results = "asis", echo=FALSE, message=FALSE, warning=FALSE}
 shannon <- read.table("./qiime/shannon/metadata.tsv", header = TRUE, sep='\t')
 shannon_stat <- data.frame(shannon[c('id',ioi,'shannon_entropy')])
+
+shannon_vals[[ioi]] <- factor(shannon_vals[[ioi]], levels=ioi_ord)
 
 form <- as.formula(paste0("shannon_entropy ~ ", ioi))
 kruskal_table <- rstatix::kruskal_test(data = shannon_stat, formula =form)
@@ -656,7 +662,7 @@ ggsave("shannon_boxplot_w_signif.png", plot=p, path=outdir)
 simpson_vals <- read.table("./qiime/simpson/metadata.tsv",sep = '\t', header = TRUE)
 dims = dim(simpson_vals)
 simpson_vals <- data.frame(simpson_vals[2:dims[1],])
-simpson_vals[[ioi]] <- reorder(as.factor(simpson_vals[[ioi]]))
+simpson_vals[[ioi]] <- factor(simpson_vals[[ioi]],levels=ioi_order)
 simpson_vals$simpson <- as.numeric(as.character(simpson_vals$simpson))
 simpson_boxplot <- ggplot(simpson_vals, aes_string(x=simpson_vals[[ioi]], y=simpson_vals$simpson, fill=ioi)) + geom_boxplot() + ylab("Simpson") + theme_bw() + xlab(ioi)
 simpson_boxplot
@@ -675,6 +681,8 @@ ggsave("simpson_violin_plot.png", plot=p, path=outdir)
 ```{r Kuskal-Wallace test for significance simpson,results = "asis", echo=FALSE, message=FALSE, warning=FALSE}
 simpson <- read.table("./qiime/simpson/metadata.tsv", header = TRUE, sep='\t')
 simpson_stat <- data.frame(simpson[c('id',ioi,'simpson')])
+
+simpson_vals[[ioi]] <- factor(simpson_vals[[ioi]], levels=ioi_ord)
 
 form <- as.formula(paste0("simpson ~ ", ioi))
 kruskal_table <- rstatix::kruskal_test(data = simpson_stat, formula = form)
@@ -710,7 +718,7 @@ ggsave("simpson_boxplot_w_signif.png", plot=p, path=outdir)
 chao1_vals <- read.table("./qiime/chao1/metadata.tsv",sep = '\t', header = TRUE)
 dims = dim(chao1_vals)
 chao1_vals <- data.frame(chao1_vals[2:dims[1],])
-chao1_vals[[ioi]] <- reorder(as.factor(chao1_vals[[ioi]]))
+chao1_vals[[ioi]] <- factor(chao1_vals[[ioi]], levels=ioi_ord)
 chao1_vals$chao1 <- as.numeric(as.character(chao1_vals$chao1))
 chao1_boxplot <- ggplot(chao1_vals, aes_string(x=chao1_vals[[ioi]], y=chao1_vals$chao1, fill=ioi)) + geom_boxplot() + ylab("Chao 1") + theme_bw() + xlab(ioi)
 chao1_boxplot
@@ -729,6 +737,8 @@ ggsave("chao1_violin_plot.png", plot=p, path=outdir)
 ```{r Kuskal-Wallace test for significance chao1,results = "asis", echo=FALSE, message=FALSE, warning=FALSE}
 chao1 <- read.table("./qiime/chao1/metadata.tsv", header = TRUE, sep='\t')
 chao1_stat <- data.frame(chao1[c('id',ioi,'chao1')])
+
+chao1_vals[[ioi]] <- factor(chao1_vals[[ioi]], levels=ioi_ord)
 
 form <- as.formula(paste0("chao1 ~ ", ioi))
 kruskal_table <- rstatix::kruskal_test(data = chao1_stat , formula = form)
@@ -764,7 +774,7 @@ ggsave("chao1_boxplot_w_signif.png", plot=p, path=outdir)
 ace_vals <- read.table("./qiime/ace/metadata.tsv",sep = '\t', header = TRUE)
 dims = dim(ace_vals)
 ace_vals <- data.frame(ace_vals[2:dims[1],])
-ace_vals[[ioi]] <- reorder(as.factor(ace_vals[[ioi]]))
+ace_vals[[ioi]] <- factor(ace_vals[[ioi]], levels=ioi_ord)
 ace_vals$ace <- as.numeric(as.character(ace_vals$ace))
 ace_boxplot <- ggplot(ace_vals, aes_string(x=ace_vals[[ioi]], y=ace_vals$ace, fill=ioi)) + geom_boxplot() + ylab("ACE") + theme_bw() + xlab(ioi)
 ace_boxplot
@@ -783,6 +793,8 @@ ggsave("ace_violin_plot.png", plot=p, path=outdir)
 ```{r Kuskal-Wallace test for significance ace,results = "asis", echo=FALSE, message=FALSE, warning=FALSE}
 ace <- read.table("./qiime/ace/metadata.tsv", header = TRUE, sep='\t')
 ace_stat <- data.frame(ace[c('id',ioi,'ace')])
+
+ace_vals[[ioi]] <- factor(ace_vals[[ioi]], levels=ioi_ord)
 
 form <- as.formula(paste0("ace ~ ", ioi))
 kruskal_table <- rstatix::kruskal_test(data = ace_stat, formula = form)
@@ -818,7 +830,7 @@ ggsave("ace_boxplot_w_signif.png", plot=p, path=outdir)
 faith_pd_vals <- read.table("./qiime/faith_pd/metadata.tsv",sep = '\t', header = TRUE)
 dims = dim(faith_pd_vals)
 faith_pd_vals <- data.frame(faith_pd_vals[2:dims[1],])
-faith_pd_vals[[ioi]] <- reorder(as.factor(faith_pd_vals[[ioi]]))
+faith_pd_vals[[ioi]] <- factor(faith_pd_vals[[ioi]], levels=ioi_ord)
 faith_pd_vals$faith_pd <- as.numeric(as.character(faith_pd_vals$faith_pd))
 faith_pd_boxplot <- ggplot(faith_pd_vals, aes_string(x=faith_pd_vals[[ioi]], y=faith_pd_vals$faith_pd, fill=ioi)) + geom_boxplot() + ylab("Faith PD") + theme_bw() + xlab(ioi)
 faith_pd_boxplot
@@ -837,6 +849,8 @@ ggsave("faith_pd_violin_plot.png", plot=p, path=outdir)
 ```{r Kuskal-Wallace test for significance faith pd,results = "asis", echo=FALSE, message=FALSE, warning=FALSE}
 faith_pd <- read.table("./qiime/faith_pd/metadata.tsv", header = TRUE, sep='\t')
 faith_pd_stat <- data.frame(faith_pd[c('id',ioi,'faith_pd')])
+
+faith_pd_vals[[ioi]] <- factor(faith_pd_vals[[ioi]], levels=ioi_ord)
 
 form <- as.formula(paste0("faith_pd ~ ", ioi))
 kruskal_table <- rstatix::kruskal_test(data = faith_pd_stat, formula = form)
@@ -873,7 +887,7 @@ ggsave("faith_pd_boxplot_w_signif.png", plot=p, path=outdir)
 ```{r beta diversity plot of bray curtis measurement, echo=FALSE, message=FALSE, warning=FALSE}
 library(qiime2R)
 metadata<-read_q2metadata(metadata_file)
-metadata[[ioi]] <- reorder(metadata[[ioi]])
+metadata[[ioi]] <- factor(metadata[[ioi]], levels=ioi_ord)
 bray_pcoa <- qiime2R::read_qza("./qiime/core-metric-results/bray_curtis_pcoa_results.qza")
 shannon<-qiime2R::read_qza("./qiime/core-metric-results/shannon_vector.qza")
 shannon <- shannon$data %>% rownames_to_column("SampleID")
@@ -917,7 +931,7 @@ jaccard <- qiime2R::read_qza("./qiime/core-metric-results/jaccard_pcoa_results.q
 shannon<-qiime2R::read_qza("./qiime/core-metric-results/shannon_vector.qza")
 shannon <- shannon$data %>% rownames_to_column("SampleID")
 
-metadata[[ioi]] <- reorder(metadata[[ioi]])
+metadata[[ioi]] <- factor(metadata[[ioi]], levels=ioi_ord)
 
 jaccard_pcoa <- jaccard$data$Vectors %>%
   dplyr::select(SampleID, PC1, PC2) %>%
@@ -957,7 +971,7 @@ ggsave("jaccard_pcoa_ordination_no_polygons.png", plot=jaccard_pcoa_no_polygon, 
 
 ```{r unweighted unifrac pcoa ordination, echo=FALSE, message=FALSE, warning=FALSE}
 metadata<-read_q2metadata(metadata_file)
-metadata[[ioi]] <- reorder(metadata[[ioi]])
+metadata[[ioi]] <- factor(metadata[[ioi]], levels=ioi_ord)
 jaccard <- qiime2R::read_qza("./qiime/core-metric-results/unweighted_unifrac_pcoa_results.qza")
 shannon<-qiime2R::read_qza("./qiime/core-metric-results/shannon_vector.qza")
 shannon <- shannon$data %>% rownames_to_column("SampleID")
@@ -1000,7 +1014,7 @@ ggsave("unweighted_unifrac_pcoa_ordination_no_polygons.png", plot=unweight_unifr
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
 metadata<-read_q2metadata(metadata_file)
-metadata[[ioi]] <- reorder(metadata[[ioi]])
+metadata[[ioi]] <- factor(metadata[[ioi]], levels=ioi_ord)
 jaccard <- qiime2R::read_qza("./qiime/core-metric-results/weighted_unifrac_pcoa_results.qza")
 shannon<-qiime2R::read_qza("./qiime/core-metric-results/shannon_vector.qza")
 shannon <- shannon$data %>% rownames_to_column("SampleID")
@@ -1047,7 +1061,7 @@ ggsave("weighted_unifrac_pcoa_ordination_no_polygons.png", plot=weighted_unifrac
 devtools::source_gist("8d0ca4206a66be7ff6d76fc4ab8e66c6")
 
 cycle_1 <- qza_to_phyloseq(table_dada2,rooted_tree,taxonomy_file,metadata_file) 
-cycle_1@sam_data[[ioi]] <- reorder(cycle_1@sam_data[[ioi]])
+cycle_1@sam_data[[ioi]] <- factor(cycle_1@sam_data[[ioi]], levels=ioi_ord)
 cycle_1_amp <- phyloseq_to_ampvis2(cycle_1)
 
 euclidean_frame <- amp_ordinate(cycle_1_amp, filter_species = 0, type = "PCA", transform = "hellinger", print_caption = T,sample_color_by = ioi, sample_colorframe = T) 
@@ -1265,7 +1279,7 @@ eight_d <- numextract(colnames(obs_rarefy[72:81])[1])
 nine_d <- numextract(colnames(obs_rarefy[82:91])[1])
 ten_d <- numextract(colnames(obs_rarefy[92:101])[1])
 
-fct_ioi <- as.factor(obs_item_of_interest)
+fct_ioi <- factor(obs_item_of_interest, levels=ioi_ord)
 one <- cbind(one,fct_ioi)
 one_flat <- melt(one,id.vars = "fct_ioi") %>%
   rename(depth = variable) %>%
@@ -1434,7 +1448,7 @@ by_sample <- ampvis2::amp_rankabundance(cycle_1_amp, group_by = "SampleID") + th
 by_sample 
 ggsave("rank_abundance_curve_by_sample.png", plot=by_sample, path=outdir)
 
-cycle_1_amp$metadata[[ioi]] <- reorder(cycle_1_amp$metadata[[ioi]])
+cycle_1_amp$metadata[[ioi]] <- factor(cycle_1_amp$metadata[[ioi]], levels=ioi_ord)
 
 by_group <- ampvis2::amp_rankabundance(cycle_1_amp, group_by = ioi) + theme(text=element_text(size = 20))
 by_group
@@ -1485,7 +1499,7 @@ split_weighted_measure <- split(weighted_measurements, weighted_measurements$Gro
 
 for(frame in split_weighted_measure){
   
-  frame$Group2 <- reorder(as.factor(frame$Group2))
+  frame$Group2 <- factor(frame$Group2, levels=ioi_ord)
   p <- ggplot(frame, aes(x=frame$Group2, y=Distance)) + geom_violin()+ geom_boxplot(width=0.1)
   p<- p + stat_summary(fun.y=mean, geom="point", shape=23, size=2)
   p<-p + stat_summary(fun.y=median, geom="point", size=2, color="red")
@@ -1508,7 +1522,7 @@ split_data_frames <- split(unweighted_measurements, unweighted_measurements$Grou
 
 for(frame in split_data_frames){
   
-  frame$Group2 <- reorder(as.factor(frame$Group2))
+  frame$Group2 <- factor(frame$Group2, levels=ioi_ord))
   p <- ggplot(frame, aes(x=frame$Group2, y=Distance)) + geom_violin()+ geom_boxplot(width=0.1)
   p<- p + stat_summary(fun.y=mean, geom="point", shape=23, size=2)
   p<-p + stat_summary(fun.y=median, geom="point", size=2, color="red")
@@ -1789,25 +1803,33 @@ pairwise_permanova_uni <- function(dat, column_of_int, weight){
 ```
 
 
-```{r Weighted Unifrac PERMANOVA, echo=FALSE, message=TRUE, warning=FALSE, results='markup'}
+```{r Weighted Unifrac PERMANOVA, message=FALSE, warning=FALSE, include=FALSE, results='markup'}
 library(PERMANOVA)
 
 cycle_1 <- qza_to_phyloseq(table_dada2,rooted_tree,taxonomy_file,metadata_file)
-sample_data(cycle_1)[[ioi]] <- factor(sample_data(cycle_1)[[ioi]], levels=mixedsort(as.character(unique(sample_data(cycle_1)[[ioi]]))))
+sample_data(cycle_1)[[ioi]] <- factor(sample_data(cycle_1)[[ioi]], levels=ioi_ord)
 
 # PERMANOVA of Weighted Unifrac
 u_unifrac <- UniFrac(cycle_1, weighted = T,)
 
 res <- PERMANOVA::PerMANOVA.Simple(D = as.matrix(u_unifrac), grupo = cycle_1@sam_data[[ioi]])
 
-message(data.frame(data.frame(res$Inicial),res$pval))
+perma_res <- data.frame(data.frame(res$Inicial),res$pval)
 
 # Pairwise PERMANOVA of Weighted Unifrac
 test <- pairwise_permanova_uni(cycle_1, ioi, T)
 
-message(kable(test)) %>% 
+perma_pairwise <- kable(test) %>% 
   kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
 
+
+```
+
+
+```{r print weighted unifrac PERMANOVA, echo=FALSE, message=FALSE, warning=FALSE}
+print(perma_res)
+
+print(perma_pairwise)
 
 ```
 
@@ -1815,19 +1837,26 @@ message(kable(test)) %>%
 
 ```{r Permanova results Weighted Unifrac from qiime, message=FALSE, warning=FALSE, include=FALSE}
 cycle_1 <- qza_to_phyloseq(table_dada2,rooted_tree,taxonomy_file,metadata_file)
-sample_data(cycle_1)[[ioi]] <- factor(sample_data(cycle_1)[[ioi]], levels=mixedsort(as.character(unique(sample_data(cycle_1)[[ioi]]))))
+sample_data(cycle_1)[[ioi]] <- factor(sample_data(cycle_1)[[ioi]], levels=ioi_ord)
 # PERMANOVA of Unweighted Unifrac
 u_unifrac <- UniFrac(cycle_1, weighted = F)
 grp <- get_variable(cycle_1, ioi)
 
-res <- PERMANOVA::PerMANOVA.Simple(D = as.matrix(u_unifrac), grupo = cycle_1@sam_data[[ioi]])
+perma_res <- PERMANOVA::PerMANOVA.Simple(D = as.matrix(u_unifrac), grupo = cycle_1@sam_data[[ioi]])
 
 print(data.frame(data.frame(res$Inicial),res$pval))
 
 # Pairwise PERMANOVA of Unweighted Unifrac
-test <- pairwise_permanova_uni(cycle_1, ioi, F)
+perma_pairwise <- pairwise_permanova_uni(cycle_1, ioi, F)
 kable(test) %>%
   kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
+```
+
+```{r print unweighted unifrac PERMANOVA, echo=FALSE, message=FALSE, warning=FALSE}
+print(perma_res)
+
+print(perma_pairwise)
+
 ```
 
 
@@ -1836,39 +1865,52 @@ kable(test) %>%
 
 ```{r Bray Curtis PERMANOVA, message=FALSE, warning=FALSE, include=FALSE}
 cycle_1 <- qza_to_phyloseq(table_dada2,rooted_tree,taxonomy_file,metadata_file)
-sample_data(cycle_1)[[ioi]] <- factor(sample_data(cycle_1)[[ioi]], levels=mixedsort(as.character(unique(sample_data(cycle_1)[[ioi]]))))
+sample_data(cycle_1)[[ioi]] <- factor(sample_data(cycle_1)[[ioi]], levels=ioi_ord)
 #PERMANOVA Bray Curtis
 grp <- get_variable(cycle_1, ioi)
 
-res <- PERMANOVA::PerMANOVA.Simple(D = as.matrix(distance(cycle_1, 'bray',)) , grupo = cycle_1@sam_data[[ioi]])
+perma_res <- PERMANOVA::PerMANOVA.Simple(D = as.matrix(distance(cycle_1, 'bray',)) , grupo = cycle_1@sam_data[[ioi]])
 print(data.frame(data.frame(res$Inicial),res$pval))
 
 #PERMANOVA Bray Curtis Pairwise
 bray_pairwise <- pairwise_permanova(cycle_1,ioi,"bray")
-kable(bray_pairwise) %>%
+pairwise_perma <- kable(bray_pairwise) %>%
   kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
 ```
 
+```{r print bray PERMANOVA, echo=FALSE, message=FALSE, warning=FALSE}
+print(perma_res)
 
+print(perma_pairwise)
+
+
+```
 
 
 ### 12.4 PERMANOVA Jaccard 
 
 ```{r Jaccard PERMANOVA, message=FALSE, warning=FALSE, include=FALSE}
 cycle_1 <- qza_to_phyloseq(table_dada2,rooted_tree,taxonomy_file,metadata_file)
-sample_data(cycle_1)[[ioi]] <- factor(sample_data(cycle_1)[[ioi]], levels=mixedsort(as.character(unique(sample_data(cycle_1)[[ioi]]))))
+sample_data(cycle_1)[[ioi]] <- factor(sample_data(cycle_1)[[ioi]], levels=ioi_ord)
 # PERMANOVA Jaccard distance
 grp <- get_variable(cycle_1, ioi)
 
-res <- PERMANOVA::PerMANOVA.Simple(D = as.matrix(distance(cycle_1, 'jaccard',)) , grupo = cycle_1@sam_data[[ioi]])
+perma_res <- PERMANOVA::PerMANOVA.Simple(D = as.matrix(distance(cycle_1, 'jaccard',)) , grupo = cycle_1@sam_data[[ioi]])
 print(data.frame(data.frame(res$Inicial),res$pval))
 # PERMANOVA Pairwise Jaccard 
 jaccard_pairwise <- pairwise_permanova(cycle_1, ioi, "jaccard")
-kable(jaccard_pairwise) %>%
+pairwise_perma <- kable(jaccard_pairwise) %>%
   kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
 
 ```
 
+```{r print jaccard PERMANOVA, echo=FALSE, message=FALSE, warning=FALSE}
+print(perma_res)
+
+print(perma_pairwise)
+
+
+```
 
 
 
@@ -1934,7 +1976,7 @@ pairwise_anosim_uni <- function(dat, column_of_int, weight){
 
 ```{r echo=FALSE, fig.height=8, fig.width=10, message=FALSE, warning=FALSE}
 cycle_1 <- qza_to_phyloseq(table_dada2,rooted_tree,taxonomy_file,metadata_file)
-sample_data(cycle_1)[[ioi]] <- factor(sample_data(cycle_1)[[ioi]], levels=mixedsort(as.character(unique(sample_data(cycle_1)[[ioi]]))))
+sample_data(cycle_1)[[ioi]] <- factor(sample_data(cycle_1)[[ioi]], levels=ioi_ord)
 
 #Weighted Unifrac Anosim
 tmp <- UniFrac(cycle_1, weighted=T)
@@ -2083,7 +2125,7 @@ pairwise_MRPP_uni <- function(dat, column_of_int, weight){
 
 ```{r MRPP analysis, echo=FALSE, message=FALSE, warning=FALSE}
 cycle_1 <- qza_to_phyloseq(table_dada2,rooted_tree,taxonomy_file,metadata_file)
-sample_data(cycle_1)[[ioi]] <- factor(sample_data(cycle_1)[[ioi]], levels=mixedsort(as.character(unique(sample_data(cycle_1)[[ioi]]))))
+sample_data(cycle_1)[[ioi]] <- factor(sample_data(cycle_1)[[ioi]], levels=ioi_ord)
 
 # Weighted Unifrac
 w_uni <- UniFrac(cycle_1, weighted = T)
@@ -2192,7 +2234,7 @@ pairwise_AMOVA_uni <- function(dat, column_of_int, weight){
 
 ```{r AMOVA testing, echo=FALSE, message=FALSE, warning=FALSE}
 cycle_1 <- qza_to_phyloseq(table_dada2,rooted_tree,taxonomy_file,metadata_file)
-sample_data(cycle_1)[[ioi]] <- factor(sample_data(cycle_1)[[ioi]], levels=mixedsort(as.character(unique(sample_data(cycle_1)[[ioi]]))))
+sample_data(cycle_1)[[ioi]] <- factor(sample_data(cycle_1)[[ioi]], levels=ioi_ord)
 
 #AMOVA Weighted Unifrac
 tmp <- UniFrac(cycle_1, weighted = T)
