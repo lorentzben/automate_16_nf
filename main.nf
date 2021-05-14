@@ -171,7 +171,7 @@ process VerifyManifest{
 
     output:
 
-    file "order_item_of_interest_csv" into ch_format_ioi_order
+    file "order_item_of_interest.csv" into ch_format_ioi_order
 
     /*this is in place for local deployment, but the server does not give access to the dir for some reason
     The change is nessecary to do nextflow run -r main lorentzben/automate_16_nf
