@@ -4,6 +4,8 @@ import PySimpleGUI as sg
 import subprocess
 import os
 
+#TODO add a box for the ordered ioi and then a call to rename it to where it should be.
+
 sg.theme('System Default')
 
 layout = [[sg.Text('Welcome to the Automate 16s Submitter')],
