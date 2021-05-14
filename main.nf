@@ -49,16 +49,10 @@ if(params.metadata) {
     Channel
         .fromPath(params.metadata)
         .ifEmpty { exit 1, log.info "Cannot find path file ${tsvFile}"}
-        .into{ ch_meta_feature_viz; ch_alpha_metadata ; ch_metadata_rare_curve ; ch_metadata_alpha_sig ; ch_metadata_beta_sig ; ch_metadata_phylo_tree ; ch_metadata_lefse ; ch_metadata_finalize}
+        .into{ ch_meta_veri ; ch_meta_feature_viz; ch_alpha_metadata ; ch_metadata_rare_curve ; ch_metadata_alpha_sig ; ch_metadata_beta_sig ; ch_metadata_phylo_tree ; ch_metadata_lefse ; ch_metadata_finalize}
 }
 
-if(params.orderIOI) {
-    csvFile = file(params.orderIOI).getName()
-    Channel
-        .fromPath(params.orderIOI)
-        .ifEmpty { exit 1, log.info "Cannot find path file ${csvFile}"}
-        .set{ ch_format_ioi_order }
-}
+
 
 Channel
     .fromPath("${baseDir}/plot_cladogram.py")
@@ -82,7 +76,7 @@ Channel
 Channel
     .from(params.itemOfInterest)
     .ifEmpty {exit 1, log.info "Cannot find Item of interest"}
-    .into{ ch_ioi_beta_sig ; ch_ioi_phylo_tree ; ch_ioi_lefse ; ch_ioi_denoise_to_file }
+    .into{ ch_ioi_veri ; ch_ioi_beta_sig ; ch_ioi_phylo_tree ; ch_ioi_lefse ; ch_ioi_denoise_to_file }
 
 Channel
     .fromPath("${baseDir}/graph.sh")
@@ -174,6 +168,10 @@ process VerifyManifest{
     input:
     file manifest from ch_mani_veri
     path seqs_dir from ch_seqs_veri
+    file metadata from ch_meta_veri
+    val ioi from ch_ioi_veri
+
+    output "order_item_of_interest_csv" into ch_format_ioi_order
 
     /*this is in place for local deployment, but the server does not give access to the dir for some reason
     The change is nessecary to do nextflow run -r main lorentzben/automate_16_nf
@@ -190,6 +188,19 @@ process VerifyManifest{
     from pathlib import PurePath
     import pandas as pd 
     import csv 
+
+    try:
+        read_metadata = pd.read_table('${metadata}', index_col=0, sep='\t')
+    except FileNotFoundError:
+        exit(1)
+
+    try:
+        read_order = pd.read_table('order_item_of_interest.csv', index_col=0, sep=',')
+    except FileNotFoundError:
+        iois = list(pd.Series.unique(read_metadata[${ioi}]))
+        ioisdf = pd.DataFrame(iois[1:])
+        ioisdf.columns = [${ioi}]
+        pd.to_csv(ioisdf, "order_item_of_interest.csv", index=False)
 
     seq_dir = '${seqs_dir}'
     try:
