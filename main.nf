@@ -199,7 +199,7 @@ process VerifyManifest{
     except FileNotFoundError:
         iois = list(pd.Series.unique(read_metadata[${ioi}]))
         ioisdf = pd.DataFrame(iois[1:])
-        ioisdf.columns = [${ioi}]
+        ioisdf.columns = ["${ioi}"]
         pd.to_csv(ioisdf, "order_item_of_interest.csv", index=False)
 
     seq_dir = '${seqs_dir}'
