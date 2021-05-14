@@ -1323,6 +1323,7 @@ process GenerateReport{
     path "result/*" from ch_lefse_results
     file "report.Rmd" from ch_report_outline
     file "make_report.sh" from ch_report_bash_script
+    file "order_item_of_interest.csv" from ch_format_ioi_order
 
 
 
