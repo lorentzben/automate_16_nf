@@ -1827,7 +1827,7 @@ perma_pairwise <- kable(test) %>%
 
 
 ```{r print weighted unifrac PERMANOVA, echo=FALSE, message=FALSE, warning=FALSE}
-print(perma_res)
+data.frame(perma_res)
   
 
 perma_pairwise
@@ -1848,13 +1848,13 @@ perma_res <- PERMANOVA::PerMANOVA.Simple(D = as.matrix(u_unifrac), grupo = cycle
 print(data.frame(data.frame(res$Inicial),res$pval))
 
 # Pairwise PERMANOVA of Unweighted Unifrac
-perma_pairwise <- pairwise_permanova_uni(cycle_1, ioi, F)
-kable(test) %>%
+test <- pairwise_permanova_uni(cycle_1, ioi, F)
+perma_pairwise <- kable(test) %>%
   kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
 ```
 
 ```{r print unweighted unifrac PERMANOVA, echo=FALSE, message=FALSE, warning=FALSE}
-print(perma_res)
+data.frame(perma_res)
 
 perma_pairwise
 
@@ -1880,9 +1880,9 @@ pairwise_perma <- kable(bray_pairwise) %>%
 ```
 
 ```{r print bray PERMANOVA, echo=FALSE, message=FALSE, warning=FALSE}
-print(perma_res)
+data.frame(perma_res)
 
-perma_pairwise
+pairwise_perma
 
 ```
 
@@ -1905,9 +1905,9 @@ pairwise_perma <- kable(jaccard_pairwise) %>%
 ```
 
 ```{r print jaccard PERMANOVA, echo=FALSE, message=FALSE, warning=FALSE}
-print(perma_res)
+data.frame(perma_res)
 
-perma_pairwise
+pairwise_perma
 
 
 ```
