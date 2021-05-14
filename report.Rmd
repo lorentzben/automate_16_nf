@@ -1827,9 +1827,9 @@ perma_pairwise <- kable(test) %>%
 
 
 ```{r print weighted unifrac PERMANOVA, echo=FALSE, message=FALSE, warning=FALSE}
-print(perma_res)
+perma_res
 
-print(perma_pairwise)
+perma_pairwise
 
 ```
 
