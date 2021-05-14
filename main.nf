@@ -195,7 +195,7 @@ process VerifyManifest{
         exit(1)
 
     try:
-        read_order = pd.read_table('order_item_of_interest.csv', index_col=0, sep=',')
+        read_order = pd.read_table('${baseDir}/order_item_of_interest.csv', index_col=0, sep=',')
     except FileNotFoundError:
         iois = list(pd.Series.unique(read_metadata[${ioi}]))
         ioisdf = pd.DataFrame(iois[1:])
