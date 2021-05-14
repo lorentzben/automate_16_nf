@@ -1895,8 +1895,8 @@ sample_data(cycle_1)[[ioi]] <- factor(sample_data(cycle_1)[[ioi]], levels=ioi_or
 # PERMANOVA Jaccard distance
 grp <- get_variable(cycle_1, ioi)
 
-perma_res <- PERMANOVA::PerMANOVA.Simple(D = as.matrix(distance(cycle_1, 'jaccard',)) , grupo = cycle_1@sam_data[[ioi]])
-print(data.frame(data.frame(res$Inicial),res$pval))
+res <- PERMANOVA::PerMANOVA.Simple(D = as.matrix(distance(cycle_1, 'jaccard',)) , grupo = cycle_1@sam_data[[ioi]])
+perma_res <- data.frame(data.frame(res$Inicial),res$pval)
 # PERMANOVA Pairwise Jaccard 
 jaccard_pairwise <- pairwise_permanova(cycle_1, ioi, "jaccard")
 pairwise_perma <- kable(jaccard_pairwise) %>%
@@ -1905,7 +1905,7 @@ pairwise_perma <- kable(jaccard_pairwise) %>%
 ```
 
 ```{r print jaccard PERMANOVA, echo=FALSE, message=FALSE, warning=FALSE}
-print(perma_res)
+print(data.frame(perma_res))
 
 pairwise_perma
 
