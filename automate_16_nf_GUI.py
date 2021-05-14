@@ -31,6 +31,8 @@ if values[6] :
 else:
     result = subprocess.run(['nextflow run ~/Documents/automate_16_nf/main.nf --input '+values[1]+" --metadata " +values[2]+" --manifest "+values[3]+" --itemOfInterest "+values[4]+" --outdir "+values[5]], shell=True)
 
+#TODO run this command in a docker/singulatiry lorentzb/r_latest 
+
 if result.returncode != 0:
     print("error")
 else:

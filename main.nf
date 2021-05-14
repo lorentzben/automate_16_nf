@@ -11,7 +11,8 @@ def helpMessage(){
         --input [path/to/folder]      Folder containing demultiplexed fastq.gz files
         --metadata [path/to/file]     Path to metadata sheet in tsv format see EXAMPLE_METADATA.tsv
         --manifest [path/to/file]     Path to mapping file in tsv format see EXAMPLE_MAPPING.tsv 
-        --itemOfInterest [str]      Item of interest, group defining treatment vs control or longitudinal variable
+        --itemOfInterest [str]        Item of interest, group defining treatment vs control or longitudinal variable
+        --orderIOI [path/to/file]     Path to file that lists the perferred order of the item of interest, used in the report generation
         -name [str]                   Name for the analysis run, if not provided nextflow will generate one 
         --outdir [file]               The output directory where the results will be saved 
         
@@ -49,6 +50,14 @@ if(params.metadata) {
         .fromPath(params.metadata)
         .ifEmpty { exit 1, log.info "Cannot find path file ${tsvFile}"}
         .into{ ch_meta_feature_viz; ch_alpha_metadata ; ch_metadata_rare_curve ; ch_metadata_alpha_sig ; ch_metadata_beta_sig ; ch_metadata_phylo_tree ; ch_metadata_lefse ; ch_metadata_finalize}
+}
+
+if(params.orderIOI) {
+    csvFile = file(params.orderIOI).getName()
+    Channel
+        .fromPath(params.orderIOI)
+        .ifEmpty { exit 1, log.info "Cannot find path file ${csvFile}"}
+        .set{ ch_format_ioi_order }
 }
 
 Channel
