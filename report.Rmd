@@ -1522,7 +1522,7 @@ split_data_frames <- split(unweighted_measurements, unweighted_measurements$Grou
 
 for(frame in split_data_frames){
   
-  frame$Group2 <- factor(frame$Group2, levels=ioi_ord))
+  frame$Group2 <- factor(frame$Group2, levels=ioi_ord)
   p <- ggplot(frame, aes(x=frame$Group2, y=Distance)) + geom_violin()+ geom_boxplot(width=0.1)
   p<- p + stat_summary(fun.y=mean, geom="point", shape=23, size=2)
   p<-p + stat_summary(fun.y=median, geom="point", size=2, color="red")
