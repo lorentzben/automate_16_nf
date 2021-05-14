@@ -12,7 +12,6 @@ def helpMessage(){
         --metadata [path/to/file]     Path to metadata sheet in tsv format see EXAMPLE_METADATA.tsv
         --manifest [path/to/file]     Path to mapping file in tsv format see EXAMPLE_MAPPING.tsv 
         --itemOfInterest [str]        Item of interest, group defining treatment vs control or longitudinal variable
-        --orderIOI [path/to/file]     Path to file that lists the perferred order of the item of interest, used in the report generation
         -name [str]                   Name for the analysis run, if not provided nextflow will generate one 
         --outdir [file]               The output directory where the results will be saved 
         
