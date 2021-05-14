@@ -1827,7 +1827,7 @@ perma_pairwise <- kable(test) %>%
 
 
 ```{r print weighted unifrac PERMANOVA, echo=FALSE, message=FALSE, warning=FALSE}
-data.frame(perma_res)
+print(perma_res)
   
 
 perma_pairwise
@@ -1854,7 +1854,7 @@ perma_pairwise <- kable(test) %>%
 ```
 
 ```{r print unweighted unifrac PERMANOVA, echo=FALSE, message=FALSE, warning=FALSE}
-data.frame(perma_res)
+print(perma_res)
 
 perma_pairwise
 
@@ -1880,7 +1880,7 @@ pairwise_perma <- kable(bray_pairwise) %>%
 ```
 
 ```{r print bray PERMANOVA, echo=FALSE, message=FALSE, warning=FALSE}
-data.frame(perma_res)
+print(perma_res)
 
 pairwise_perma
 
@@ -1905,7 +1905,7 @@ pairwise_perma <- kable(jaccard_pairwise) %>%
 ```
 
 ```{r print jaccard PERMANOVA, echo=FALSE, message=FALSE, warning=FALSE}
-data.frame(perma_res)
+print(perma_res)
 
 pairwise_perma
 
