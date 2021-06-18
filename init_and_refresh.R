@@ -3,7 +3,8 @@ if(!require(renv)) {install.packages("renv",repos="http://cran.us.r-project.org"
 renv::init()
 install.packages("BiocManager")
 BiocManager::install(version = "3.13")
-if(!require(dplyr)){install.packages("dplyr",repos="http://cran.us.r-project.org")}
+if(!require(dplyr)){renv::install("dplyr")}
+if(!require(rhdf5)){renv::install("rhdf5")}
 if(!require(tibble)) {install.packages("tibble",repos="http://cran.us.r-project.org")}
 if(!require(qiime2R)) {devtools::install_github("jbisanz/qiime2R")} # current version is 0.99.20
 if(!require(phyloseq)) {install.packages("phyloseq",repos="http://cran.us.r-project.org")}
