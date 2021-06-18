@@ -162,7 +162,7 @@ process SetupRPackages{
 
 //TODO write item of interest into csv/txt for r script
 process VerifyManifest{
-
+    publishDir "${params.outdir}", mode: 'copy'
     input:
     file manifest from ch_mani_veri
     path seqs_dir from ch_seqs_veri
