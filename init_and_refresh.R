@@ -1,5 +1,6 @@
 #! /usr/bin/env Rscript --vanilla
 if(!require(renv)) {install.packages("renv",repos="http://cran.us.r-project.org")}
+install.packages("BiocInstaller", repos="http://bioconductor.org/packages/2.13/bioc")
 renv::init()
 renv::restore()
 if(!require(dplyr)){install.packages("dplyr",repos="http://cran.us.r-project.org")}
