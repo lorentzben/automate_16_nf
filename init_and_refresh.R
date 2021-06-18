@@ -5,9 +5,9 @@ install.packages("BiocManager")
 BiocManager::install(version = "3.13")
 if(!require(dplyr)){renv::install("dplyr")}
 if(!require(rhdf5)){renv::install("rhdf5")}
-if(!require(tibble)) {install.packages("tibble",repos="http://cran.us.r-project.org")}
-if(!require(qiime2R)) {devtools::install_github("jbisanz/qiime2R")} # current version is 0.99.20
-if(!require(phyloseq)) {install.packages("phyloseq",repos="http://cran.us.r-project.org")}
-if(!require(jamba)){remotes::install_github("jmw86069/jamba@0.0.6.900")}
+if(!require(tibble)) {renv::install("tibble")}
+if(!require(qiime2R)) {renv::install("jbisanz/qiime2R@d1ad96657ada993cf6c2841b29113a4f635c6b56")} # current version is 0.99.20
+if(!require(phyloseq)) {BiocManager::install("phyloseq", version="3.13")}
+if(!require(jamba)){renv::install("jmw86069/jamba@0.0.6.900")}
 renv::restore()
 q()
