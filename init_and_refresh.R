@@ -1,8 +1,8 @@
 #! /usr/bin/env Rscript --vanilla
 if(!require(renv)) {install.packages("renv",repos="http://cran.us.r-project.org")}
+renv::init()
 install.packages("BiocManager")
 BiocManager::install(version = "3.13")
-renv::init()
 renv::restore()
 if(!require(dplyr)){install.packages("dplyr",repos="http://cran.us.r-project.org")}
 if(!require(tibble)) {install.packages("tibble",repos="http://cran.us.r-project.org")}
