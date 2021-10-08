@@ -5,7 +5,7 @@ from os import path
 import argparse
 import pandas as pd
 import numpy as np 
-import glob
+
 
 def get_file_count(seq_dir):
     #print("returns a count of the number of sequence files in the directory provided by the user.")
@@ -107,8 +107,6 @@ if __name__ == "__main__":
         description="Assists in the Creation of the metadata file for SRA submission")
     parser.add_argument('-n', '--name', action='store', required=True,
                         help="name of the directory that sequences are stored in", dest='dir_name')
-    parser.add_argument('-m','--metadata', action='store', required=False,
-                        help="name of the metadata file with sample names", dest='metadata')
     parser.add_argument('-t', '--title', action='store', required=False,
                         help="Short description: {methodology} of {organism}: {sample info}", dest='title')
     parser.add_argument('-l', '--library_strategy', action='store', required=False,
