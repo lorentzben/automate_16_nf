@@ -527,8 +527,8 @@ process FindCutoffs{
             writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
 
             writer.writeheader()
-            writer.writerow({'cutoff': 'right', 'value': right_cutoff})
             writer.writerow({'cutoff': 'left', 'value': left_cutoff})
+            writer.writerow({'cutoff': 'right', 'value': right_cutoff})
             writer.writerow({'cutoff': 'filename', 'value': input_file})
 
         print(left_cutoff, right_cutoff)
