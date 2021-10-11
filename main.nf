@@ -480,8 +480,8 @@ process FindCutoffs{
                 left_cutoff = i+1
                 break
         for i in range(0, len(mean_qual_vals)):
-            if mean_qual_vals[len(mean_qual_vals)-1-i] >= int(average_qual):
-                right_cutoff = len(mean_qual_vals)-i
+            if mean_qual_vals[len(mean_qual_vals)-2-i] >= int(average_qual):
+                right_cutoff = len(mean_qual_vals)-1-i
                 break
         return(left_cutoff, right_cutoff)
 
