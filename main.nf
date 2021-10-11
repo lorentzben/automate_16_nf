@@ -806,7 +806,7 @@ process AlphaDiversityMeasure{
     file "shannon.qza" into ch_shannon_qza
     file "simpson.qza" into ch_simpson_qza 
     file "chao1.qza" into ch_chao_qza
-    file "ace.qza" into ch_ace_qza
+    file "ace.qza" optional true into ch_ace_qza
     file "obs.qza" into ch_obs_qza
     file "faith_pd.qza" into ch_faith_qza
     file "table-dada2.qza" into ch_table_rare_curve
@@ -984,7 +984,7 @@ process AlphaDiversitySignificance{
     file "shannon.qza" from ch_shannon_qza
     file "simpson.qza" from ch_simpson_qza
     file "chao1.qza" from ch_chao_qza
-    file "ace.qza" from ch_ace_qza
+    file "ace.qza" optional true from ch_ace_qza
     file "obs.qza" from ch_obs_qza
     file "faith_pd.qza" from ch_faith_qza
 
@@ -992,7 +992,7 @@ process AlphaDiversitySignificance{
     path "shannon/*" into ch_shannon_path
     path "simpson/*" into ch_simpson_path
     path "chao1/*" into ch_chao_path
-    path "ace/*" into ch_ace_path
+    path "ace/*" optional true into ch_ace_path
     path "obs/*" into ch_obs_path
     path "faith_pd/*" into ch_faith_path
 
@@ -1324,7 +1324,7 @@ process GenerateReport{
     path "shannon/*" from ch_shannon_path
     path "simpson/*" from ch_simpson_path
     path "chao1/*" from ch_chao_path
-    path "ace/*" from ch_ace_path
+    path "ace/*" optional true from ch_ace_path
     path "obs/*" from ch_obs_path
     path "faith_pd/*" from ch_faith_path
     path "core-metric-results/*" from ch_core_report
