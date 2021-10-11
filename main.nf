@@ -481,7 +481,7 @@ process FindCutoffs{
                 break
         for i in range(0, len(mean_qual_vals)):
             if mean_qual_vals[len(mean_qual_vals)-1-i] >= int(average_qual):
-                right_cutoff = len(mean_qual_vals)-i-1
+                right_cutoff = len(mean_qual_vals)-i
                 break
         return(left_cutoff, right_cutoff)
 
@@ -606,8 +606,8 @@ process Denoise {
         right = cutoff['value'][1]
         command = "qiime dada2 denoise-single \
             --i-demultiplexed-seqs demux.qza \
-            --p-trim-left " + str(right)+" \
-            --p-trunc-len " + str(left) + " \
+            --p-trim-left " + str(left)+" \
+            --p-trunc-len " + str(right) + " \
             --o-representative-sequences rep-seqs-dada2.qza \
             --o-table table-dada2.qza \
             --o-denoising-stats stats-dada2.qza"
