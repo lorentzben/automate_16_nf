@@ -467,7 +467,7 @@ process FindCutoffs{
     def find_cutoffs(dataframe):
         mean_qual = dataframe[4:5]
 
-        average_qual = np.round(mean_qual.mean(axis=1), 0)-1
+        average_qual = np.round(mean_qual.mean(axis=1), 0)
         mean_qual_vals = np.array(mean_qual)[0]
 
         if int(average_qual) < 30:
@@ -480,8 +480,8 @@ process FindCutoffs{
                 left_cutoff = i+1
                 break
         for i in range(0, len(mean_qual_vals)):
-            if mean_qual_vals[len(mean_qual_vals)-2-i] >= int(average_qual):
-                right_cutoff = len(mean_qual_vals)-1-i
+            if mean_qual_vals[len(mean_qual_vals)-1-i] >= int(average_qual):
+                right_cutoff = len(mean_qual_vals)-i
                 break
         return(left_cutoff, right_cutoff)
 
