@@ -466,9 +466,13 @@ process FindCutoffs{
 
     def find_cutoffs(dataframe):
         mean_qual = dataframe[4:5]
+        mean_count = dataframe[0:1]
 
         average_qual = np.round(mean_qual.mean(axis=1), 0)
+        average_count = np.round(mean_count.mean(axis=1), 0)
+
         mean_qual_vals = np.array(mean_qual)[0]
+        mean_count_vals = np.array(mean_count)[0]
 
         if int(average_qual) < 30:
             print(
@@ -477,19 +481,25 @@ process FindCutoffs{
 
         for i in range(0, len(mean_qual_vals)):
             if mean_qual_vals[i] >= int(average_qual):
-                left_cutoff = i+1
-                break
+                if mean_count_vals[i] >= int(average_count):
+                    left_cutoff = i+1
+                    break
         for i in range(0, len(mean_qual_vals)):
             if mean_qual_vals[len(mean_qual_vals)-1-i] >= int(average_qual):
-                right_cutoff = len(mean_qual_vals)-i
-                break
+                if mean_count_vals[len(mean_count_vals)-1-i] >= int(average_count):
+                    right_cutoff = len(mean_qual_vals)-i
+                    break
         return(left_cutoff, right_cutoff)
 
     def find_rev_cutoffs(dataframe):
         mean_qual = dataframe[4:5]
+        mean_count = dataframe[0:1]
 
         average_qual = np.round(mean_qual.mean(axis=1), 0)+2
+        average_count = np.round(mean_count.mean(axis=1), 0)
+
         mean_qual_vals = np.array(mean_qual)[0]
+        mean_count_vals = np.array(mean_count)[0]
 
         if int(average_qual) < 30:
             print(
@@ -501,13 +511,15 @@ process FindCutoffs{
 
         for i in range(0, len(mean_qual_vals)):
             if mean_qual_vals[i] >= int(average_qual):
-                left_cutoff = i+1
-                break
+                if mean_count_vals[i] >= int(average_count):
+                    left_cutoff = i+1
+                    break
 
         for i in range(0, len(mean_qual_vals)):
             if mean_qual_vals[len(mean_qual_vals)-1-i] >= int(average_qual):
-                right_cutoff = len(mean_qual_vals)-i
-                break
+                if mean_count_vals[len(mean_count_vals)-1-i] >= int(average_count):
+                    right_cutoff = len(mean_qual_vals)-i
+                    break
 
         return(left_cutoff, right_cutoff)
 
