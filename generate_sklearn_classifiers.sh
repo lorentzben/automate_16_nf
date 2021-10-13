@@ -1,14 +1,6 @@
 #!/usr/bin/env bash
 
 
-eval "$(conda shell.bash hook)"
-CHECKCONDA="$(conda activate ./tmp_env)"
-if [[ $CHECKCONDA -eq 1 ]]
-then
-    conda env create --prefix ./tmp_env -f environment.yml
-fi
-conda activate ./tmp_env
-
 if [[ ! -d "classifier_gen" ]]; then
     mkdir classifier_gen
 fi

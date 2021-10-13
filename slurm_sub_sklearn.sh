@@ -12,4 +12,4 @@
 #SBATCH --mail-type=BEGIN,END,FAIL
 
 echo "this script will take approx 11:16:54 to generate 2 classifiers"
-bash generate_sklearn_classifiers.sh
+singularity run docker://lorentzb/automate_16_nf bash generate_sklearn_classifiers.sh
