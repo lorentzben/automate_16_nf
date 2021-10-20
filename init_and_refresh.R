@@ -14,4 +14,3 @@ if(!require(jamba)){renv::install("jmw86069/jamba@0.0.6.900")}
 renv::restore()
 q()
 
-[7b/1fe637] process > LefseFormat (1)                [  0%] 0 of 1
