@@ -13,3 +13,7 @@
 
 module load Nextflow/20.04.1
 nextflow run main.nf --input seqs --metadata metadata_1.tsv --manifest mapping.tsv --itemOfInterest treatment --outdir yadav
+cp report.Rmd $(cat out.txt)
+cp make_report.sh $(cat out.txt)
+cd $(cat out.txt)
+singularity shell docker://lorentzb/r_latest bash make_report.sh

@@ -42,10 +42,11 @@ if(!require(remotes)){renv::install("remotes")}
 if(!require(ggplot2)) {renv::install("tidyverse/ggplot2@v3.3.2")}
 if(!require(tidyverse)) {renv::install("tidyverse")}
 
-
+install.packages("BiocManager")
+BiocManager::install(version = "3.13")
 if (!require("devtools", quietly = TRUE)){renv::install("devtools")}
-if(!require(qiime2R)) {renv::install("jbisanz/qiime2R")} # current version is 0.99.20
-if(!require(phyloseq)) {renv::install("phyloseq")}
+if(!require(qiime2R)) {renv::install("jbisanz/qiime2R@d1ad96657ada993cf6c2841b29113a4f635c6b56")} # current version is 0.99.20
+if(!require(phyloseq)) {BiocManager::install("phyloseq", version="3.13")}
 if(!require(gtools)) {renv::install("gtools")}
 if(!require(reshape2)) {renv::install("reshape2")}
 if(!require(forcats)) {renv::install("forcats")}
@@ -68,7 +69,7 @@ if(!require(vegan)){renv::install("vegan", type="source")}
 if(!require(ggvegan)){renv::install("gavinsimpson/ggvegan")}
 if(!require(ggpubr)){renv::install("ggpubr")}
 if(!require(dplyr)){renv::install("dplyr")}
-if(!require(jamba)){renv::install("jmw86069/jamba")}
+if(!require(jamba)){renv::install("jmw86069/jamba@0.0.6.900")}
 if(!require(ggConvexHull)){renv::install("cmartin/ggConvexHull")}
 if(!require(PERMANOVA)){renv::install("PERMANOVA")}
 # library(remotes)
