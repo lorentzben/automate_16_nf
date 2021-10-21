@@ -1466,24 +1466,24 @@ ggsave("rank_abundance_curve_by_treatemnt.png", plot=by_group, path=outdir)
 ## 9 Unifrac Heatmap 
 
 ```{r echo=FALSE,fig.height=8, fig.width=14, message=FALSE, warning=FALSE}
-metadata<-read_q2metadata(metadata_file)
-metadata[[ioi]] <- reorder(metadata[[ioi]])
-w_unifrac_dist <- qiime2R::read_qza("./qiime/core-metric-results/weighted_unifrac_distance_matrix.qza")
-u_unifrac_dist <- qiime2R::read_qza("./qiime/core-metric-results/unweighted_unifrac_distance_matrix.qza")
+#metadata<-read_q2metadata(metadata_file)
+#metadata[[ioi]] <- reorder(metadata[[ioi]])
+#w_unifrac_dist <- qiime2R::read_qza("./qiime/core-metric-results/weighted_unifrac_distance_matrix.qza")
+#u_unifrac_dist <- qiime2R::read_qza("./qiime/core-metric-results/unweighted_unifrac_distance_matrix.qza")
 
-un_weight_matrix <- as.matrix(u_unifrac_dist$data)
-un_weight_matrix[lower.tri(un_weight_matrix)] <- NA
-un_weight_heatmap <- pheatmap(un_weight_matrix, cluster_rows = F, cluster_cols = F, na_col = "grey", display_numbers = T, number_format ="%.3f",main = "Beta Diversity Heatmap using Unweighted Unifrac Distance")
-un_weight_heatmap
+#un_weight_matrix <- as.matrix(u_unifrac_dist$data)
+#un_weight_matrix[lower.tri(un_weight_matrix)] <- NA
+#un_weight_heatmap <- pheatmap(un_weight_matrix, cluster_rows = F, cluster_cols = F, na_col = "grey", display_numbers = T, number_format ="%.3f",main = "Beta Diversity Heatmap using Unweighted Unifrac Distance")
+#un_weight_heatmap
 
-ggsave("beta_div_heatmap_unweight_unifrac.png", plot=un_weight_heatmap, path=outdir)
+#ggsave("beta_div_heatmap_unweight_unifrac.png", plot=un_weight_heatmap, path=outdir)
 
-weight_matrix <- as.matrix(w_unifrac_dist$data)
-weight_matrix[lower.tri(weight_matrix)] <- NA
-weight_heatmap <- pheatmap(weight_matrix, cluster_rows = F, cluster_cols = F, na_col = "grey", display_numbers = T, number_format ="%.3f",main = "Beta Diversity Heatmap using Weighted Unifrac Distance")
-weight_heatmap
+#weight_matrix <- as.matrix(w_unifrac_dist$data)
+#weight_matrix[lower.tri(weight_matrix)] <- NA
+#weight_heatmap <- pheatmap(weight_matrix, cluster_rows = F, cluster_cols = F, na_col = "grey", display_numbers = T, number_format ="%.3f",main = "Beta Diversity Heatmap using Weighted Unifrac Distance")
+#weight_heatmap
 
-ggsave("beta_div_heatmap_Weighted_unifrac.png", plot=weight_heatmap, path=outdir)
+#ggsave("beta_div_heatmap_Weighted_unifrac.png", plot=weight_heatmap, path=outdir)
 ```
 
 
