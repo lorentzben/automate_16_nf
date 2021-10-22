@@ -13,8 +13,8 @@ def helpMessage(){
         --manifest [path/to/file]     Path to mapping file in tsv format see EXAMPLE_MAPPING.tsv 
         --itemOfInterest [str]        Item of interest, group defining treatment vs control or longitudinal variable
         --name [str]                   Name for the analysis run, if not provided nextflow will generate one
-        --sampDepth [val]             Value of sampling depth derived from demux_summary.qzv
-        --rareDepth [val]             Value of rarefaction depth derived from table.qzv
+        --sampDepth [str]             Value of sampling depth derived from demux_summary.qzv
+        --rareDepth [str]             Value of rarefaction depth derived from table.qzv
         --outdir [file]               The output directory where the results will be saved 
 
 
