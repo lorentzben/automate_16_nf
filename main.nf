@@ -53,7 +53,7 @@ if(params.metadata) {
 
 if(params.sampDepth){
     Channel
-        .set{ ch_user_sample_depth }
+    .set{ ch_user_sample_depth }
 }
 
 if(params.rareDepth){
