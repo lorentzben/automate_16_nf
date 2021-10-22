@@ -54,13 +54,13 @@ if(params.metadata) {
 if(params.sampDepth){
     Channel
         .fromPath(params.sampDepth)
-        .into{ ch_user_sample_depth }
+        .set{ ch_user_sample_depth }
 }
 
 if(params.rareDepth){
     Channel
         .fromPath(params.rareDepth)
-        .into{ ch_user_rarefaction_depth }
+        .set{ ch_user_rarefaction_depth }
 }
 
 
@@ -826,7 +826,7 @@ process AlphaDiversityMeasure{
     file "table-dada2.qza" from ch_alpha_div_table
     file "rooted-tree.qza" from ch_rooted_tree
     file "samp_depth_simple.txt" from ch_depth
-    val user_depth from ch_user_sample_depth
+    str user_depth from ch_user_sample_depth
 
     output:
     path "core-metric-results/*" into ch_core_beta_significance 
