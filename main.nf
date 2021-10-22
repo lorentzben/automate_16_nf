@@ -826,7 +826,7 @@ process AlphaDiversityMeasure{
     file "table-dada2.qza" from ch_alpha_div_table
     file "rooted-tree.qza" from ch_rooted_tree
     file "samp_depth_simple.txt" from ch_depth
-    str user_depth from ch_user_sample_depth
+    val "user_depth" from ch_user_sample_depth
 
     output:
     path "core-metric-results/*" into ch_core_beta_significance 
@@ -847,7 +847,7 @@ process AlphaDiversityMeasure{
     '''
     #!/usr/bin/env bash
 
-    echo user_depth
+    echo !{user_depth}
   
     qiime diversity core-metrics-phylogenetic \
     --i-phylogeny rooted-tree.qza \
