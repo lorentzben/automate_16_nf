@@ -847,7 +847,7 @@ process AlphaDiversityMeasure{
     '''
     #!/usr/bin/env bash
 
-    echo !{user_depth}
+    echo !{user_depth} > something.txt
   
     qiime diversity core-metrics-phylogenetic \
     --i-phylogeny rooted-tree.qza \
