@@ -862,8 +862,10 @@ process AlphaDiversityMeasure{
     if [ !{user_depth} == 0 ];then
         SAMP_DEPTH=$(head samp_depth_simple.txt)
     fi
-
-    SAMP_DEPTH=!{user_depth}
+    
+    if [ !{user_depth} != 0 ];then
+        SAMP_DEPTH=!{user_depth}
+    fi
   
     qiime diversity core-metrics-phylogenetic \
     --i-phylogeny rooted-tree.qza \
