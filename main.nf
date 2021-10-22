@@ -857,8 +857,6 @@ process AlphaDiversityMeasure{
     '''
     #!/usr/bin/env bash
 
-   
-
     if [ !{user_depth} == 0 ];then
         SAMP_DEPTH=$(head samp_depth_simple.txt)
     fi
@@ -991,6 +989,7 @@ process RareCurveCalc{
     file metadata from ch_metadata_rare_curve
     file "table-dada2.qza" from ch_table_rare_curve
     file "rooted-tree.qza" from ch_tree_rare_curve
+    val user_rare_depth from ch_user_rarefaction_depth
 
 
     output:
@@ -1004,7 +1003,15 @@ process RareCurveCalc{
     '''
     #!/usr/bin/env bash
 
-    DEPTH=$(head rare_depth.txt)
+    if [ !{user_rare_depth} == 0 ];then
+        DEPTH=$(head rare_depth.txt)
+    fi
+    
+    if [ !{user_rare_depth} != 0 ];then
+        DEPTH=!{user__rare_depth}
+    fi
+
+    
     
     qiime diversity alpha-rarefaction \
     --i-table table-dada2.qza \
