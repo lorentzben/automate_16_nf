@@ -860,15 +860,15 @@ process AlphaDiversityMeasure{
    
 
     if [ !{user_depth} == 0 ];then
-        echo "auto_depth" > format.txt
+        SAMP_DEPTH=$(head samp_depth_simple.txt)
     fi
 
-    echo !{user_depth} > use_cutoff.txt
+    SAMP_DEPTH=!{user_depth}
   
     qiime diversity core-metrics-phylogenetic \
     --i-phylogeny rooted-tree.qza \
     --i-table table-dada2.qza \
-    --p-sampling-depth $(head samp_depth_simple.txt) \
+    --p-sampling-depth $SAMP_DEPTH \
     --m-metadata-file !{metadata} \
     --output-dir core-metric-results 
 
