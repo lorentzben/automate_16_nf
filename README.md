@@ -54,3 +54,13 @@ I have a script in this repo that will also generate the files above, however it
 
 For the item of interest and related column in the metadata file, QIIME will not let filenames use the '_' character so they should be replaced by the '-' or alternate character. 
 
+
+### If you want to check the files for Depth Parameters
+
+The file for cutoff is in:
+$RESULT_DIRECTORY/qiime/demux_summary.qzv
+
+The file for Sampling Depth and Rarefaction Depth is:
+$RESULT_DIRECTORY/qiime/table.qzv
+
+Both of these files can be unzipped or opened on the internet at view.qiime2.org
