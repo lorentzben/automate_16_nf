@@ -53,13 +53,13 @@ if(params.metadata) {
 
 if(params.sampDepth){
     Channel
-        .fromPath(params.sampDepth)
+        .fromVal(params.sampDepth)
         .set{ ch_user_sample_depth }
 }
 
 if(params.rareDepth){
     Channel
-        .fromPath(params.rareDepth)
+        .fromVal(params.rareDepth)
         .set{ ch_user_rarefaction_depth }
 }
 
