@@ -847,7 +847,13 @@ process AlphaDiversityMeasure{
     '''
     #!/usr/bin/env bash
 
-    echo !{user_depth} > something.txt
+   
+
+    if [ !{user_depth} == 0 ];then
+        echo "auto_depth" > format.txt
+    fi
+
+    echo !{user_depth} > use_cutoff.txt
   
     qiime diversity core-metrics-phylogenetic \
     --i-phylogeny rooted-tree.qza \
