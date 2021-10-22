@@ -63,7 +63,17 @@ if(params.rareDepth){
         .set{ ch_user_rarefaction_depth }
 }
 
+if(!params.sampDepth){
+    Channel
+        .from(0)
+        .set{ ch_user_sample_depth }
+}
 
+if(!params.rareDepth){
+    Channel
+        .from(0)
+        .set{ ch_user_rarefaction_depth }
+}
 
 Channel
     .fromPath("${baseDir}/plot_cladogram.py")
