@@ -437,6 +437,7 @@ process QualControl{
     output: 
     file('demux_summary/*') into ch_qiime_qual
     file seq_obj into ch_qiime_denoise
+    file 'demux_summary.qzv' into ch_demux_export
 
     //conda "${projectDir}/environment.yml"
     //conda "environment.yml"
@@ -679,6 +680,7 @@ process FeatureVisualization{
     output:
     file "stats-dada2.qzv" into ch_dada_stats_export
     file "table.qzv" into ch_table_viz_obj
+    file "table.qzv" into ch_table_viz_export
     file "rep-seqs.qzv" into ch_req_seq_vis_obj
     file "rep-seqs-dada2.qza" into ch_rep_seq_tree_gen
     file "table-dada2.qza" into ch_alpha_div_table
@@ -1390,6 +1392,8 @@ process GenerateReport{
     file "report.Rmd" from ch_report_outline
     file "make_report.sh" from ch_report_bash_script
     file "order_item_of_interest.csv" from ch_format_ioi_order
+    file "table.qzv" from ch_table_viz_export
+    file 'demux_summary.qzv' from ch_demux_export
 
 
 
