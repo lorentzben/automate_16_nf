@@ -1008,7 +1008,7 @@ process RareCurveCalc{
     fi
     
     if [ !{user_rare_depth} != 0 ];then
-        DEPTH=!{user__rare_depth}
+        DEPTH=!{user_rare_depth}
     fi
 
     
