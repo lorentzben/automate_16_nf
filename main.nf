@@ -12,7 +12,9 @@ def helpMessage(){
         --metadata [path/to/file]     Path to metadata sheet in tsv format see EXAMPLE_METADATA.tsv
         --manifest [path/to/file]     Path to mapping file in tsv format see EXAMPLE_MAPPING.tsv 
         --itemOfInterest [str]        Item of interest, group defining treatment vs control or longitudinal variable
-        -name [str]                   Name for the analysis run, if not provided nextflow will generate one 
+        --name [str]                   Name for the analysis run, if not provided nextflow will generate one
+        --sampDepth [int]             Value of sampling depth derived from demux_summary.qzv
+        --rareDepth [int]             Value of rarefaction depth derived from table.qzv
         --outdir [file]               The output directory where the results will be saved 
 
 
@@ -47,6 +49,16 @@ if(params.metadata) {
         .fromPath(params.metadata)
         .ifEmpty { exit 1, log.info "Cannot find path file ${tsvFile}"}
         .into{ ch_meta_veri ; ch_meta_feature_viz; ch_alpha_metadata ; ch_metadata_rare_curve ; ch_metadata_alpha_sig ; ch_metadata_beta_sig ; ch_metadata_phylo_tree ; ch_metadata_lefse ; ch_metadata_finalize}
+}
+
+if(params.sampDepth){
+    Channel
+        .set{ ch_user_sample_depth }
+}
+
+if(params.rareDepth){
+    Channel
+    .set{ ch_user_rarefaction_depth }
 }
 
 
@@ -105,6 +117,7 @@ Channel
 Channel
     .fromPath("${baseDir}/renv.lock")
     .set{ ch_r_lock }
+
 
 /*
 process SetupPy2CondaEnv{
@@ -811,6 +824,7 @@ process AlphaDiversityMeasure{
     file "table-dada2.qza" from ch_alpha_div_table
     file "rooted-tree.qza" from ch_rooted_tree
     file "samp_depth_simple.txt" from ch_depth
+    val user_depth from ch_user_sample_depth
 
     output:
     path "core-metric-results/*" into ch_core_beta_significance 
@@ -830,6 +844,8 @@ process AlphaDiversityMeasure{
     shell:
     '''
     #!/usr/bin/env bash
+
+    echo user_depth
   
     qiime diversity core-metrics-phylogenetic \
     --i-phylogeny rooted-tree.qza \
