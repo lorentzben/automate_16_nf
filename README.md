@@ -44,11 +44,17 @@ I ran into an issue with xml2 but running "Sys.setenv(R_INSTALL_STAGED = FALSE)"
 TODO check to see if these links are correct for the version of Scikit that Qiime is using.
 On setup, you will need to download one of the classifiers I generated below, or genertate your own. 
 
-[515-806 Classifier](https://outlookuga-my.sharepoint.com/:u:/g/personal/bjl34716_uga_edu/EX3h7KrIg_5HqkUGhEkPyDYBbmEhBqsQzlLtIUAFyQzXDQ?e=Y2Y56B)
+[515-806 Classifier](https://outlookuga-my.sharepoint.com/:u:/g/personal/bjl34716_uga_edu/ETXcJb8cC1VNnZUn2HGxAEcBCQZSet4635ZJENEd0TrDXA?e=YzPQcf)
 
-[Whole 16s Classifier](https://outlookuga-my.sharepoint.com/:u:/g/personal/bjl34716_uga_edu/EcydxUc2syZBnZLLT_Z9ISQBow7NdSRxYHxazvL9iCwxOQ?e=Yad1bX)
+[515-805 ALT](https://lorentzvault.quickconnect.to/d/s/lzaQnpI1s6n10gDy21VEJhTiloqNXuM1/X12oymNQrJQPRo3hmnf5qr1ydrFwk3Uj-Tr7A0QUqBAk)
+
+[Whole 16s Classifier](https://outlookuga-my.sharepoint.com/:u:/g/personal/bjl34716_uga_edu/EfjwPSMRsuNJuJc4vsFsq48BmRg4Y7el79hdQpPB4KEGyQ?e=Nu7rZE)
+
+[Whole 16s ALT](https://lorentzvault.quickconnect.to/d/s/lzaNTHGucSeauP4cgjJRBQoUlNg1coH7/jJMrGBAJd2cx2Ma841fxOhUIZxwx00aB-X77AxCEqBAk)
 
 [Qiime Guide to Train Custom Classifer](https://docs.qiime2.org/2021.2/tutorials/feature-classifier/)
+
+Also see generate_sklearn_classifers.sh for a slurm script.
 
 I have a script in this repo that will also generate the files above, however it takes about 12 hours to run. 
 
