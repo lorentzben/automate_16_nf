@@ -42,11 +42,10 @@ if(!require(remotes)){renv::install("remotes")}
 if(!require(ggplot2)) {renv::install("tidyverse/ggplot2@v3.3.2")}
 if(!require(tidyverse)) {renv::install("tidyverse")}
 
-install.packages("BiocManager")
-BiocManager::install(version = "3.13")
+
 if (!require("devtools", quietly = TRUE)){renv::install("devtools")}
-if(!require(qiime2R)) {renv::install("jbisanz/qiime2R@d1ad96657ada993cf6c2841b29113a4f635c6b56")} # current version is 0.99.20
-if(!require(phyloseq)) {BiocManager::install("phyloseq", version="3.13")}
+if(!require(qiime2R)) {renv::install("jbisanz/qiime2R")} # current version is 0.99.20
+if(!require(phyloseq)) {renv::install("phyloseq")}
 if(!require(gtools)) {renv::install("gtools")}
 if(!require(reshape2)) {renv::install("reshape2")}
 if(!require(forcats)) {renv::install("forcats")}
@@ -69,7 +68,7 @@ if(!require(vegan)){renv::install("vegan", type="source")}
 if(!require(ggvegan)){renv::install("gavinsimpson/ggvegan")}
 if(!require(ggpubr)){renv::install("ggpubr")}
 if(!require(dplyr)){renv::install("dplyr")}
-if(!require(jamba)){renv::install("jmw86069/jamba@0.0.6.900")}
+if(!require(jamba)){renv::install("jmw86069/jamba")}
 if(!require(ggConvexHull)){renv::install("cmartin/ggConvexHull")}
 if(!require(PERMANOVA)){renv::install("PERMANOVA")}
 # library(remotes)
@@ -1059,15 +1058,40 @@ ggsave("weighted_unifrac_pcoa_ordination_no_polygons.png", plot=weighted_unifrac
 ### 6.5 Principal Components Analysis
 
 ```{r PCA created by ampvis2, echo=FALSE, message=FALSE, warning=FALSE}
+library(dplyr)
 devtools::source_gist("8d0ca4206a66be7ff6d76fc4ab8e66c6")
 
 cycle_1 <- qza_to_phyloseq(table_dada2,rooted_tree,taxonomy_file,metadata_file) 
 cycle_1@sam_data[[ioi]] <- factor(cycle_1@sam_data[[ioi]], levels=ioi_ord)
 cycle_1_amp <- phyloseq_to_ampvis2(cycle_1)
 
-euclidean_frame <- amp_ordinate(cycle_1_amp, filter_species = 0, type = "PCA", transform = "hellinger", print_caption = T,sample_color_by = ioi, sample_colorframe = T) 
-euclidean_frame
-ggsave("PCA_ordination_with_boundries.png", plot=euclidean_frame , path=outdir)
+euclidean_frame <- amp_ordinate(cycle_1_amp, filter_species = 0, type = "PCA", transform = "hellinger", print_caption = T,sample_color_by = ioi, sample_colorframe = T, detailed_output = T,envfit_factor =ioi,envfit_show = F) 
+euclidean_frame$plot
+print(euclidean_frame$evf_factor_model)
+print(euclidean_frame$screeplot)
+ggsave("PCA_ordination_with_boundries.png", plot=euclidean_frame$plot , path=outdir)
+
+loading <- as.data.frame(euclidean_frame$dspecies)
+#loading <- select(loading, "PC1", "PC2" , "Genus")
+loading <- subset(loading, select = c(PC1, PC2, Genus))
+loading <- melt(loading, id.vars="Genus")
+loading <- arrange(loading, desc(abs(value)))
+
+loading$Genus <- factor(loading$Genus, levels= unique(loading$Genus))
+
+cutoff <- summary(loading$value)[2]
+
+loading2 <- subset(loading, abs(value) > abs(cutoff))
+
+loading <- loading2[1:100,]
+
+p <- ggplot(data=loading, aes(x=Genus, y=value, fill=variable))+
+  geom_bar(stat="identity", width=0.4,position = position_dodge(width = 0.5)) +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+p
+ggsave("Loading_top_100_genera.png", plot=p , path=outdir)
+
+
 euclidean <- amp_ordinate(cycle_1_amp, filter_species = 0, type = "PCA", transform = "hellinger", print_caption = T,sample_color_by = ioi) 
 euclidean
 
@@ -1466,9 +1490,9 @@ ggsave("rank_abundance_curve_by_treatemnt.png", plot=by_group, path=outdir)
 ## 9 Unifrac Heatmap 
 
 ```{r echo=FALSE,fig.height=8, fig.width=14, message=FALSE, warning=FALSE}
-library(forcats)
+
 metadata<-read_q2metadata(metadata_file)
-metadata[[ioi]] <- fct_relevel(metadata[[ioi]])
+#metadata[[ioi]] <- fct_reorder(metadata[[ioi]])
 w_unifrac_dist <- qiime2R::read_qza("./qiime/core-metric-results/weighted_unifrac_distance_matrix.qza")
 u_unifrac_dist <- qiime2R::read_qza("./qiime/core-metric-results/unweighted_unifrac_distance_matrix.qza")
 
@@ -1543,7 +1567,6 @@ for(frame in split_data_frames){
 ```{r UPGMA Plot of Weighted Unifrac Distance, echo=FALSE, fig.height=8, fig.width=10, message=FALSE, warning=FALSE}
 library("ggplot2")
 library("ggdendro")
-library("forcats")
 cycle_1 <- qza_to_phyloseq(table_dada2,rooted_tree,taxonomy_file,metadata_file)
 w_unifrac <- UniFrac(cycle_1,weighted=TRUE)
 
@@ -1566,7 +1589,7 @@ p <- ggplot(segment(ddata)) +
         panel.grid.minor = element_blank()) +
   ylab("Weighted Unifrac Distance") 
   
-sample_data(cycle_1)[[ioi]] <- fct_relevel(sample_data(cycle_1)[[ioi]])
+#sample_data(cycle_1)[[ioi]] <- reorder(sample_data(cycle_1)[[ioi]])
 
 level <- "Phylum"
 #Select number of taxa at phylum level to plot
@@ -1637,7 +1660,6 @@ ggsave("UPGMA_weighted_unifrac_plot.png", plot=weight_plot, path=outdir)
 ### 11.2 UPGMA Plot for Unweighted Unifrac Distance
 
 ```{r UPGMA Plot of Unweighted Unifrac Distances, echo=FALSE, fig.height=8, fig.width=10, message=FALSE, warning=FALSE}
-library(forcats)
 cycle_1 <- qza_to_phyloseq(table_dada2,rooted_tree,taxonomy_file,metadata_file)
 u_unifrac <- UniFrac(cycle_1, weighted = FALSE)
 
@@ -1660,7 +1682,7 @@ p <- ggplot(segment(ddata)) +
         panel.grid.minor = element_blank()) +
   ylab("Unweighted Unifrac Distance") 
   
-sample_data(cycle_1)[[ioi]] <- fct_relevel(sample_data(cycle_1)[[ioi]])
+#sample_data(cycle_1)[[ioi]] <- reorder(sample_data(cycle_1)[[ioi]])
 
 level <- "Phylum"
 #Select number of taxa at phylum level to plot
@@ -1943,7 +1965,8 @@ pairwise_anosim <- function(dat, column_of_int, dissim){
   tmp_2 <- data.frame(p_res)
   colnames(tmp_2)<- c("group1", "group2", "statistic", "permutations", "dissimilarity", "p.val")
   result <- adjust_pvalue(tmp_2, p.col = "p.val", output.col = "p.adjust",method = "BH")
-  result <- add_significance(result, p.col = "p.adjust", output.col = "p.signif",symbols =c("****", "***", "**", "$*$", "ns"))
+  result <- add_significance(result, p.col = "p.adjust", output.col = "p.signif",symbols =c('****', '***', '**', '$*$', 'ns'))
+  result <- add_significance(result, p.col="p.adjust",output.col = "p.signif.box",symbols =c('****', '***', '**', '*', 'ns'))
   res_df <- data.frame(result)
   res_df <- res_df[mixedorder(res_df$group1),]
   return(res_df)
@@ -1972,7 +1995,8 @@ pairwise_anosim_uni <- function(dat, column_of_int, weight){
   tmp_2 <- data.frame(p_res)
   colnames(tmp_2)<- c("group1","group2", "statistic", "permutations", "p")
   result <- adjust_pvalue(tmp_2, p.col = "p", output.col = "p.adj",method = "BH")
-  result <- add_significance(result, p.col="p.adj",output.col = "p.signif",symbols =c("****", "***", "**", "$*$", "ns"))
+  result <- add_significance(result, p.col="p.adj",output.col = "p.signif",symbols =c('****', '***', '**', '$*$', 'ns'))
+  result <- add_significance(result, p.col="p.adj",output.col = "p.signif.box",symbols =c('****', '***', '**', '*', 'ns'))
   res_df <- data.frame(result)
   res_df <- res_df[mixedorder(res_df$group1),]
   return(res_df)
@@ -1994,11 +2018,13 @@ res
 
 #Weighted Unifrac Anosim Pairwise
 w_uni_pear <- pairwise_anosim_uni(cycle_1, ioi, T) 
-kable(w_uni_pear) %>%
+w_uni_pear %>%
+  dplyr::select(group1,group2,statistic,permutations,p,p.adj,p.signif) %>%
+  kable() %>%
   kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
 
 #Weighted Unifrac ANOSIM Plot
-w_uni_plot <- autoplot(res, notch=F) + theme_bw()+labs(title = "ANOSIM Weighted Unifrac") + xlab(ioi) + ylab("Rank Value")  + stat_pvalue_manual(w_uni_pear, label = "p.signif", y.position = max(res$dis.rank)-(.5*median(res$dis.rank)),step.increase = .03, tip.length = 0.01, guide="none") 
+w_uni_plot <- autoplot(res, notch=F) + theme_bw()+labs(title = "ANOSIM Weighted Unifrac") + xlab(ioi) + ylab("Rank Value")  + stat_pvalue_manual(w_uni_pear, label = "p.signif.box", y.position = max(res$dis.rank)-(.5*median(res$dis.rank)),step.increase = .03, tip.length = 0.01, guide="none", hide.ns=T) 
 w_uni_plot
 #Save image to disk
 ggsave("ANOSIM_weighted_unifrac_boxplot.png", plot = w_uni_plot,path = outdir)
@@ -2015,11 +2041,15 @@ res <- anosim(tmp, sample_data(cycle_1)[[ioi]])
 res
 #Unweighted Unifrac Anosim Pairwise
 uw_uni_pair <- pairwise_anosim_uni(cycle_1, ioi, T)
-kable(uw_uni_pair) %>% 
+
+uw_uni_pair %>%
+  dplyr::select(group1,group2,statistic,permutations,p,p.adj,p.signif) %>%
+  kable() %>% 
   kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
+
 #Unweighted Unifrac ANOSIM plot
 uw_uni_plot <- autoplot(res,notch = F) +theme_bw() + labs(title = "ANOSIM Unweighted Unifrac") +
-  stat_pvalue_manual(uw_uni_pair, label="p.signif", y.position = max(res$dis.rank)-(.5*median(res$dis.rank)),step.increase = .03, tip.length = 0.01)+ xlab(as.character(ioi)) + ylab("Rank Value")
+  stat_pvalue_manual(uw_uni_pair, label="p.signif.box", y.position = max(res$dis.rank)-(.5*median(res$dis.rank)),step.increase = .03, tip.length = 0.01, hide.ns=T)+ xlab(as.character(ioi)) + ylab("Rank Value")
 uw_uni_plot
 #save to disk
 ggsave("ANOSIM_unweighted_unifrac_boxplot.png", plot=uw_uni_plot, path=outdir)
@@ -2035,10 +2065,12 @@ ano <- anosim(distance(cycle_1, "bray"), grp)
 ano
 #Bray Curtis ANOSIM pairwise
 bray_pair <- pairwise_anosim(cycle_1, ioi, "bray")
-kable(bray_pair) %>% 
+bray_pair %>%
+  dplyr::select(group1,group2,statistic,permutations,dissimilarity,p.val,p.adjust,p.signif) %>%
+  kable() %>% 
   kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
 #Bray Curtis ANOSIM plot
-bray_plot <- autoplot(ano, notch=F) + theme_bw() + labs(title ="ANOSIM Bray Curtis") + stat_pvalue_manual(bray_pair, label="p.signif", y.position = max(ano$dis.rank)-(.5*median(res$dis.rank)), step.increase = .03, tip.length = 0.01) + xlab(as.character(ioi)) + ylab("Rank Value")
+bray_plot <- autoplot(ano, notch=F) + theme_bw() + labs(title ="ANOSIM Bray Curtis") + stat_pvalue_manual(bray_pair, label="p.signif.box", y.position = max(ano$dis.rank)-(.5*median(res$dis.rank)), step.increase = .03, tip.length = 0.01, hide.ns=T) + xlab(as.character(ioi)) + ylab("Rank Value")
 bray_plot
 #save to disk
 ggsave("ANOSIM_bray_curtis_boxplot.png", plot=bray_plot, path=outdir)
@@ -2054,10 +2086,12 @@ ano <- anosim(distance(cycle_1, "jaccard"), grp)
 ano
 #Jaccard ANOSIM pairwise
 jaccard_pair <- pairwise_anosim(cycle_1, ioi, "jaccard")
-kable(jaccard_pair) %>%
+jaccard_pair %>%
+  dplyr::select(group1,group2,statistic,permutations,dissimilarity,p.val,p.adjust,p.signif) %>%
+  kable() %>% 
   kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
 #Jaccard ANOSIM plot
-jaccard_plot <- autoplot(ano, notch =F) + theme_bw() + labs(title = "ANOSIM Jaccard") + stat_pvalue_manual(jaccard_pair, label = "p.signif", y.position = max(ano$dis.rank)-(.5*median(res$dis.rank)), step.increase = .03, tip.length = 0.01) + xlab(as.character(ioi)) + ylab("Rank Value")
+jaccard_plot <- autoplot(ano, notch =F) + theme_bw() + labs(title = "ANOSIM Jaccard") + stat_pvalue_manual(jaccard_pair, label = "p.signif.box", y.position = max(ano$dis.rank)-(.5*median(res$dis.rank)), step.increase = .03, tip.length = 0.01, hide.ns=T) + xlab(as.character(ioi)) + ylab("Rank Value")
 jaccard_plot
 #save to disk 
 ggsave("ANOSIM_jaccard_boxplot.png", plot=jaccard_plot, path = outdir)
