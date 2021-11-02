@@ -54,7 +54,7 @@ if(!require(gridExtra)) {renv::install("gridExtra")}
 
 if(!require(pheatmap)){renv::install("pheatmap")}
 if(!require(rstatix)){renv::install("rstatix")}
-# if(!require(knitr)){renv::install("knitr")}
+#if(!require(knitr)){renv::install("knitr")}
 if(!require(tidyverse)){renv::install("tidyverse")}
 if(!require(ampvis2)){renv::install("MadsAlbertsen/ampvis2")}
 if(!require(devtools)) {renv::install("devtools")}
@@ -84,7 +84,7 @@ library(gridExtra)
 
 library(pheatmap)
 library(rstatix)
-library(knitr)
+#library(knitr)
 #library(tidyverse)
 library(reshape2)
 library(ampvis2)

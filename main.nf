@@ -1356,9 +1356,9 @@ process ExportSetup{
     --input-path stats-dada2.qzv \
     --output-path stats-dada2
 
-    cp stats-dada2/metadata.tsv dada2_stats.tsv
+    cp stats-dada2/metadata.tsv ./dada2_stats.tsv
 
-    cp ${metadata} metadata.tsv  
+    cp ${metadata} ./metadata.tsv  
     """
 }
 
