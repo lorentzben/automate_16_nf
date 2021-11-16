@@ -16,4 +16,5 @@ nextflow run main.nf --input seqs --metadata metadata_1.tsv --manifest mapping.t
 cp report.Rmd $(cat out.txt)
 cp make_report.sh $(cat out.txt)
 cd $(cat out.txt)
+find lefse/result/ -size 0 -delete
 singularity run docker://lorentzb/r_latest bash make_report.sh
