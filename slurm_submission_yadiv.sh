@@ -12,7 +12,7 @@
 #SBATCH --mail-type=BEGIN,END,FAIL
 
 module load Nextflow/20.04.1
-nextflow run main.nf --input seqs --metadata metadata_1.tsv --manifest mapping.tsv --itemOfInterest treatment --outdir yadav
+nextflow run main.nf --input seqs --metadata metadata_1.tsv --manifest mapping.tsv --itemOfInterest treatment --outdir yadav -resume
 cp report.Rmd $(cat out.txt)
 cp make_report.sh $(cat out.txt)
 cd $(cat out.txt)
