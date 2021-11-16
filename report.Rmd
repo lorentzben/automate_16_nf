@@ -80,6 +80,7 @@ library(phyloseq)
 library(reshape2)
 library(forcats)
 library(gridExtra)
+
 #library(microbiome)
 
 library(pheatmap)
@@ -98,6 +99,7 @@ library(dplyr)
 library(jamba)
 library(ggConvexHull)
 library(PERMANOVA)
+library(tinytex)
 ```
 <!-- input files required:  -->
 <!-- item_of_interest.csv -->
