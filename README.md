@@ -5,6 +5,7 @@ This project's aim is focused on automating processes of 16s rRNA analysis and l
 ## Prerequisities
 * Linux based system
 * nextflow
+* docker or singularity installed
 
 ## Install
 
