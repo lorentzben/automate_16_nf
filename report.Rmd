@@ -2351,7 +2351,7 @@ if(getOutputFormat() == 'html_document') {
 
 ```{r Lefse analysis Results pdf style, echo=FALSE, message=FALSE, warning=FALSE, out.height="85%",dpi=36, out.width="85%", fig.cap="\\newline{}"}
 if(getOutputFormat() =='pdf_document'){
-print("see end of report")
+  print("see end of report")
    
   lefse_res_filenames <- list.files("lefse/result",pattern="*_pdf_r.png",full.names=T)
 
