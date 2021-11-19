@@ -843,6 +843,7 @@ process AlphaDiversityMeasure{
     output:
     path "core-metric-results/*" into ch_core_beta_significance 
     path "core-metric-results/*" into ch_core_report
+    file "core-metric-results/rarefied_table.qza" into ch_phylo_tree_rare_table
     file "shannon.qza" into ch_shannon_qza
     file "simpson.qza" into ch_simpson_qza 
     file "chao1.qza" into ch_chao_qza
@@ -875,32 +876,32 @@ process AlphaDiversityMeasure{
     --output-dir core-metric-results 
 
     qiime diversity alpha \
-    --i-table table-dada2.qza \
+    --i-table core-metric-results/rarefied_table.qza \
     --p-metric shannon \
     --o-alpha-diversity shannon.qza
 
     qiime diversity alpha \
-    --i-table table-dada2.qza \
+    --i-table core-metric-results/rarefied_table.qza \
     --p-metric simpson \
     --o-alpha-diversity simpson.qza 
 
     qiime diversity alpha \
-    --i-table table-dada2.qza \
+    --i-table core-metric-results/rarefied_table.qza \
     --p-metric chao1 \
     --o-alpha-diversity chao1.qza
 
     qiime diversity alpha \
-    --i-table table-dada2.qza \
+    --i-table core-metric-results/rarefied_table.qza \
     --p-metric ace \
     --o-alpha-diversity ace.qza
 
     qiime diversity alpha \
-    --i-table table-dada2.qza \
+    --i-table core-metric-results/rarefied_table.qza \
     --p-metric observed_features \
     --o-alpha-diversity obs.qza 
 
     qiime diversity alpha-phylogenetic \
-    --i-table table-dada2.qza \
+    --i-table core-metric-results/rarefied_table.qza \
     --i-phylogeny rooted-tree.qza \
     --p-metric faith_pd \
     --o-alpha-diversity faith_pd.qza 
@@ -1167,14 +1168,16 @@ process GeneratePhylogeneticTrees{
     input:
     file metadata from ch_metadata_phylo_tree
     val ioi from ch_ioi_phylo_tree
-    file "table-dada2.qza" from ch_table_phylo_tree
+    //file "table-dada2.qza" from ch_table_phylo_tree
+    file "rarefied_table.qza" from ch_phylo_tree_rare_table
     file "taxonomy.qza" from ch_taxonomy_phylo_tree
     file "graph.sh" from ch_graph_script
     file "filter_samples.py" from ch_filter_script
 
     output:
     path "phylo_trees/*" into ch_png_phylo_tree
-    file "table-dada2.qza" into ch_table_lefse
+    //file "table-dada2.qza" into ch_table_lefse
+    file "rarefied_table.qza" into ch_table_lefse
     file "taxonomy.qza" into ch_tax_lefse
     
 
@@ -1243,7 +1246,7 @@ process GeneratePhylogeneticTrees{
 
         result = subprocess.run([biom_format_command], shell=True)
 
-        # Outputs the current ioi so that it can be annotatted in the graphlan image
+        # Outputs the current ioi so that it can be annotated in the graphlan image
         with open('current.txt', 'w') as file:
             file.write(item)
 
@@ -1280,7 +1283,8 @@ process LefseFormat {
 
     input:
     val ioi from ch_ioi_lefse
-    file "table-dada2.qza" from ch_table_lefse
+    //file "table-dada2.qza" from ch_table_lefse
+    file "rarefied_table.qza" from ch_table_lefse
     file "rooted-tree.qza" from ch_tree_lefse
     file "taxonomy.qza" from ch_tax_lefse
     file metadata from ch_metadata_lefse
@@ -1292,7 +1296,8 @@ process LefseFormat {
 
     output:
     path "combos/*" into ch_paired_lefse_format
-    file "table-dada2.qza" into ch_table_report
+    //file "table-dada2.qza" into ch_table_report
+    file "rarefied_table.qza" into ch_table_report
     file "rooted-tree.qza" into ch_tree_report
     file "taxonomy.qza" into ch_tax_report
     file "metadata.tsv" into ch_metadata_report
@@ -1373,7 +1378,8 @@ process GenerateReport{
 
     input:
     file "item_of_interest.csv" from ch_ioi_file_out
-    file "table-dada2.qza" from ch_table_report
+    //file "table-dada2.qza" from ch_table_report
+    file "rarefied_table.qza" from ch_table_report
     file "rooted-tree.qza" from ch_tree_report
     file "taxonomy.qza" from ch_tax_report
     file metadata from ch_metadata_report
