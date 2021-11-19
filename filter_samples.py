@@ -11,8 +11,9 @@ import time
 def filter_command(metadata_fi, item_of_int, current): 
 
     # filters/splits the feature table based on the current ioi
+    #swapped table-dada2.qza for rarefied_table.qza
     filter_command = "qiime feature-table filter-samples \
-    --i-table table-dada2.qza \
+    --i-table rarefied_table.qza \
     --m-metadata-file " +metadata_fi+" \
     --p-where \""+ item_of_int +"='"+ current +"'\" \
     --o-filtered-table "+current+"-filtered-table.qza"
