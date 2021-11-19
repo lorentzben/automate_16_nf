@@ -1379,7 +1379,7 @@ process GenerateReport{
     input:
     file "item_of_interest.csv" from ch_ioi_file_out
     //file "table-dada2.qza" from ch_table_report
-    file "rarefied_table.qza" into ch_table_report
+    file "rarefied_table.qza" from ch_table_report
     file "rooted-tree.qza" from ch_tree_report
     file "taxonomy.qza" from ch_tax_report
     file metadata from ch_metadata_report
