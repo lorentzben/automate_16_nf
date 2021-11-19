@@ -151,7 +151,8 @@ outdir <- paste0("./",outdir_name)
 options(bitmapType='cairo')
 level = "Phylum"
 
-table_dada2 <- "./qiime/table-dada2.qza"
+#table_dada2 <- "./qiime/table-dada2.qza"
+table_dada2 <- "./qiime/rarefied_table.qza"
 rooted_tree <- "./qiime/rooted-tree.qza"
 taxonomy_file <- "./qiime/taxonomy.qza"
 metadata_file <- "./metadata.tsv"

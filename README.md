@@ -70,3 +70,8 @@ The file for Sampling Depth and Rarefaction Depth is:
 $RESULT_DIRECTORY/qiime/table.qzv
 
 Both of these files can be unzipped or opened on the internet at view.qiime2.org
+
+### Possible installs to be added to the report
+```R
+BiocManager::install("BioBase")
+```
