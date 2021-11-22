@@ -56,7 +56,8 @@ phyloseq_to_lefs <- function(physeq){
   return(lefse_table)
 }
 
-cycle_1 <- qza_to_phyloseq("table-dada2.qza","rooted-tree.qza","taxonomy.qza","metadata.tsv")
+#"table-dada2.qza"
+cycle_1 <- qza_to_phyloseq("rarefied_table.qza","rooted-tree.qza","taxonomy.qza","metadata.tsv")
 
 # modifications to select item of interest and remove the rest of the metadata
 new_samp_2 <- data.frame(sample_data(cycle_1))
