@@ -22,6 +22,13 @@ library(renv)
 renv::isolate()
 renv::settings$snapshot.type("all")
 renv::init()
+install.packages("BiocManager")
+BiocManager::install(version = "3.13", ask=FALSE)
+if(!require(rhdf5)) renv::install("bioc::rhdf5")
+if(!require(Biostrings)) renv::install("bioc::Biostrings")
+if(!require(Biobase)) renv::install("bioc::Biobase")
+if(!require(phyloseq)) BiocManager::install("phyloseq", version="3.13")
+if(!require(biomformat)) BiocManager::install("biomformat",version="3.13")
 renv::restore()
 ```
 
@@ -39,13 +46,7 @@ getOutputFormat <- function() {
 ```
 
 ```{r install/load libraries, message=FALSE, warning=FALSE, include=FALSE}
-install.packages("BiocManager")
-BiocManager::install(version = "3.13", ask=FALSE)
-if(!require(rhdf5)) renv::install("bioc::rhdf5")
-if(!require(Biostrings)) renv::install("bioc::Biostrings")
-if(!require(Biobase)) renv::install("bioc::Biobase")
-if(!require(phyloseq)) BiocManager::install("phyloseq", version="3.13")
-if(!require(biomformat)) BiocManager::install("biomformat",version="3.13")
+
 
 if(!require(kableExtra)) {renv::install("kableExtra")}
 if(!require(remotes)){renv::install("remotes")}
