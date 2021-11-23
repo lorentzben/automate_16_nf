@@ -22,7 +22,7 @@ if(!require(rmarkdown)) renv::install("rmarkdown@2.8")
 if(!require(rstatix)) renv::install("kassambara/rstatix@e2b8c93a54b08534ea550ecf588d383697e67f23")
 if(!require(RcppEigen)) renv::install("RcppEigen@0.3.3.9.1")
 if(!require(biomformat)) BiocManager::install("biomformat",version="3.13")
-renv::restore()
+#renv::restore()
 renv::snapshot()
 q()
 

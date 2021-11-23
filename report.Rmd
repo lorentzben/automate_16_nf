@@ -30,7 +30,7 @@ if(!require(Biostrings)) {renv::install("bioc::Biostrings") }
 if(!require(Biobase)) {renv::install("bioc::Biobase")}
 if(!require(phyloseq)) {renv::install("bioc::phyloseq")}
 if(!require(biomformat)) {renv::install("bioc::biomformat")}
-renv::restore()
+#renv::restore()
 ```
 
 ```{r function to check how the document is being rendered, message=FALSE, warning=FALSE, include=FALSE}
