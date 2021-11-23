@@ -14,8 +14,8 @@ if(!require(qiime2R)) renv::install("jbisanz/qiime2R@d1ad96657ada993cf6c2841b291
 if(!require(ggdendro)) renv::install("ggdendro@0.1.22", type="source")
 if(!require(pegas)) renv::install("pegas@1.0")
 if(!require(rmarkdown)) renv::install("rmarkdown@2.8")
+if(!require(rstatix)) renv::install("rstatix@0.7.0")
 
-
-#renv::restore()
+renv::restore()
 q()
 
