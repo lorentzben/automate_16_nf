@@ -27,8 +27,8 @@ BiocManager::install(version = "3.13", ask=FALSE)
 if(!require(rhdf5)) renv::install("bioc::rhdf5")
 if(!require(Biostrings)) renv::install("bioc::Biostrings")
 if(!require(Biobase)) renv::install("bioc::Biobase")
-if(!require(phyloseq)) BiocManager::install("phyloseq", version="3.13")
-if(!require(biomformat)) BiocManager::install("biomformat",version="3.13")
+if(!require(phyloseq)) renv::install("bioc::phyloseq")
+if(!require(biomformat)) renv::install("bioc::biomformat")
 renv::restore()
 ```
 
