@@ -22,6 +22,7 @@ library(renv)
 renv::isolate()
 renv::settings$snapshot.type("all")
 renv::init()
+renv::restore()
 ```
 
 ```{r function to check how the document is being rendered, message=FALSE, warning=FALSE, include=FALSE}

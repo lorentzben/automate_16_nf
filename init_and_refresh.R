@@ -21,7 +21,7 @@ if(!require(pegas)) renv::install("pegas@1.0")
 if(!require(rmarkdown)) renv::install("rmarkdown@2.8")
 if(!require(rstatix)) renv::install("rstatix@0.7.0")
 if(!require(RcppEigen)) renv::install("RcppEigen@0.3.3.9.1")
-
 renv::restore()
+renv::snapshot()
 q()
 
