@@ -14,8 +14,8 @@ output:
 <!-- then you take the stem of where the bin for that package is and replace it below -->
 
 ```{r handle lib errors, echo=FALSE, message=FALSE, warning=FALSE}
-#Sys.setenv(LD_LIBRARY_PATH = "/lib64")
-#Sys.setenv(PKG_CONFIG_PATH = "/lib64/pkgconfig")
+Sys.setenv(LD_LIBRARY_PATH = "/lib64")
+Sys.setenv(PKG_CONFIG_PATH = "/lib64/pkgconfig")
 #Sys.setenv(R_REMOTES_NO_ERRORS_FROM_WARNINGS="true")
 if(!require(renv)){install.packages("renv", repos="http://cran.us.r-project.org")}
 library(renv)
