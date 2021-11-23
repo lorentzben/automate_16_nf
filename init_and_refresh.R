@@ -2,7 +2,7 @@
 if(!require(renv)) {install.packages("renv",repos="http://cran.us.r-project.org")}
 renv::init()
 install.packages("BiocManager")
-BiocManager::install(version = "3.13")
+BiocManager::install(version = "3.13", ask=FALSE)
 if(!require(rhdf5)){renv::install("bioc::rhdf5")}
 if(!require(Biostrings)){renv::install("bioc::Biostrings")}
 if(!require(Biobase)){renv::install("bioc::Biobase")}
