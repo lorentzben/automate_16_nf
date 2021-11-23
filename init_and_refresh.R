@@ -13,6 +13,8 @@ if(!require(jamba)) renv::install("jmw86069/jamba@0.0.6.900")
 if(!require(qiime2R)) renv::install("jbisanz/qiime2R@d1ad96657ada993cf6c2841b29113a4f635c6b56") # current version is 0.99.20
 if(!require(ggdendro)) renv::install("ggdendro@0.1.22", type="source")
 if(!require(pegas)) renv::install("pegas@1.0")
+if(!require(rmarkdown)) renv::install("rmarkdown@2.8")
+
 
 #renv::restore()
 q()
