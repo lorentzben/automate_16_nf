@@ -1,5 +1,6 @@
 #! /usr/bin/env Rscript --vanilla
 if(!require(renv)) {install.packages("renv",repos="http://cran.us.r-project.org")}
+renv::isolate()
 renv::init()
 install.packages("BiocManager")
 BiocManager::install(version = "3.13", ask=FALSE)

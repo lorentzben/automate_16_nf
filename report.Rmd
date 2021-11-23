@@ -19,6 +19,7 @@ output:
 #Sys.setenv(R_REMOTES_NO_ERRORS_FROM_WARNINGS="true")
 if(!require(renv)){install.packages("renv", repos="http://cran.us.r-project.org")}
 library(renv)
+renv::isolate()
 renv::settings$snapshot.type("all")
 renv::init()
 ```
