@@ -12,9 +12,12 @@
 #SBATCH --mail-type=BEGIN,END,FAIL
 
 module load Nextflow/20.04.1
-nextflow run main.nf --input seqs --metadata metadata_1.tsv --manifest mapping.tsv --itemOfInterest treatment --outdir yadav -resume
+nextflow run main.nf --input seqs --metadata metadata_1.tsv --manifest mapping.tsv --itemOfInterest treatment  --sampDepth 10736 --outdir yadav_custom_param -resume
 cp report.Rmd $(cat out.txt)
 cp make_report.sh $(cat out.txt)
+cp init_and_refresh.R $(cat out.txt)
+cp renv.lock $(cat out.txt)
 cd $(cat out.txt)
 find lefse/result/ -size 0 -delete
+singularity run docker://lorentzb/r_latest Rscript init_and_refresh.R
 singularity run docker://lorentzb/r_latest bash make_report.sh
