@@ -39,6 +39,14 @@ getOutputFormat <- function() {
 ```
 
 ```{r install/load libraries, message=FALSE, warning=FALSE, include=FALSE}
+install.packages("BiocManager")
+BiocManager::install(version = "3.13", ask=FALSE)
+if(!require(rhdf5)) renv::install("bioc::rhdf5")
+if(!require(Biostrings)) renv::install("bioc::Biostrings")
+if(!require(Biobase)) renv::install("bioc::Biobase")
+if(!require(phyloseq)) BiocManager::install("phyloseq", version="3.13")
+if(!require(biomformat)) BiocManager::install("biomformat",version="3.13")
+
 if(!require(kableExtra)) {renv::install("kableExtra")}
 if(!require(remotes)){renv::install("remotes")}
 if(!require(ggplot2)) {renv::install("tidyverse/ggplot2@v3.3.2")}
@@ -55,7 +63,7 @@ if(!require(gridExtra)) {renv::install("gridExtra")}
 
 
 if(!require(pheatmap)){renv::install("pheatmap")}
-if(!require(rstatix)){renv::install("rstatix")}
+if(!require(rstatix)){renv::install("rstatix@0.7.0")}
 #if(!require(knitr)){renv::install("knitr")}
 if(!require(tidyverse)){renv::install("tidyverse")}
 if(!require(ampvis2)){renv::install("MadsAlbertsen/ampvis2")}
