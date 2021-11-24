@@ -641,7 +641,7 @@ kable(kruskal_table) %>%
 
 form = as.formula(paste0("shannon_entropy ~", ioi))
 
-dunn_table <- read.table('./qiime/shannon/kruskal-wallis-pairwise-treatment.csv')
+dunn_table <- read.table('./qiime/shannon/kruskal-wallis-pairwise-treatment.csv',header=TRUE, sep=",")
 dunn_table<- add_significance(dunn_table, p.col="q.value",output.col = "p.adj.signif",symbols =c("****", "***", "**", "$*$", "ns"))
 colnames(dunn_table) <- c("group1","group2","H","p.value","q.value","p.adj.signif")
 kable(dunn_table) %>% 
@@ -688,7 +688,7 @@ kable(kruskal_table) %>%
 
 form = as.formula(paste0("simpson ~", ioi))
 
-dunn_table <- read.table('./qiime/simpson/kruskal-wallis-pairwise-treatment.csv')
+dunn_table <- read.table('./qiime/simpson/kruskal-wallis-pairwise-treatment.csv',header=TRUE, sep=",")
 dunn_table<- add_significance(dunn_table, p.col="q.value",output.col = "p.adj.signif",symbols =c("****", "***", "**", "$*$", "ns"))
 colnames(dunn_table) <- c("group1","group2","H","p.value","q.value","p.adj.signif")
 kable(dunn_table) %>% 
@@ -735,7 +735,7 @@ kable(kruskal_table) %>%
 
 form = as.formula(paste0("chao1 ~", ioi))
 
-dunn_table <- read.table('./qiime/chao1/kruskal-wallis-pairwise-treatment.csv')
+dunn_table <- read.table('./qiime/chao1/kruskal-wallis-pairwise-treatment.csv',header=TRUE, sep=",")
 dunn_table<- add_significance(dunn_table, p.col="q.value",output.col = "p.adj.signif",symbols =c("****", "***", "**", "$*$", "ns"))
 colnames(dunn_table) <- c("group1","group2","H","p.value","q.value","p.adj.signif")
 kable(dunn_table) %>% 
@@ -782,7 +782,7 @@ kable(kruskal_table) %>%
 
 form = as.formula(paste0("ace ~", ioi))
 
-dunn_table <- read.table('./qiime/ace/kruskal-wallis-pairwise-treatment.csv')
+dunn_table <- read.table('./qiime/ace/kruskal-wallis-pairwise-treatment.csv',header=TRUE, sep=",")
 dunn_table<- add_significance(dunn_table, p.col="p.adj",output.col = "p.adj.signif",symbols =c("****", "***", "**", "$*$", "ns"))
 colnames(dunn_table) <- c("group1","group2","H","p.value","q.value","p.adj.signif")
 kable(dunn_table) %>% 
@@ -829,7 +829,7 @@ kable(kruskal_table) %>%
 
 form = as.formula(paste0("faith_pd ~", ioi))
 
-dunn_table <- read.table('./qiime/faith_pd/kruskal-wallis-pairwise-treatment.csv')
+dunn_table <- read.table('./qiime/faith_pd/kruskal-wallis-pairwise-treatment.csv',header=TRUE, sep=",")
 dunn_table<- add_significance(dunn_table, p.col="p.adj",output.col = "p.adj.signif",symbols =c("****", "***", "**", "$*$", "ns"))
 colnames(dunn_table) <- c("group1","group2","H","p.value","q.value","p.adj.signif")
 kable(dunn_table) %>% 
