@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
 
-
 if [[ ! -d "classifier_gen" ]]; then
     mkdir classifier_gen
 fi
