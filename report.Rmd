@@ -65,7 +65,7 @@ if(!require(gridExtra)) {renv::install("gridExtra")}
 
 
 if(!require(pheatmap)){renv::install("pheatmap")}
-if(!require(rstatix)){renv::install("kassambara/rstatix@9edc59286f31d2ac58627ae6adb581db6ad20c22")}
+if(!require(rstatix)){renv::install("rstatix")}
 #if(!require(knitr)){renv::install("knitr")}
 if(!require(tidyverse)){renv::install("tidyverse")}
 if(!require(ampvis2)){renv::install("MadsAlbertsen/ampvis2")}
