@@ -56,8 +56,8 @@ if(!require(tidyverse)) {renv::install("tidyverse")}
 
 
 if (!require("devtools", quietly = TRUE)){renv::install("devtools")}
-if(!require(qiime2R)) {renv::install("jbisanz/qiime2R")} # current version is 0.99.20
-if(!require(phyloseq)) {renv::install("phyloseq")}
+if(!require(qiime2R)) {renv::install("jbisanz/qiime2R@d1ad96657ada993cf6c2841b29113a4f635c6b56")} # current version is 0.99.20
+if(!require(phyloseq)) {BiocManager::install("phyloseq", version="3.13")}
 if(!require(gtools)) {renv::install("gtools")}
 if(!require(reshape2)) {renv::install("reshape2")}
 if(!require(forcats)) {renv::install("forcats")}
