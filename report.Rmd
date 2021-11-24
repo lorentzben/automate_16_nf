@@ -1963,6 +1963,7 @@ pairwise_perma
 
 ```{r Method to do pairwise anosim comparisons, echo=FALSE, message=FALSE, warning=FALSE}
 library(rstatix)
+library("ggpubr")
 pairwise_anosim <- function(dat, column_of_int, dissim){
   all_comparisons <- unique(sample_data(dat)[[column_of_int]])
   combos <- (t(combn(all_comparisons,2)))
