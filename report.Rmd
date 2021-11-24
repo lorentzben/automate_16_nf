@@ -594,8 +594,8 @@ kable(kruskal_table) %>%
 
 form = as.formula(paste0("observed_features ~", ioi))
 
-dunn_table <- rstatix::dunn_test(data = obs_stat, formula = form, p.adjust.method = "holm") 
-dunn_table<- add_significance(dunn_table, p.col="p.adj",output.col = "p.adj.signif",symbols =c("****", "***", "**", "$*$", "ns"))
+dunn_table <- read.table("./qiime/obs/kruskal-wallis-pairwise-treatment.csv",header=TRUE, sep=",") 
+dunn_table<- add_significance(dunn_table, p.col="q-value",output.col = "p.adj.signif",symbols =c("****", "***", "**", "$*$", "ns"))
 kable(dunn_table) %>% 
   kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
 
