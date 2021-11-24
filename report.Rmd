@@ -783,7 +783,7 @@ kable(kruskal_table) %>%
 form = as.formula(paste0("ace ~", ioi))
 
 dunn_table <- read.table('./qiime/ace/kruskal-wallis-pairwise-treatment.csv',header=TRUE, sep=",")
-dunn_table<- add_significance(dunn_table, p.col="p.adj",output.col = "p.adj.signif",symbols =c("****", "***", "**", "$*$", "ns"))
+dunn_table<- add_significance(dunn_table, p.col="q.value",output.col = "p.adj.signif",symbols =c("****", "***", "**", "$*$", "ns"))
 colnames(dunn_table) <- c("group1","group2","H","p.value","q.value","p.adj.signif")
 kable(dunn_table) %>% 
   kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
@@ -830,7 +830,7 @@ kable(kruskal_table) %>%
 form = as.formula(paste0("faith_pd ~", ioi))
 
 dunn_table <- read.table('./qiime/faith_pd/kruskal-wallis-pairwise-treatment.csv',header=TRUE, sep=",")
-dunn_table<- add_significance(dunn_table, p.col="p.adj",output.col = "p.adj.signif",symbols =c("****", "***", "**", "$*$", "ns"))
+dunn_table<- add_significance(dunn_table, p.col="q.value",output.col = "p.adj.signif",symbols =c("****", "***", "**", "$*$", "ns"))
 colnames(dunn_table) <- c("group1","group2","H","p.value","q.value","p.adj.signif")
 kable(dunn_table) %>% 
   kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
