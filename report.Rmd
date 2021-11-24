@@ -596,10 +596,9 @@ form = as.formula(paste0("observed_features ~", ioi))
 
 dunn_table <- read.table("./qiime/obs/kruskal-wallis-pairwise-treatment.csv",header=TRUE, sep=",") 
 dunn_table<- add_significance(dunn_table, p.col="q.value",output.col = "p.adj.signif",symbols =c("****", "***", "**", "$*$", "ns"))
+colnames(dunn_table) <- c("group1","group2","H","p.value","q.value","p.adj.signif")
 kable(dunn_table) %>% 
   kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
-
-dunn_table <- dunn_table %>% add_xy_position()
 
 ```
 
@@ -642,21 +641,12 @@ kable(kruskal_table) %>%
 
 form = as.formula(paste0("shannon_entropy ~", ioi))
 
-dunn_table <- rstatix::dunn_test(data = shannon_stat, formula = form, p.adjust.method = "holm")
-dunn_table<- add_significance(dunn_table, p.col="p.adj",output.col = "p.adj.signif",symbols =c("****", "***", "**", "$*$", "ns"))
+dunn_table <- read.table('./qiime/shannon/kruskal-wallis-pairwise-treatment.csv')
+dunn_table<- add_significance(dunn_table, p.col="q.value",output.col = "p.adj.signif",symbols =c("****", "***", "**", "$*$", "ns"))
+colnames(dunn_table) <- c("group1","group2","H","p.value","q.value","p.adj.signif")
 kable(dunn_table) %>% 
   kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
 
-dunn_table <- dunn_table  %>% add_xy_position()
-
-p <- ggplot(shannon_vals, aes(x=shannon_vals[[ioi]], y=shannon_entropy)) + geom_violin()+ geom_boxplot(width=0.1)
-p<- p + stat_summary(fun.y=mean, geom="point", shape=23, size=2)
-p<-p + stat_summary(fun.y=median, geom="point", size=2, color="red")
-p <- p+geom_jitter(shape=16, position=position_jitter(0.2)) + xlab(ioi) + ylab("Shannon") + theme_bw()
-dunn_table<- add_significance(dunn_table, p.col="p.adj",output.col = "p.adj.signif")
-p <- p + stat_pvalue_manual(dunn_table, label = "p.adj.signif",hide.ns = TRUE)
-p
-ggsave("shannon_boxplot_w_signif.png", plot=p, path=outdir)
 ```
 
 
@@ -698,21 +688,12 @@ kable(kruskal_table) %>%
 
 form = as.formula(paste0("simpson ~", ioi))
 
-dunn_table <- rstatix::dunn_test(data = simpson_stat, formula = form, p.adjust.method = "holm") 
-dunn_table<- add_significance(dunn_table, p.col="p.adj",output.col = "p.adj.signif",symbols =c("****", "***", "**", "$*$", "ns"))
+dunn_table <- read.table('./qiime/simpson/kruskal-wallis-pairwise-treatment.csv')
+dunn_table<- add_significance(dunn_table, p.col="q.value",output.col = "p.adj.signif",symbols =c("****", "***", "**", "$*$", "ns"))
+colnames(dunn_table) <- c("group1","group2","H","p.value","q.value","p.adj.signif")
 kable(dunn_table) %>% 
   kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
 
-dunn_table <- dunn_table %>% add_xy_position()
-
-p <- ggplot(simpson_vals, aes(x=simpson_vals[[ioi]], y=simpson)) + geom_violin()+ geom_boxplot(width=0.1)
-p<- p + stat_summary(fun.y=mean, geom="point", shape=23, size=2)
-p<-p + stat_summary(fun.y=median, geom="point", size=2, color="red")
-p <- p+geom_jitter(shape=16, position=position_jitter(0.2)) + xlab(ioi) + ylab("Simpson") + theme_bw()
-dunn_table<- add_significance(dunn_table, p.col="p.adj",output.col = "p.adj.signif")
-p <- p+ stat_pvalue_manual(dunn_table, label = "p.adj.signif", hide.ns = TRUE)
-p
-ggsave("simpson_boxplot_w_signif.png", plot=p, path=outdir)
 ```
 
 
@@ -754,21 +735,12 @@ kable(kruskal_table) %>%
 
 form = as.formula(paste0("chao1 ~", ioi))
 
-dunn_table <- rstatix::dunn_test(data = chao1_stat, formula = form, p.adjust.method = "holm") 
-dunn_table<- add_significance(dunn_table, p.col="p.adj",output.col = "p.adj.signif",symbols =c("****", "***", "**", "$*$", "ns"))
+dunn_table <- read.table('./qiime/chao1/kruskal-wallis-pairwise-treatment.csv')
+dunn_table<- add_significance(dunn_table, p.col="q.value",output.col = "p.adj.signif",symbols =c("****", "***", "**", "$*$", "ns"))
+colnames(dunn_table) <- c("group1","group2","H","p.value","q.value","p.adj.signif")
 kable(dunn_table) %>% 
   kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
 
-dunn_table <- dunn_table %>% add_xy_position()
-
-p <- ggplot(chao1_vals, aes(x=chao1_vals[[ioi]], y=chao1)) + geom_violin()+ geom_boxplot(width=0.1)
-p<- p + stat_summary(fun.y=mean, geom="point", shape=23, size=2)
-p<-p + stat_summary(fun.y=median, geom="point", size=2, color="red")
-p <- p+geom_jitter(shape=16, position=position_jitter(0.2)) + xlab(ioi) + ylab("Chao 1") + theme_bw()
-dunn_table<- add_significance(dunn_table, p.col="p.adj",output.col = "p.adj.signif")
-p <- p+stat_pvalue_manual(dunn_table, label="p.adj.signif", hide.ns = TRUE)
-p
-ggsave("chao1_boxplot_w_signif.png", plot=p, path=outdir)
 ```
 
 
@@ -810,21 +782,12 @@ kable(kruskal_table) %>%
 
 form = as.formula(paste0("ace ~", ioi))
 
-dunn_table <- rstatix::dunn_test(data = ace_stat, formula = form, p.adjust.method = "holm") 
+dunn_table <- read.table('./qiime/ace/kruskal-wallis-pairwise-treatment.csv')
 dunn_table<- add_significance(dunn_table, p.col="p.adj",output.col = "p.adj.signif",symbols =c("****", "***", "**", "$*$", "ns"))
+colnames(dunn_table) <- c("group1","group2","H","p.value","q.value","p.adj.signif")
 kable(dunn_table) %>% 
   kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
 
-dunn_table <- dunn_table %>% add_xy_position()
-
-p <- ggplot(ace_vals, aes(x=ace_vals[[ioi]], y=ace)) + geom_violin()+ geom_boxplot(width=0.1)
-p<- p + stat_summary(fun.y=mean, geom="point", shape=23, size=2)
-p<-p + stat_summary(fun.y=median, geom="point", size=2, color="red")
-p <- p+geom_jitter(shape=16, position=position_jitter(0.2)) + xlab(ioi) + ylab("ACE") + theme_bw()
-dunn_table<- add_significance(dunn_table, p.col="p.adj",output.col = "p.adj.signif")
-p <- p+ stat_pvalue_manual(dunn_table, label = "p.adj.signif", hide.ns = TRUE)
-p
-ggsave("ace_boxplot_w_signif.png", plot=p, path=outdir)
 ```
 
 
@@ -866,21 +829,12 @@ kable(kruskal_table) %>%
 
 form = as.formula(paste0("faith_pd ~", ioi))
 
-dunn_table <- rstatix::dunn_test(data = faith_pd_stat, formula = form, p.adjust.method = "holm") 
+dunn_table <- read.table('./qiime/faith_pd/kruskal-wallis-pairwise-treatment.csv')
 dunn_table<- add_significance(dunn_table, p.col="p.adj",output.col = "p.adj.signif",symbols =c("****", "***", "**", "$*$", "ns"))
+colnames(dunn_table) <- c("group1","group2","H","p.value","q.value","p.adj.signif")
 kable(dunn_table) %>% 
   kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
 
-dunn_table <- dunn_table %>% add_xy_position()
-
-p <- ggplot(faith_pd_vals, aes(x=faith_pd_vals[[ioi]], y=faith_pd)) + geom_violin()+ geom_boxplot(width=0.1)
-p<- p + stat_summary(fun.y=mean, geom="point", shape=23, size=2)
-p<-p + stat_summary(fun.y=median, geom="point", size=2, color="red")
-p <- p+geom_jitter(shape=16, position=position_jitter(0.2)) + xlab(ioi) + ylab("Faith PD") + theme_bw()
-dunn_table<- add_significance(dunn_table, p.col="p.adj",output.col = "p.adj.signif")
-p <- p+stat_pvalue_manual(dunn_table, label="p.adj.signif", hide.ns = TRUE)
-p
-ggsave("faith_pd_boxplot_w_signif.png", plot=p, path=outdir)
 ```
 
 
