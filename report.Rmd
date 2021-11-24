@@ -601,15 +601,6 @@ kable(dunn_table) %>%
 
 dunn_table <- dunn_table %>% add_xy_position()
 
-p <- ggplot(obs_vals, aes(x=obs_vals[[ioi]], y=observed_features)) + geom_violin()+ geom_boxplot(width=0.1)
-p<- p + stat_summary(fun.y=mean, geom="point", shape=23, size=2)
-p<-p + stat_summary(fun.y=median, geom="point", size=2, color="red")
-p <- p+geom_jitter(shape=16, position=position_jitter(0.2)) + xlab(ioi) + ylab("Observed Features") + theme_bw()
-dunn_table<- add_significance(dunn_table, p.col="p.adj",output.col = "p.adj.signif")
-p <- p + stat_pvalue_manual(dunn_table, label = "p.adj.signif",hide.ns = TRUE )
-p
-ggsave("obs_boxplot_w_signif.png", plot=p, path=outdir)
-
 ```
 
 
