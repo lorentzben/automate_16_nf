@@ -2042,10 +2042,10 @@ w_uni_pear %>%
   kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
 
 #Weighted Unifrac ANOSIM Plot
-w_uni_plot <- autoplot(res, notch=F) + theme_bw()+labs(title = "ANOSIM Weighted Unifrac") + xlab(ioi) + ylab("Rank Value")  + stat_pvalue_manual(w_uni_pear, label = "p.signif.box", y.position = max(res$dis.rank)-(.5*median(res$dis.rank)),step.increase = .03, tip.length = 0.01, guide="none", hide.ns=T) 
-w_uni_plot
+#w_uni_plot <- autoplot(res, notch=F) + theme_bw()+labs(title = "ANOSIM Weighted Unifrac") + xlab(ioi) + ylab("Rank Value")  + stat_pvalue_manual(w_uni_pear, label = "p.signif.box", y.position = max(res$dis.rank)-(.5*median(res$dis.rank)),step.increase = .03, tip.length = 0.01, guide="none", hide.ns=T) 
+#w_uni_plot
 #Save image to disk
-ggsave("ANOSIM_weighted_unifrac_boxplot.png", plot = w_uni_plot,path = outdir)
+#ggsave("ANOSIM_weighted_unifrac_boxplot.png", plot = w_uni_plot,path = outdir)
 
 #Weighted Unifrac ANOSIM Plot No Bracket
 w_uni_plot_no_brac <- autoplot(res, notch=F) + theme_bw()+ aes(fill=res$class.vec) +labs(title = "ANOSIM Weighted Unifrac", fill=ioi)+ xlab(as.character(ioi)) + ylab("Rank Value")
@@ -2066,11 +2066,11 @@ uw_uni_pair %>%
   kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
 
 #Unweighted Unifrac ANOSIM plot
-uw_uni_plot <- autoplot(res,notch = F) +theme_bw() + labs(title = "ANOSIM Unweighted Unifrac") +
+#uw_uni_plot <- autoplot(res,notch = F) +theme_bw() + labs(title = "ANOSIM Unweighted Unifrac") +
   stat_pvalue_manual(uw_uni_pair, label="p.signif.box", y.position = max(res$dis.rank)-(.5*median(res$dis.rank)),step.increase = .03, tip.length = 0.01, hide.ns=T)+ xlab(as.character(ioi)) + ylab("Rank Value")
-uw_uni_plot
+#uw_uni_plot
 #save to disk
-ggsave("ANOSIM_unweighted_unifrac_boxplot.png", plot=uw_uni_plot, path=outdir)
+#ggsave("ANOSIM_unweighted_unifrac_boxplot.png", plot=uw_uni_plot, path=outdir)
 #Unweighted Unifrac ANOSIM plot No bracket
 uw_uni_plot_no_brac <- autoplot(res,notch = F) +theme_bw() +aes(fill=res$class.vec)+ labs(title = "ANOSIM Unweighted Unifrac", fill=ioi) + xlab(as.character(ioi)) + ylab("Rank Value")
 uw_uni_plot_no_brac
@@ -2088,10 +2088,10 @@ bray_pair %>%
   kable() %>% 
   kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
 #Bray Curtis ANOSIM plot
-bray_plot <- autoplot(ano, notch=F) + theme_bw() + labs(title ="ANOSIM Bray Curtis") + stat_pvalue_manual(bray_pair, label="p.signif.box", y.position = max(ano$dis.rank)-(.5*median(res$dis.rank)), step.increase = .03, tip.length = 0.01, hide.ns=T) + xlab(as.character(ioi)) + ylab("Rank Value")
-bray_plot
+#bray_plot <- autoplot(ano, notch=F) + theme_bw() + labs(title ="ANOSIM Bray Curtis") + stat_pvalue_manual(bray_pair, label="p.signif.box", y.position = max(ano$dis.rank)-(.5*median(res$dis.rank)), step.increase = .03, tip.length = 0.01, hide.ns=T) + xlab(as.character(ioi)) + ylab("Rank Value")
+#bray_plot
 #save to disk
-ggsave("ANOSIM_bray_curtis_boxplot.png", plot=bray_plot, path=outdir)
+#ggsave("ANOSIM_bray_curtis_boxplot.png", plot=bray_plot, path=outdir)
 #Bray Curtis ANOSIM plot No Bracket
 bray_plot_no_brac <- autoplot(ano, notch=F) + theme_bw() +aes(fill=ano$class.vec) + labs(title ="ANOSIM Bray Curtis", fill=ioi) + xlab(as.character(ioi)) + ylab("Rank Value")
 bray_plot_no_brac
@@ -2109,10 +2109,10 @@ jaccard_pair %>%
   kable() %>% 
   kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
 #Jaccard ANOSIM plot
-jaccard_plot <- autoplot(ano, notch =F) + theme_bw() + labs(title = "ANOSIM Jaccard") + stat_pvalue_manual(jaccard_pair, label = "p.signif.box", y.position = max(ano$dis.rank)-(.5*median(res$dis.rank)), step.increase = .03, tip.length = 0.01, hide.ns=T) + xlab(as.character(ioi)) + ylab("Rank Value")
-jaccard_plot
+#jaccard_plot <- autoplot(ano, notch =F) + theme_bw() + labs(title = "ANOSIM Jaccard") + stat_pvalue_manual(jaccard_pair, label = "p.signif.box", y.position = max(ano$dis.rank)-(.5*median(res$dis.rank)), step.increase = .03, tip.length = 0.01, hide.ns=T) + xlab(as.character(ioi)) + ylab("Rank Value")
+#jaccard_plot
 #save to disk 
-ggsave("ANOSIM_jaccard_boxplot.png", plot=jaccard_plot, path = outdir)
+#ggsave("ANOSIM_jaccard_boxplot.png", plot=jaccard_plot, path = outdir)
 #Jaccard ANOSIM plot No Bracket
 jaccard_plot_no_brac <- autoplot(ano, notch =F) + theme_bw() +aes(fill=ano$class.vec) + labs(title = "ANOSIM Jaccard", fill=ioi) +  xlab(as.character(ioi)) + ylab("Rank Value")
 jaccard_plot_no_brac
