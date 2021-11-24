@@ -29,7 +29,7 @@ if(!require(rhdf5)){ renv::install("bioc::rhdf5") }
 if(!require(Biostrings)) {renv::install("bioc::Biostrings") }
 if(!require(Biobase)) {renv::install("bioc::Biobase")}
 if(!require(phyloseq)) {renv::install("bioc::phyloseq")}
-if(!require(biomformat)) {renv::install("bioc::biomformat")}
+if(!require(biomformat)) {renv::install("bioc::biomformat",version="3.13")}
 #renv::restore()
 ```
 
@@ -68,20 +68,20 @@ if(!require(pheatmap)){renv::install("pheatmap")}
 if(!require(rstatix)){renv::install("rstatix")}
 #if(!require(knitr)){renv::install("knitr")}
 if(!require(tidyverse)){renv::install("tidyverse")}
-if(!require(ampvis2)){renv::install("MadsAlbertsen/ampvis2")}
+if(!require(ampvis2)){renv::install("MadsAlbertsen/ampvis2@eaef3f8df7e3fc90ef5c8c7f241f87fa05afb1b8")}
 if(!require(devtools)) {renv::install("devtools")}
-if(!require(ggdendro)){renv::install("ggendro")}
+if(!require(ggdendro)){renv::install("ggdendro@0.1.22", type="source")}
 if(!require(vegan)){renv::install("vegan", type="source")}
 #if(!require(ape)){renv::install("ape")}
 #if(!require(adegenet)){renv::install("adegenet")}
 #if(!require(ade4)){renv::install("ade4")}
-#if(!require(pegas)){renv::install("pegas")}
+#if(!require(pegas)){renv::install("pegas@1.0")}
 
-if(!require(ggvegan)){renv::install("gavinsimpson/ggvegan")}
+if(!require(ggvegan)){renv::install("gavinsimpson/ggvegan@4bc6ee9945dd9229ed486409c0acab9413b8c9af")}
 if(!require(ggpubr)){renv::install("ggpubr")}
 if(!require(dplyr)){renv::install("dplyr")}
-if(!require(jamba)){renv::install("jmw86069/jamba")}
-if(!require(ggConvexHull)){renv::install("cmartin/ggConvexHull")}
+if(!require(jamba)){ renv::install("jmw86069/jamba@0.0.6.900")}
+if(!require(ggConvexHull)){renv::install("cmartin/ggConvexHull@e05904a2ea4747712c0733a85a1e645c308e24ae")}
 if(!require(PERMANOVA)){renv::install("PERMANOVA")}
 # library(remotes)
 library(openssl)
