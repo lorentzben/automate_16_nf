@@ -50,7 +50,7 @@ if(params.metadata) {
         .ifEmpty { exit 1, log.info "Cannot find path file ${tsvFile}"}
         .into{ ch_meta_veri ; ch_meta_feature_viz; ch_alpha_metadata ; ch_metadata_rare_curve ; ch_metadata_alpha_sig ; ch_metadata_beta_sig ; ch_metadata_phylo_tree ; ch_metadata_lefse ; ch_metadata_finalize}
 }
-
+//TODO add a channel that will pull in cutoffs in a txt if the user submits them
 if(params.sampDepth){
     Channel
         .from(params.sampDepth)
@@ -475,6 +475,7 @@ process FindCutoffs{
     container "docker://lorentzb/automate_16_nf"
 
     script:
+    //TODO add a if block here that can grep a .txt to see if a user submitted cutoffs
     """
     #!/usr/bin/env python3
     import pandas as pd 
