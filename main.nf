@@ -522,8 +522,8 @@ process FindCutoffs{
                 writer.writerow({'cutoff': 'forward right', 'value': forward[1]})
                 writer.writerow({'cutoff': 'reverse left', 'value': reverse[0]})
                 writer.writerow({'cutoff': 'reverse right', 'value': reverse[1]})
-                writer.writerow({'cutoff': 'filename', 'value': forward_file})
-                writer.writerow({'cutoff': 'filename', 'value': reverse_file})
+                writer.writerow({'cutoff': 'filename', 'value': "user_sub"})
+                writer.writerow({'cutoff': 'filename', 'value': "user_sub"})
         """
     else 
         """
