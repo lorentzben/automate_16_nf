@@ -12,9 +12,11 @@ def helpMessage(){
         --metadata [path/to/file]     Path to metadata sheet in tsv format see EXAMPLE_METADATA.tsv
         --manifest [path/to/file]     Path to mapping file in tsv format see EXAMPLE_MAPPING.tsv 
         --itemOfInterest [str]        Item of interest, group defining treatment vs control or longitudinal variable
-        --name [str]                   Name for the analysis run, if not provided nextflow will generate one
+        --name [str]                  Name for the analysis run, if not provided nextflow will generate one
         --sampDepth [str]             Value of sampling depth derived from demux_summary.qzv
         --rareDepth [str]             Value of rarefaction depth derived from table.qzv
+        --forward [str]               Value of the custom forward cutoff
+        --rev [str]                   Value of the custom reverse cutoff
         --outdir [file]               The output directory where the results will be saved 
 
 
@@ -55,6 +57,29 @@ if(params.sampDepth){
     Channel
         .from(params.sampDepth)
         .set{ ch_user_sample_depth }
+}
+if (params.forward){
+    Channel
+        .from(params.forward)
+        .set{ ch_user_forward }
+}
+
+if(!params.forward){
+    Channel
+        .from(0)
+        .set{ ch_user_forward }
+}
+
+if(params.rev){
+    Channel
+        .from(params.rev)
+        .set{ ch_user_rev }
+}
+
+if(!params.rev){
+    Channel
+        .from(0)
+        .set{ ch_user_rev }
 }
 
 if(params.rareDepth){
@@ -464,7 +489,9 @@ process FindCutoffs{
 
     input:
     file 'manifest_format.txt' from ch_manifest_type
-    file('demux_summary/*') from ch_qiime_qual
+    file ('demux_summary/*') from ch_qiime_qual
+    value forward_val from ch_user_forward 
+    value reverse_val from ch_user_rev
     
     output: 
     file("cutoffs.csv") into ch_cutoff_vals
@@ -476,130 +503,148 @@ process FindCutoffs{
 
     script:
     //TODO add a if block here that can grep a .txt to see if a user submitted cutoffs
-    """
-    #!/usr/bin/env python3
-    import pandas as pd 
-    from pathlib import Path
-    import numpy as np 
-    import csv 
-
-    wd = Path.cwd()
-
-    seq_file = pd.read_table("manifest_format.txt")
-    if seq_file.columns[0] == "SingleEndFastqManifestPhred33V2":
-        seq_format = "single"
-    else:
-        seq_format = "paired"
-
-    def find_cutoffs(dataframe):
-        mean_qual = dataframe[4:5]
-        mean_count = dataframe[0:1]
-
-        average_qual = np.round(mean_qual.mean(axis=1), 0)
-        average_count = np.round(mean_count.mean(axis=1), 0)
-
-        mean_qual_vals = np.array(mean_qual)[0]
-        mean_count_vals = np.array(mean_count)[0]
-
-        if int(average_qual) < 30:
-            print(
-                "The Average Quality of these sequences may be a concern would you like to continue?")
-            exit(0)
-
-        for i in range(0, len(mean_qual_vals)):
-            if mean_qual_vals[i] >= int(average_qual):
-                if mean_count_vals[i] >= int(average_count):
-                    left_cutoff = i+1
-                    break
-        for i in range(0, len(mean_qual_vals)):
-            if mean_qual_vals[len(mean_qual_vals)-1-i] >= int(average_qual):
-                if mean_count_vals[len(mean_count_vals)-1-i] >= int(average_count):
-                    right_cutoff = len(mean_qual_vals)-i
-                    break
-        return(left_cutoff, right_cutoff)
-
-    def find_rev_cutoffs(dataframe):
-        mean_qual = dataframe[4:5]
-        mean_count = dataframe[0:1]
-
-        average_qual = np.round(mean_qual.mean(axis=1), 0)+2
-        average_count = np.round(mean_count.mean(axis=1), 0)
-
-        mean_qual_vals = np.array(mean_qual)[0]
-        mean_count_vals = np.array(mean_count)[0]
-
-        if int(average_qual) < 30:
-            print(
-                "The Average Quality of these sequences may be a concern would you like to continue?")
-            exit(0)
-
-        left_cutoff = 0
-        right_cutoff = len(mean_qual_vals)-1
-
-        for i in range(0, len(mean_qual_vals)):
-            if mean_qual_vals[i] >= int(average_qual):
-                if mean_count_vals[i] >= int(average_count):
-                    left_cutoff = i+1
-                    break
-
-        for i in range(0, len(mean_qual_vals)):
-            if mean_qual_vals[len(mean_qual_vals)-1-i] >= int(average_qual):
-                if mean_count_vals[len(mean_count_vals)-1-i] >= int(average_count):
-                    right_cutoff = len(mean_qual_vals)-i
-                    break
-
-        return(left_cutoff, right_cutoff)
-
-    if seq_format == "single":
-        print("determining left and right cutoffs based on qual score")
-
-        input_file = str(wd)+"/demux_summary/forward-seven-number-summaries.tsv"
-
-        summary = pd.read_table(input_file, index_col=0, sep='\t')
-        left_cutoff, right_cutoff = find_cutoffs(summary)
-
-        print("right cutoff: "+str(right_cutoff))
-        print("left cutoff: " + str(left_cutoff))
-
+    if(forward_val != 0)
+        """
+        #!/usr/bin/env python3
+        forward = [0,forward_val]
+        reverse =[0, reverse_val]
         with open('cutoffs.csv', 'w', newline='') as csvfile:
-            fieldnames = ['cutoff', 'value']
-            writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+                fieldnames = ['cutoff', 'value']
+                writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
 
-            writer.writeheader()
-            writer.writerow({'cutoff': 'left', 'value': left_cutoff})
-            writer.writerow({'cutoff': 'right', 'value': right_cutoff})
-            writer.writerow({'cutoff': 'filename', 'value': input_file})
+                writer.writeheader()
+                writer.writerow({'cutoff': 'forward left', 'value': forward[0]})
+                writer.writerow({'cutoff': 'forward right', 'value': forward[1]})
+                writer.writerow({'cutoff': 'reverse left', 'value': reverse[0]})
+                writer.writerow({'cutoff': 'reverse right', 'value': reverse[1]})
+                writer.writerow({'cutoff': 'filename', 'value': forward_file})
+                writer.writerow({'cutoff': 'filename', 'value': reverse_file})
+        """
+    else 
+        """
+        #!/usr/bin/env python3
+        import pandas as pd 
+        from pathlib import Path
+        import numpy as np 
+        import csv 
 
-        print(left_cutoff, right_cutoff)
+        wd = Path.cwd()
 
-    elif seq_format == "paired":
-        print("determining forward and revese, left and right cutoffs based on qual score")
-        forward_file = str(wd)+"/demux_summary/forward-seven-number-summaries.tsv"
-        fr_summary = pd.read_table(forward_file, index_col=0, sep='\t')
+        seq_file = pd.read_table("manifest_format.txt")
+        if seq_file.columns[0] == "SingleEndFastqManifestPhred33V2":
+            seq_format = "single"
+        else:
+            seq_format = "paired"
 
-        forward = find_cutoffs(fr_summary)
+        def find_cutoffs(dataframe):
+            mean_qual = dataframe[4:5]
+            mean_count = dataframe[0:1]
 
-        reverse_file = str(wd)+"/demux_summary/reverse-seven-number-summaries.tsv"
-        rev_summary = pd.read_table(reverse_file, index_col=0, sep='\t')
+            average_qual = np.round(mean_qual.mean(axis=1), 0)
+            average_count = np.round(mean_count.mean(axis=1), 0)
 
-        reverse = find_rev_cutoffs(rev_summary)
+            mean_qual_vals = np.array(mean_qual)[0]
+            mean_count_vals = np.array(mean_count)[0]
 
-        print("forward cutoffs: "+str(forward))
-        print("reverse cutoffs: " + str(reverse))
+            if int(average_qual) < 30:
+                print(
+                    "The Average Quality of these sequences may be a concern would you like to continue?")
+                exit(0)
 
-        with open('cutoffs.csv', 'w', newline='') as csvfile:
-            fieldnames = ['cutoff', 'value']
-            writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+            for i in range(0, len(mean_qual_vals)):
+                if mean_qual_vals[i] >= int(average_qual):
+                    if mean_count_vals[i] >= int(average_count):
+                        left_cutoff = i+1
+                        break
+            for i in range(0, len(mean_qual_vals)):
+                if mean_qual_vals[len(mean_qual_vals)-1-i] >= int(average_qual):
+                    if mean_count_vals[len(mean_count_vals)-1-i] >= int(average_count):
+                        right_cutoff = len(mean_qual_vals)-i
+                        break
+            return(left_cutoff, right_cutoff)
 
-            writer.writeheader()
-            writer.writerow({'cutoff': 'forward left', 'value': forward[0]})
-            writer.writerow({'cutoff': 'forward right', 'value': forward[1]})
-            writer.writerow({'cutoff': 'reverse left', 'value': reverse[0]})
-            writer.writerow({'cutoff': 'reverse right', 'value': reverse[1]})
-            writer.writerow({'cutoff': 'filename', 'value': forward_file})
-            writer.writerow({'cutoff': 'filename', 'value': reverse_file})
+        def find_rev_cutoffs(dataframe):
+            mean_qual = dataframe[4:5]
+            mean_count = dataframe[0:1]
 
-    """
+            average_qual = np.round(mean_qual.mean(axis=1), 0)+2
+            average_count = np.round(mean_count.mean(axis=1), 0)
+
+            mean_qual_vals = np.array(mean_qual)[0]
+            mean_count_vals = np.array(mean_count)[0]
+
+            if int(average_qual) < 30:
+                print(
+                    "The Average Quality of these sequences may be a concern would you like to continue?")
+                exit(0)
+
+            left_cutoff = 0
+            right_cutoff = len(mean_qual_vals)-1
+
+            for i in range(0, len(mean_qual_vals)):
+                if mean_qual_vals[i] >= int(average_qual):
+                    if mean_count_vals[i] >= int(average_count):
+                        left_cutoff = i+1
+                        break
+
+            for i in range(0, len(mean_qual_vals)):
+                if mean_qual_vals[len(mean_qual_vals)-1-i] >= int(average_qual):
+                    if mean_count_vals[len(mean_count_vals)-1-i] >= int(average_count):
+                        right_cutoff = len(mean_qual_vals)-i
+                        break
+
+            return(left_cutoff, right_cutoff)
+
+        if seq_format == "single":
+            print("determining left and right cutoffs based on qual score")
+
+            input_file = str(wd)+"/demux_summary/forward-seven-number-summaries.tsv"
+
+            summary = pd.read_table(input_file, index_col=0, sep='\t')
+            left_cutoff, right_cutoff = find_cutoffs(summary)
+
+            print("right cutoff: "+str(right_cutoff))
+            print("left cutoff: " + str(left_cutoff))
+
+            with open('cutoffs.csv', 'w', newline='') as csvfile:
+                fieldnames = ['cutoff', 'value']
+                writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+
+                writer.writeheader()
+                writer.writerow({'cutoff': 'left', 'value': left_cutoff})
+                writer.writerow({'cutoff': 'right', 'value': right_cutoff})
+                writer.writerow({'cutoff': 'filename', 'value': input_file})
+
+            print(left_cutoff, right_cutoff)
+
+        elif seq_format == "paired":
+            print("determining forward and revese, left and right cutoffs based on qual score")
+            forward_file = str(wd)+"/demux_summary/forward-seven-number-summaries.tsv"
+            fr_summary = pd.read_table(forward_file, index_col=0, sep='\t')
+
+            forward = find_cutoffs(fr_summary)
+
+            reverse_file = str(wd)+"/demux_summary/reverse-seven-number-summaries.tsv"
+            rev_summary = pd.read_table(reverse_file, index_col=0, sep='\t')
+
+            reverse = find_rev_cutoffs(rev_summary)
+
+            print("forward cutoffs: "+str(forward))
+            print("reverse cutoffs: " + str(reverse))
+
+            with open('cutoffs.csv', 'w', newline='') as csvfile:
+                fieldnames = ['cutoff', 'value']
+                writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+
+                writer.writeheader()
+                writer.writerow({'cutoff': 'forward left', 'value': forward[0]})
+                writer.writerow({'cutoff': 'forward right', 'value': forward[1]})
+                writer.writerow({'cutoff': 'reverse left', 'value': reverse[0]})
+                writer.writerow({'cutoff': 'reverse right', 'value': reverse[1]})
+                writer.writerow({'cutoff': 'filename', 'value': forward_file})
+                writer.writerow({'cutoff': 'filename', 'value': reverse_file})
+
+        """
 }
 
 
