@@ -505,6 +505,10 @@ process FindCutoffs{
     //TODO add a if block here that can grep a .txt to see if a user submitted cutoffs
     if(forward_val != 0)
         """
+        import pandas as pd 
+        from pathlib import Path
+        import numpy as np 
+        import csv 
         #!/usr/bin/env python3
         forward = [0,${forward_val}]
         reverse =[0, ${reverse_val}]
