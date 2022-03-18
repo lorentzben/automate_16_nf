@@ -506,8 +506,8 @@ process FindCutoffs{
     if(forward_val != 0)
         """
         #!/usr/bin/env python3
-        forward = [0,forward_val]
-        reverse =[0, reverse_val]
+        forward = [0,${forward_val}]
+        reverse =[0, ${reverse_val}]
         with open('cutoffs.csv', 'w', newline='') as csvfile:
                 fieldnames = ['cutoff', 'value']
                 writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
