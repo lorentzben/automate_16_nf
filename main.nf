@@ -490,8 +490,8 @@ process FindCutoffs{
     input:
     file 'manifest_format.txt' from ch_manifest_type
     file ('demux_summary/*') from ch_qiime_qual
-    value forward_val from ch_user_forward 
-    value reverse_val from ch_user_rev
+    val forward_val from ch_user_forward 
+    val reverse_val from ch_user_rev
     
     output: 
     file("cutoffs.csv") into ch_cutoff_vals
