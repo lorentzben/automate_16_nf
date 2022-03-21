@@ -1249,7 +1249,7 @@ process GeneratePhylogeneticTrees{
     subprocess.run(['mkdir phylo_trees'], shell=True)
 
     # iterates over the items of interest to produce a circular phylogenetic tree per category e.g. CONTROL TREATMENT
-    for item in ioi_set:
+    for str(item) in ioi_set:
 
         # filters/splits the feature table based on the current ioi
         
