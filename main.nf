@@ -1253,15 +1253,15 @@ process GeneratePhylogeneticTrees{
 
         # filters/splits the feature table based on the current ioi
         
-        filter_command = "python3 filter_samples.py -m ${metadata} -i ${ioi} -c "+item
+        filter_command = "python3 filter_samples.py -m ${metadata} -i ${ioi} -c "+str(item)
         result = subprocess.run([filter_command], shell=True)
 
         time.sleep(2)
 
         # adds taxonomic info needed for plotting
         collapse_command = 'qiime taxa collapse \
-        --i-table '+item+'-filtered-table.qza \
-        --o-collapsed-table collapse-'+item+'-table.qza \
+        --i-table '+str(item)+'-filtered-table.qza \
+        --o-collapsed-table collapse-'+str(item)+'-table.qza \
         --p-level 7 \
         --i-taxonomy taxonomy.qza'
 
@@ -1269,14 +1269,14 @@ process GeneratePhylogeneticTrees{
 
         # exports artifact so that the next step can collect it
         export_command='qiime tools export \
-        --input-path collapse-'+item+'-table.qza \
-        --output-path collapse-'+item+'-frequency/'
+        --input-path collapse-'+str(item)+'-table.qza \
+        --output-path collapse-'+str(item)+'-frequency/'
         
         result = subprocess.run([export_command], shell=True)
 
         # turns feature table into a human-reable format
-        biom_command = 'biom convert -i collapse-'+item+\
-        '-frequency/feature-table.biom -o otu-'+item+\
+        biom_command = 'biom convert -i collapse-'+str(item)+\
+        '-frequency/feature-table.biom -o otu-'+str(item)+\
         '-table.tsv --to-tsv --header-key taxonomy'
 
         result = subprocess.run([biom_command], shell=True)
@@ -1307,17 +1307,17 @@ process GeneratePhylogeneticTrees{
         result = subprocess.run([generate_image_command], shell=True)
 
         # renaming otu tables so they have meaning
-        rename_table = 'cp otu-table-mod.biom phylo_trees/otu-table-'+item+'-mod.biom'
+        rename_table = 'cp otu-table-mod.biom phylo_trees/otu-table-'+str(item)+'-mod.biom'
         
         result = subprocess.run([rename_table],shell=True)
 
         # renaming the output of the graping bash script so that it has meaning
-        rename_image = 'cp image_graph.png phylo_trees/image_'+item+'_graph.png'
+        rename_image = 'cp image_graph.png phylo_trees/image_'+str(item)+'_graph.png'
 
         result = subprocess.run([rename_image], shell=True)
 
         # rename pdf quality image so that it has meaning
-        rename_pdf_image = 'cp image_pdf_graph.png phylo_trees/image_'+item+'_pdf_g.png'
+        rename_pdf_image = 'cp image_pdf_graph.png phylo_trees/image_'+str(item)+'_pdf_g.png'
 
         result = subprocess.run([rename_pdf_image], shell=True)
         
