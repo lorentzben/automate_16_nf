@@ -1249,8 +1249,8 @@ process GeneratePhylogeneticTrees{
     subprocess.run(['mkdir phylo_trees'], shell=True)
 
     # iterates over the items of interest to produce a circular phylogenetic tree per category e.g. CONTROL TREATMENT
-    for str(item) in ioi_set:
-
+    for item in ioi_set:
+        item = str(item)
         # filters/splits the feature table based on the current ioi
         
         filter_command = "python3 filter_samples.py -m ${metadata} -i ${ioi} -c "+str(item)
