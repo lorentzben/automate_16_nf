@@ -23,6 +23,6 @@ if(!require(rstatix)) renv::install("rstatix")
 if(!require(RcppEigen)) renv::install("RcppEigen@0.3.3.9.1")
 if(!require(biomformat)) BiocManager::install("biomformat",version="3.12")
 #renv::restore()
-renv::snapshot()
+#renv::snapshot()
 q()
 
