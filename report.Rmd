@@ -23,13 +23,13 @@ renv::isolate()
 renv::settings$snapshot.type("all")
 renv::init()
 install.packages("BiocManager")
-BiocManager::install(version = "3.13", ask=FALSE)
-BiocManager::repositories(version="3.13")
+BiocManager::install(version = "3.12", ask=FALSE)
+BiocManager::repositories(version="3.12")
 if(!require(rhdf5)){ renv::install("bioc::rhdf5") }
 if(!require(Biostrings)) {renv::install("bioc::Biostrings") }
 if(!require(Biobase)) {renv::install("bioc::Biobase")}
 if(!require(phyloseq)) {renv::install("bioc::phyloseq")}
-if(!require(biomformat)) {renv::install("bioc::biomformat",version="3.13")}
+if(!require(biomformat)) {renv::install("bioc::biomformat",version="3.12")}
 #renv::restore()
 ```
 
@@ -57,7 +57,7 @@ if(!require(tidyverse)) {renv::install("tidyverse")}
 
 if (!require("devtools", quietly = TRUE)){renv::install("devtools")}
 if(!require(qiime2R)) {renv::install("jbisanz/qiime2R@d1ad96657ada993cf6c2841b29113a4f635c6b56")} # current version is 0.99.20
-if(!require(phyloseq)) {BiocManager::install("phyloseq", version="3.13")}
+if(!require(phyloseq)) {BiocManager::install("phyloseq", version="3.12")}
 if(!require(gtools)) {renv::install("gtools")}
 if(!require(reshape2)) {renv::install("reshape2")}
 if(!require(forcats)) {renv::install("forcats")}
