@@ -4,6 +4,7 @@ if(!require(rmarkdown)) {install.packages("rmarkdown", repos="http://cran.us.r-p
 if(!require(renv)) {install.packages("renv",repos="http://cran.us.r-project.org")}
 renv::init()
 renv::restore(packages = "renv")
+if(!require(rstatix)){renv::install(rstatix@0.7.0)}
 if(!require(remotes)){install.packages("remotes",repos="http://cran.us.r-project.org")}
 if(!require(devtools)){install.packages("devtools",repos="http://cran.us.r-project.org")}
 if(!require(jamba)){remotes::install_github("jmw86069/jamba@0.0.6.900")}
