@@ -1,7 +1,7 @@
 #! /usr/bin/env Rscript --vanilla
 if(!require(renv)) {install.packages("renv",repos="http://cran.us.r-project.org")}
 renv::isolate()
-renv::init()
+renv::init(bioconductor = TRUE)
 install.packages("BiocManager")
 BiocManager::install(version = "3.12", ask=FALSE)
 if(!require(rhdf5)) renv::install("bioc::rhdf5")
