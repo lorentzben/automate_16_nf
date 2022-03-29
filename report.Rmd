@@ -21,7 +21,8 @@ if(!require(renv)){install.packages("renv", repos="http://cran.us.r-project.org"
 library(renv)
 renv::isolate()
 renv::settings$snapshot.type("all")
-renv::init(bioconductor = TRUE)
+#renv::init(bioconductor = TRUE)
+renv::init()
 install.packages("BiocManager")
 BiocManager::install(version = "3.12", ask=FALSE)
 BiocManager::repositories(version="3.12")
@@ -30,7 +31,7 @@ if(!require(Biostrings)) {renv::install("bioc::Biostrings") }
 if(!require(Biobase)) {renv::install("bioc::Biobase")}
 if(!require(phyloseq)) {renv::install("bioc::phyloseq")}
 if(!require(biomformat)) {renv::install("bioc::biomformat",version="3.12")}
-#renv::restore()
+renv::restore()
 ```
 
 ```{r function to check how the document is being rendered, message=FALSE, warning=FALSE, include=FALSE}
