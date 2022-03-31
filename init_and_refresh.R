@@ -9,7 +9,7 @@ if(!require(Biostrings)) renv::install("bioc::Biostrings",version="3.12")
 if(!require(Biobase)) renv::install("bioc::Biobase",version="3.12")
 if(!require(dplyr)) renv::install("dplyr")
 if(!require(tibble)) renv::install("tibble")
-if(!require(phyloseq)) BiocManager::install("phyloseq", version="3.12")
+if(!require(phyloseq)) BiocManager::install("phyloseq", version="3.12", force=TRUE)
 if(!require(jamba)) renv::install("jmw86069/jamba@0.0.6.900")
 if(!require(qiime2R)) renv::install("jbisanz/qiime2R@d1ad96657ada993cf6c2841b29113a4f635c6b56") # current version is 0.99.20
 if(!require(ampvis2)) renv::install("MadsAlbertsen/ampvis2@eaef3f8df7e3fc90ef5c8c7f241f87fa05afb1b8")
