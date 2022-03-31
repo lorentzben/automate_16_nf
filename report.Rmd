@@ -53,7 +53,7 @@ getOutputFormat <- function() {
 if(!require(kableExtra)) {renv::install("kableExtra")}
 if(!require(remotes)){renv::install("remotes")}
 if(!require(ggplot2)) {renv::install("tidyverse/ggplot2@v3.3.2")}
-if(!require(tidyverse)) {renv::install("tidyverse")}
+if(!require(tidyverse)) {renv::install("tidyverse@1.3.1")}
 
 
 if (!require("devtools", quietly = TRUE)){renv::install("devtools")}
