@@ -14,23 +14,26 @@ output:
 <!-- then you take the stem of where the bin for that package is and replace it below -->
 
 ```{r handle lib errors, echo=FALSE, message=FALSE, warning=FALSE}
-Sys.setenv(LD_LIBRARY_PATH = "/lib64")
-Sys.setenv(PKG_CONFIG_PATH = "/lib64/pkgconfig")
+#Sys.setenv(LD_LIBRARY_PATH = "/lib64")
+#Sys.setenv(PKG_CONFIG_PATH = "/lib64/pkgconfig")
 #Sys.setenv(R_REMOTES_NO_ERRORS_FROM_WARNINGS="true")
 if(!require(renv)){install.packages("renv", repos="http://cran.us.r-project.org")}
 library(renv)
 renv::isolate()
 renv::settings$snapshot.type("all")
 #renv::init(bioconductor = TRUE)
-renv::init()
+#renv::init()
+renv::init(bare=T)
 install.packages("BiocManager")
 BiocManager::install(version = "3.12", ask=FALSE)
 BiocManager::repositories(version="3.12")
-if(!require(rhdf5)){ renv::install("bioc::rhdf5",version="3.12") }
-if(!require(Biostrings)) {renv::install("bioc::Biostrings",version="3.12") }
-if(!require(Biobase)) {renv::install("bioc::Biobase",version="3.12")}
-if(!require(phyloseq)) {renv::install("bioc::phyloseq",version="3.12")}
-if(!require(biomformat)) {renv::install("bioc::biomformat",version="3.12")}
+BiocManager::install("remotes")
+BiocManager::install('grimbough/Rhdf5lib', ref='TEST_3_12')
+#renv::install("bioc::rhdf5",version="3.12")
+renv::install("bioc::Biostrings",version="3.12")
+renv::install("bioc::Biobase",version="3.12")
+renv::install("bioc::phyloseq",version="3.12")
+renv::install("bioc::biomformat",version="3.12")
 renv::restore()
 ```
 
@@ -52,13 +55,15 @@ getOutputFormat <- function() {
 
 if(!require(kableExtra)) {renv::install("kableExtra")}
 if(!require(remotes)){renv::install("remotes")}
-if(!require(ggplot2)) {renv::install("tidyverse/ggplot2@v3.3.2")}
-if(!require(tidyverse)) {renv::install("tidyverse@1.3.1")}
-
+renv::install("tidyverse/ggplot2@v3.3.2")
+renv::install("tidyverse@1.3.1")
+if(!require(stringi)) {renv::install("stringi")}
+renv::install("vctrs@0.3.7")
+renv::install("openssl")
 
 if (!require("devtools", quietly = TRUE)){renv::install("devtools")}
-if(!require(qiime2R)) {renv::install("jbisanz/qiime2R@d1ad96657ada993cf6c2841b29113a4f635c6b56")} # current version is 0.99.20
-if(!require(phyloseq)) {BiocManager::install("phyloseq", version="3.12")}
+renv::install("jbisanz/qiime2R@d1ad96657ada993cf6c2841b29113a4f635c6b56") # current version is 0.99.20
+#BiocManager::install("phyloseq", version="3.12")
 if(!require(gtools)) {renv::install("gtools")}
 if(!require(reshape2)) {renv::install("reshape2")}
 if(!require(forcats)) {renv::install("forcats")}
@@ -73,7 +78,7 @@ if(!require(ampvis2)){renv::install("MadsAlbertsen/ampvis2@eaef3f8df7e3fc90ef5c8
 if(!require(devtools)) {renv::install("devtools")}
 if(!require(ggdendro)){renv::install("ggdendro@0.1.22", type="source")}
 if(!require(vegan)){renv::install("vegan", type="source")}
-#if(!require(ape)){renv::install("ape")}
+#if(!require(ape)){renv::install("ape@5.5")}
 #if(!require(adegenet)){renv::install("adegenet")}
 #if(!require(ade4)){renv::install("ade4")}
 #if(!require(pegas)){renv::install("pegas@1.0")}
