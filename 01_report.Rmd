@@ -41,6 +41,10 @@ outdir <- paste0("./",outdir_name)
 
 ```{r stacked bar chart at Phylum level, echo=FALSE, fig.height=12, fig.width=18, message=FALSE, warning=FALSE}
 #TODO add library calls
+library(qiime2R)
+library(phyloseq)
+library(ggplot2)
+
 options(bitmapType='cairo')
 level = "Phylum"
 
@@ -139,6 +143,10 @@ ggsave("stacked_bar_phylum_by_treatment.png", plot=by_treatment, path=outdir)
 ### 1.2 Relative Abundance of Top 10 Genera
 
 ```{r stacked bar chart at Genus level, echo=FALSE, fig.height=12, fig.width=18, message=FALSE, warning=FALSE}
+library(qiime2R)
+library(phyloseq)
+library(ggplot2)
+
 level = "Genus"
 
 #Create phyloseq object from qiime objects
@@ -228,6 +236,10 @@ ggsave("stacked_bar_genus_by_treatment.png", plot = by_treatment, path=outdir)
 ### 1.3 Relative Abundance of Top 10 Species
 
 ```{r stacked bar chart at Species level, echo=FALSE, fig.height=12, fig.width=18, message=FALSE, warning=FALSE}
+library(qiime2R)
+library(phyloseq)
+library(ggplot2)
+
 level = "Species"
 
 #Create phyloseq object from qiime objects
