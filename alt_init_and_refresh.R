@@ -9,4 +9,5 @@ install.packages("BiocManager")
 BiocManager::install(version = "3.12", ask=FALSE)
 BiocManager::repositories(version="3.12")
 BiocManager::install("remotes")
-
+renv::snapshot()
+q()
