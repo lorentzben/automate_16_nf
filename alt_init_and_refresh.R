@@ -1,6 +1,7 @@
 #! /usr/bin/env Rscript --vanilla
 if(!require(renv)) {install.packages("renv",repos="http://cran.us.r-project.org")}
-renv::isolate()
+library(renv)
+renv::init(bare=T)
 renv::isolate()
 renv::settings$snapshot.type("all")
 renv::install("rmarkdown")
