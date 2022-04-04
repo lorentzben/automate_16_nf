@@ -5,6 +5,7 @@ pwd
 ls
 
 cp ../item_of_interest.csv .
+cp ../order_item_of_interest.csv .
 
 dt=$(date '+%d-%m-%Y_%H.%M.%S');
 
