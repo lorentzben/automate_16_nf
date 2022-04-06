@@ -8,6 +8,7 @@ cp -rf /renv_dev/renv .
 cp -rf /renv_dev/renv.lock . 
 
 Rscript -e "renv::init()"
+Rscript -e "renv::install('rmarkdown')"
 
 cp ../item_of_interest.csv .
 cp ../order_item_of_interest.csv .
