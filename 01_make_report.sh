@@ -7,6 +7,7 @@ ls
 cp -rf /renv_dev/renv .
 cp -rf /renv_dev/renv.lock . 
 
+Rscript -e 'renv::init()'
 
 cp ../item_of_interest.csv .
 cp ../order_item_of_interest.csv .
