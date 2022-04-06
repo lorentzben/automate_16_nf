@@ -11,5 +11,8 @@
 #SBATCH --mail-user="bjl34716@uga.edu"
 #SBATCH --mail-type=BEGIN,END,FAIL
 
+export LC_ALL=C.UTF-8
+export LANG=C.UTF-8
+
 echo "this script will take approx 11:16:54 to generate 2 classifiers"
 singularity run docker://lorentzb/automate_16_nf bash generate_sklearn_classifiers.sh

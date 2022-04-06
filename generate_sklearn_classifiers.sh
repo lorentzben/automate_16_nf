@@ -33,14 +33,14 @@ qiime feature-classifier fit-classifier-naive-bayes \
 --o-classifier 16s-whole-seq-classifier.qza
 
 
-echo "Classifier trained on 515f 806r region"
+echo "Classifier trained on 341f 785r region (note the name will be different but is trained correctly)"
 qiime feature-classifier extract-reads \
 --i-sequences silva_132_99_16s.qza \
---p-f-primer GTGCCAGCMGCCGCGGTAA \
---p-r-primer GGACTACHVGGGTWTCTAAT \
+--p-f-primer CCTACGGGNGGCWGCAG \
+--p-r-primer GACTACHVGGGTATCTAATCC \
 --p-trunc-len 120 \
 --p-min-length 100 \
---p-max-length 400 \
+--p-max-length 464 \
 --o-reads 515-806-ref-seqs.qza
 
 qiime feature-classifier fit-classifier-naive-bayes \
