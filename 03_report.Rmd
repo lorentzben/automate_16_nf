@@ -1,0 +1,93 @@
+---
+title: "03 16s Analysis Report"
+output:
+  pdf_document:
+    
+    
+    df_print: kable
+  html_document:
+    df_print: kable
+    smart: false
+---
+
+```{r init renv}
+library(renv)
+#renv::isolate()
+#renv::settings$snapshot.type("all")
+renv::restore()
+```
+
+```{r parse item of interest and make outdir for figures, echo=FALSE, message=FALSE, warning=FALSE}
+#this may be required for each file
+#item of interest, comes from bash and python script that orchestrates everything
+wd <- getwd()
+ioi <- read.csv("../item_of_interest.csv")
+ioi<-as.character(ioi)
+
+ioi_ord <- read.csv("../order_item_of_interest.csv")
+colnames(ioi_ord) <- ioi
+ioi_ord <- as.list(ioi_ord)[[ioi]]
+
+outdir_name <- "Figures"
+if(!dir.exists(paste0("./",outdir_name))) {dir.create(paste0("./",outdir_name))}
+outdir <- paste0("./",outdir_name)
+```
+
+## 3 Species Abundance Heatmap
+
+```{r heatmap at the Genus level annotatted with item of interest, echo=FALSE, fig.height=10, fig.width=14, message=FALSE, warning=FALSE}
+library(qiime2R)
+library(phyloseq)
+library(ampvis2)
+library(ggplot2)
+
+table_dada2 <- "../qiime/core-metric-results/rarefied_table.qza"
+rooted_tree <- "../qiime/rooted-tree.qza"
+taxonomy_file <- "../qiime/taxonomy.qza"
+metadata_file <- "../metadata.tsv"
+
+devtools::source_gist("8d0ca4206a66be7ff6d76fc4ab8e66c6")
+cycle_1 <- qza_to_phyloseq(table_dada2,rooted_tree,taxonomy_file,metadata_file) 
+cycle_1@sam_data[[ioi]] <- factor(cycle_1@sam_data[[ioi]], levels= ioi_ord)
+
+cycle_1_amp <- phyloseq_to_ampvis2(cycle_1)
+
+heatmap <- ampvis2::amp_heatmap(cycle_1_amp,
+                     group_by = "SampleID", 
+                     tax_aggregate = "Genus",
+                     tax_show = 30,
+                     facet_by = ioi,
+                     tax_add = "Phylum",
+                     plot_values = FALSE,
+                     plot_colorscale = "log10") +
+  theme(text=element_text(size = 20))
+
+heatmap
+ggsave("heatmap.png", plot=heatmap, path=outdir)
+
+```
+
+
+```{r read in cutoffs used by qiime, message=FALSE, warning=FALSE, include=FALSE}
+library(tidyverse)
+library(kableExtra)
+cutoffs = read.csv("../qiime/cutoffs.csv",sep = ',',strip.white = TRUE)
+#cutoffs = knitr::kable(cutoffs)
+cutoffs %>% kbl() %>% kable_styling(bootstrap_options = c("striped","condensed","responsive"))
+```
+
+
+```{r make data table for dada2 stats from qiime, message=FALSE, warning=FALSE, include=FALSE}
+library(tidyverse)
+library(kableExta)
+dadastat = read.csv("../dada2_stats.tsv",sep = '\t',strip.white = TRUE)
+#dadastat_t = dadastat %>% kbl() %>% kable_classic(full_width = F)
+dadastat %>% kbl() %>% kable_styling(bootstrap_options = c("striped","condensed","responsive")) 
+```
+
+```{r table for sampling depth in qiime, message=FALSE, warning=FALSE, include=FALSE}
+library(tidyverse)
+library(kableExtra)
+depth = read.csv("../qiime/sampling_depth.csv", sep=",")
+depth %>% kbl() %>% kable_styling(bootstrap_options = c("striped","condensed","responsive"))
+```
