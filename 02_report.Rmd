@@ -12,8 +12,8 @@ output:
 
 ```{r init renv}
 library(renv)
-renv::isolate()
-renv::settings$snapshot.type("all")
+#renv::isolate()
+#renv::settings$snapshot.type("all")
 renv::restore()
 ```
 
