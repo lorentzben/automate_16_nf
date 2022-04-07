@@ -79,7 +79,7 @@ cutoffs %>% kbl() %>% kable_styling(bootstrap_options = c("striped","condensed",
 
 ```{r make data table for dada2 stats from qiime, message=FALSE, warning=FALSE, include=FALSE}
 library(tidyverse)
-library(kableExta)
+library(kableExtra)
 dadastat = read.csv("../dada2_stats.tsv",sep = '\t',strip.white = TRUE)
 #dadastat_t = dadastat %>% kbl() %>% kable_classic(full_width = F)
 dadastat %>% kbl() %>% kable_styling(bootstrap_options = c("striped","condensed","responsive")) 
