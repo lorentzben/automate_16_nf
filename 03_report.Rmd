@@ -10,7 +10,7 @@ output:
     smart: false
 ---
 
-```{r init renv}
+```{r init renv, message=FALSE, warning=FALSE, include=FALSE}
 library(renv)
 #renv::isolate()
 #renv::settings$snapshot.type("all")
@@ -68,7 +68,7 @@ ggsave("heatmap.png", plot=heatmap, path=outdir)
 ```
 
 
-```{r read in cutoffs used by qiime, message=FALSE, warning=FALSE, include=FALSE}
+```{r read in cutoffs used by qiime, echo=FALSE, message=FALSE, warning=FALSE}
 library(tidyverse)
 library(kableExtra)
 cutoffs = read.csv("../qiime/cutoffs.csv",sep = ',',strip.white = TRUE)
@@ -77,7 +77,7 @@ cutoffs %>% kbl() %>% kable_styling(bootstrap_options = c("striped","condensed",
 ```
 
 
-```{r make data table for dada2 stats from qiime, message=FALSE, warning=FALSE, include=FALSE}
+```{r make data table for dada2 stats from qiime, echo=FALSE, message=FALSE, warning=FALSE}
 library(tidyverse)
 library(kableExtra)
 dadastat = read.csv("../dada2_stats.tsv",sep = '\t',strip.white = TRUE)
@@ -85,7 +85,7 @@ dadastat = read.csv("../dada2_stats.tsv",sep = '\t',strip.white = TRUE)
 dadastat %>% kbl() %>% kable_styling(bootstrap_options = c("striped","condensed","responsive")) 
 ```
 
-```{r table for sampling depth in qiime, message=FALSE, warning=FALSE, include=FALSE}
+```{r table for sampling depth in qiime, echo=FALSE, message=FALSE, warning=FALSE}
 library(tidyverse)
 library(kableExtra)
 depth = read.csv("../qiime/sampling_depth.csv", sep=",")
