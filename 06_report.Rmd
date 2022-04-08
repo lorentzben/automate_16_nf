@@ -1,0 +1,286 @@
+---
+title: "04 16s Analysis Report"
+output:
+  pdf_document:
+    
+    
+    df_print: kable
+  html_document:
+    df_print: kable
+    smart: false
+---
+
+```{r init renv, message=FALSE, warning=FALSE, include=FALSE}
+library(renv)
+#renv::isolate()
+#renv::settings$snapshot.type("all")
+renv::restore()
+```
+
+```{r parse item of interest and make outdir for figures, echo=FALSE, message=FALSE, warning=FALSE}
+#this may be required for each file
+#item of interest, comes from bash and python script that orchestrates everything
+wd <- getwd()
+ioi <- read.csv("../item_of_interest.csv")
+ioi<-as.character(ioi)
+
+ioi_ord <- read.csv("../order_item_of_interest.csv")
+colnames(ioi_ord) <- ioi
+ioi_ord <- as.list(ioi_ord)[[ioi]]
+
+outdir_name <- "Figures"
+if(!dir.exists(paste0("./",outdir_name))) {dir.create(paste0("./",outdir_name))}
+outdir <- paste0("./",outdir_name)
+```
+
+## 6 Beta diversity 
+
+### 6.1 Bray curtis ordination
+
+```{r beta diversity plot of bray curtis measurement, echo=FALSE, message=FALSE, warning=FALSE}
+library(qiime2R)
+library(tidyverse)
+library(dplyr)
+library(ggplot2)
+library(ggConvexHull)
+
+table_dada2 <- "../qiime/core-metric-results/rarefied_table.qza"
+rooted_tree <- "../qiime/rooted-tree.qza"
+taxonomy_file <- "../qiime/taxonomy.qza"
+metadata_file <- "../metadata.tsv"
+
+metadata<-read_q2metadata(metadata_file)
+metadata[[ioi]] <- factor(metadata[[ioi]], levels=ioi_ord)
+bray_pcoa <- qiime2R::read_qza("../qiime/core-metric-results/bray_curtis_pcoa_results.qza")
+shannon<-qiime2R::read_qza("../qiime/core-metric-results/shannon_vector.qza")
+shannon <- shannon$data %>% rownames_to_column("SampleID")
+
+
+bray_curtis <- bray_pcoa$data$Vectors %>%
+  dplyr::select(SampleID, PC1, PC2) %>%
+  left_join(metadata) %>%
+  left_join(shannon) %>%
+  ggplot(aes_string(x="PC1", y="PC2", color=ioi))+
+  geom_point() +
+  geom_convexhull(alpha=0.5, aes_string(fill=ioi)) +
+  theme_q2r() +
+  scale_color_discrete(name=ioi)
+
+bray_curtis_no_poly <- bray_pcoa$data$Vectors %>%
+  dplyr::select(SampleID, PC1, PC2) %>%
+  left_join(metadata) %>%
+  left_join(shannon) %>%
+  ggplot(aes_string(x="PC1", y="PC2", color=ioi))+
+  geom_point() +
+  theme_q2r() +
+  scale_color_discrete(name=ioi)
+
+bray_curtis
+ggsave("bray_curtis_pcoa_ordination.png", plot=bray_curtis, path=outdir)
+
+bray_curtis_no_poly
+ggsave("bray_curtis_pcoa_ordination_no_polygon.png", plot=bray_curtis_no_poly, path=outdir)
+
+```
+
+
+
+
+### 6.2 Jaccard ordination
+
+```{r pcoa using Jaccard distance, echo=FALSE, message=FALSE, warning=FALSE}
+library(qiime2R)
+library(tidyverse)
+library(dplyr)
+library(ggplot2)
+library(ggConvexHull)
+
+metadata<-read_q2metadata(metadata_file)
+jaccard <- qiime2R::read_qza("../qiime/core-metric-results/jaccard_pcoa_results.qza")
+shannon<-qiime2R::read_qza("../qiime/core-metric-results/shannon_vector.qza")
+shannon <- shannon$data %>% rownames_to_column("SampleID")
+
+metadata[[ioi]] <- factor(metadata[[ioi]], levels=ioi_ord)
+
+jaccard_pcoa <- jaccard$data$Vectors %>%
+  dplyr::select(SampleID, PC1, PC2) %>%
+  left_join(metadata) %>%
+  left_join(shannon) %>%
+  ggplot(aes_string(x="PC1", y="PC2", color=ioi))+
+  geom_point() +
+  geom_convexhull(alpha=0.5, aes_string(fill=ioi)) +
+  theme_q2r() +
+  scale_size_continuous(name="Shannon Diversity") +
+  scale_color_discrete(name=ioi)
+
+jaccard_pcoa_no_polygon <- jaccard$data$Vectors %>%
+  dplyr::select(SampleID, PC1, PC2) %>%
+  left_join(metadata) %>%
+  left_join(shannon) %>%
+  ggplot(aes_string(x="PC1", y="PC2", color=ioi))+
+  geom_point() +
+  theme_q2r() +
+  scale_size_continuous(name="Shannon Diversity") +
+  scale_color_discrete(name=ioi)
+
+jaccard_pcoa
+
+ggsave("jaccard_pcoa_ordination.png", plot=jaccard_pcoa, path=outdir)
+
+jaccard_pcoa_no_polygon
+ggsave("jaccard_pcoa_ordination_no_polygons.png", plot=jaccard_pcoa_no_polygon, path=outdir)
+
+
+```
+
+
+
+
+### 6.3 Unweighted unifrac ordination
+
+```{r unweighted unifrac pcoa ordination, echo=FALSE, message=FALSE, warning=FALSE}
+library(qiime2R)
+library(tidyverse)
+library(dplyr)
+library(ggplot2)
+library(ggConvexHull)
+
+metadata<-read_q2metadata(metadata_file)
+metadata[[ioi]] <- factor(metadata[[ioi]], levels=ioi_ord)
+jaccard <- qiime2R::read_qza("../qiime/core-metric-results/unweighted_unifrac_pcoa_results.qza")
+shannon<-qiime2R::read_qza("../qiime/core-metric-results/shannon_vector.qza")
+shannon <- shannon$data %>% rownames_to_column("SampleID")
+
+
+unweight_unifrac_pcoa <- jaccard$data$Vectors %>%
+  dplyr::select(SampleID, PC1, PC2) %>%
+  left_join(metadata) %>%
+  left_join(shannon) %>%
+  ggplot(aes_string(x="PC1", y="PC2", color=ioi))+
+  geom_point() +
+  geom_convexhull(alpha=0.5, aes_string(fill=ioi)) +
+  theme_q2r() +
+  scale_color_discrete(name=ioi)
+
+unweight_unifrac_pcoa 
+
+ggsave("unweighted_unifrac_pcoa_ordination.png", plot=unweight_unifrac_pcoa, path=outdir)
+
+unweight_unifrac_pcoa_no_polygon <- jaccard$data$Vectors %>%
+  dplyr::select(SampleID, PC1, PC2) %>%
+  left_join(metadata) %>%
+  left_join(shannon) %>%
+  ggplot(aes_string(x="PC1", y="PC2", color=ioi))+
+  geom_point() +
+  theme_q2r() +
+  scale_color_discrete(name=ioi)
+
+unweight_unifrac_pcoa_no_polygon
+
+ggsave("unweighted_unifrac_pcoa_ordination_no_polygons.png", plot=unweight_unifrac_pcoa_no_polygon, path=outdir)
+
+
+```
+
+
+
+
+### 6.4 Weighted unifrac ordination
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+library(qiime2R)
+library(tidyverse)
+library(dplyr)
+library(ggplot2)
+library(ggConvexHull)
+
+metadata<-read_q2metadata(metadata_file)
+metadata[[ioi]] <- factor(metadata[[ioi]], levels=ioi_ord)
+jaccard <- qiime2R::read_qza("../qiime/core-metric-results/weighted_unifrac_pcoa_results.qza")
+shannon<-qiime2R::read_qza("../qiime/core-metric-results/shannon_vector.qza")
+shannon <- shannon$data %>% rownames_to_column("SampleID")
+
+weighted_unifrac_pcoa <- jaccard$data$Vectors %>%
+  dplyr::select(SampleID, PC1, PC2) %>%
+  left_join(metadata) %>%
+  left_join(shannon)
+
+
+weighted_unifrac_pcoa <- jaccard$data$Vectors %>%
+  dplyr::select(SampleID, PC1, PC2) %>%
+  left_join(metadata) %>%
+  left_join(shannon) %>%
+  ggplot(aes_string(x="PC1", y="PC2", color=ioi))+
+  geom_point() +
+  geom_convexhull(alpha=0.5, aes_string(fill=ioi)) +
+  theme_q2r() +
+  scale_color_discrete(name=ioi)
+
+weighted_unifrac_pcoa
+
+ggsave("weighted_unifrac_pcoa_ordination.png", plot=weighted_unifrac_pcoa, path=outdir)
+
+weighted_unifrac_pcoa_no_polygon <- jaccard$data$Vectors %>%
+  dplyr::select(SampleID, PC1, PC2) %>%
+  left_join(metadata) %>%
+  left_join(shannon) %>%
+  ggplot(aes_string(x="PC1", y="PC2", color=ioi))+
+  geom_point() +
+  theme_q2r() +
+  scale_color_discrete(name=ioi)
+
+weighted_unifrac_pcoa_no_polygon
+ggsave("weighted_unifrac_pcoa_ordination_no_polygons.png", plot=weighted_unifrac_pcoa_no_polygon, path=outdir)
+```
+
+
+
+
+### 6.5 Principal Components Analysis
+
+```{r PCA created by ampvis2, echo=FALSE, message=FALSE, warning=FALSE}
+library(dplyr)
+library(qiime2R)
+library(ampvis2)
+library(ggplot2)
+library(ggConvexHull)
+library(reshape2)
+
+devtools::source_gist("8d0ca4206a66be7ff6d76fc4ab8e66c6")
+
+cycle_1 <- qza_to_phyloseq(table_dada2,rooted_tree,taxonomy_file,metadata_file) 
+cycle_1@sam_data[[ioi]] <- factor(cycle_1@sam_data[[ioi]], levels=ioi_ord)
+cycle_1_amp <- phyloseq_to_ampvis2(cycle_1)
+
+euclidean_frame <- amp_ordinate(cycle_1_amp, filter_species = 0, type = "PCA", transform = "hellinger", print_caption = T,sample_color_by = ioi, sample_colorframe = T, detailed_output = T,envfit_factor =ioi,envfit_show = F) 
+euclidean_frame$plot
+print(euclidean_frame$evf_factor_model)
+print(euclidean_frame$screeplot)
+ggsave("PCA_ordination_with_boundries.png", plot=euclidean_frame$plot , path=outdir)
+
+loading <- as.data.frame(euclidean_frame$dspecies)
+#loading <- select(loading, "PC1", "PC2" , "Genus")
+loading <- subset(loading, select = c(PC1, PC2, Genus))
+loading <- melt(loading, id.vars="Genus")
+loading <- arrange(loading, desc(abs(value)))
+
+loading$Genus <- factor(loading$Genus, levels= unique(loading$Genus))
+
+cutoff <- summary(loading$value)[2]
+
+loading2 <- subset(loading, abs(value) > abs(cutoff))
+
+loading <- loading2[1:100,]
+
+p <- ggplot(data=loading, aes(x=Genus, y=value, fill=variable))+
+  geom_bar(stat="identity", width=0.4,position = position_dodge(width = 0.5)) +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+p
+ggsave("Loading_top_100_genera.png", plot=p , path=outdir)
+
+
+euclidean <- amp_ordinate(cycle_1_amp, filter_species = 0, type = "PCA", transform = "hellinger", print_caption = T,sample_color_by = ioi) 
+euclidean
+
+ggsave("PCA_ordination_without_boundries.png", plot=euclidean , path=outdir)
+```
