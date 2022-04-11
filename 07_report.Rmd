@@ -204,14 +204,14 @@ bound$depth <- as.numeric(as.character(bound$depth))
 bound <- bound[order(bound$depth),]
 
 rarefy_curve_by_sample <- ggplot(bound, aes(x=depth, y=value, fill=sample, color=sample))+
-  geom_point(data=bound_mean, mapping=aes(x=as.numeric(depth), y=as.numeric(average)),size=3) + 
-  geom_line(data=bound_mean, mapping= aes(x=as.numeric(depth), y=as.numeric(average), group=sample), size=1) + 
+  geom_point(data=bound_mean, mapping=aes(x=as.numeric(depth), y=as.numeric(average)),size=3, show.legend=F) + 
+  geom_line(data=bound_mean, mapping= aes(x=as.numeric(depth), y=as.numeric(average), group=sample, show.legend=F), size=1) + 
   scale_x_binned("Sampling Depth",n.breaks = 12, nice.breaks = TRUE) + theme_bw() +
   scale_y_continuous("Observed Species") + 
   theme(text=element_text(size = 20))
 rarefy_curve_by_sample
 
-ggsave("rarefaction_curve_by_sample.png", plot=rarefy_curve_by_sample, path=outdir)
+ggsave("rarefaction_curve_by_sample.png", plot=rarefy_curve_by_sample, , path=outdir)
 
 samples <- obs_rarefy[1]
 one <- obs_rarefy[2:11]
