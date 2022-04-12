@@ -41,8 +41,10 @@ outdir <- paste0("./",outdir_name)
 ## 8 Ranked Abundance Curves
 
 ```{r, echo=FALSE, fig.height=10, fig.width=16, message=FALSE, warning=FALSE}
-library(devtools)
-library(remotes)
+#library(devtools)
+#llibrary(remotes)
+#install.packages("BiocManager")
+#BiocManager::install(version="3.13")
 library(ampvis2)
 #b655a307c8431201573096ab57140b46d8733dd7
 library(ggplot2)
@@ -63,7 +65,7 @@ devtools::source_gist("8d0ca4206a66be7ff6d76fc4ab8e66c6")
 cycle_1 <- qza_to_phyloseq(table_dada2,rooted_tree,taxonomy_file,metadata_file) 
 cycle_1_amp <- phyloseq_to_ampvis2(cycle_1)
 
-by_sample <- ampvis2::amp_rankabundance(cycle_1_amp, group_by = "SampleID") + theme(text=element_text(size = 20))
+by_sample <- ampvis2::amp_rankabundance(cycle_1_amp, group_by = "SampleID") + theme(text=element_text(size = 20), legend.position="none")
 by_sample 
 ggsave("rank_abundance_curve_by_sample.png", plot=by_sample, path=outdir)
 
