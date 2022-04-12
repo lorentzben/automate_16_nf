@@ -31,362 +31,45 @@ ioi_ord <- as.list(ioi_ord)[[ioi]]
 outdir_name <- "Figures"
 if(!dir.exists(paste0("./",outdir_name))) {dir.create(paste0("./",outdir_name))}
 outdir <- paste0("./",outdir_name)
+
+# library(tidyverse)
+# library(reshape2)
+# library(dplyr)
+# library(ggplot2)
 ```
 
-## 7 Rarefaction Curves
+## 8 Ranked Abundance Curves
 
-```{r rarefaction curves, echo=FALSE, fig.height=10, fig.width=16, message=FALSE, warning=FALSE}
-library(tidyverse)
-library(reshape2)
-library(dplyr)
+```{r, echo=FALSE, fig.height=10, fig.width=16, message=FALSE, warning=FALSE}
+library(devtools)
+library(remotes)
+library(ampvis2)
+#b655a307c8431201573096ab57140b46d8733dd7
 library(ggplot2)
-
-numextract <- function(string){
-  str_extract(string, "\\-*\\d+\\.*\\d*")
-}
-
-obs_rarefy <- read.csv("../qiime/alpha-rareplot/observed_features.csv")
-samples <- obs_rarefy[1]
-one <- obs_rarefy[2:11]
-two <- obs_rarefy[12:21]
-three <- obs_rarefy[22:31]
-four <- obs_rarefy[32:41]
-five <- obs_rarefy[42:51]
-six <- obs_rarefy[52:61]
-seven <- obs_rarefy[62:71]
-eight <- obs_rarefy[72:81]
-nine <- obs_rarefy[82:91]
-ten <- obs_rarefy[92:101]
-obs_item_of_interest <- obs_rarefy[[ioi]]
-
-
-
-one_d <- numextract(colnames(obs_rarefy[2:11])[1])
-two_d <- numextract(colnames(obs_rarefy[12:21])[1])
-three_d <- numextract(colnames(obs_rarefy[22:31])[1])
-four_d <- numextract(colnames(obs_rarefy[32:41])[1])
-five_d <- numextract(colnames(obs_rarefy[42:51])[1])
-six_d <- numextract(colnames(obs_rarefy[52:61])[1])
-seven_d <- numextract(colnames(obs_rarefy[62:71])[1])
-eight_d <- numextract(colnames(obs_rarefy[72:81])[1])
-nine_d <- numextract(colnames(obs_rarefy[82:91])[1])
-ten_d <- numextract(colnames(obs_rarefy[92:101])[1])
-
-
-one["sample"] <- samples
-one_flat <- melt(one) %>%
-  rename(depth = variable)
-one_flat["depth"] <- rep(one_d, dim(one_flat)[1])
-
-one_flat_mean <- one_flat %>%
-  group_by(sample) %>%
-  summarise(average=mean(value,na.rm = TRUE)) %>%
-  ungroup()
-
-one_flat_mean["depth"] <- rep(one_d, dim(one_flat_mean)[1])
-
-two["sample"] <- samples
-two_flat <- melt(two) %>%
-  rename(depth = variable)
-two_flat["depth"] <- rep(two_d, dim(two_flat)[1])
-
-two_flat_mean <- two_flat %>%
-  group_by(sample) %>%
-  summarise(average=mean(value,na.rm = TRUE)) %>%
-  ungroup()
-
-two_flat_mean["depth"] <- rep(two_d, dim(two_flat_mean)[1])
-
-three["sample"] <- samples
-three_flat <- melt(three) %>% 
-  rename(depth = variable)
-three_flat["depth"] <- rep(three_d, dim(three_flat)[1])
-
-three_flat_mean <- three_flat %>%
-  group_by(sample) %>%
-  summarise(average=mean(value,na.rm = TRUE)) %>%
-  ungroup()
-
-three_flat_mean["depth"] <- rep(three_d, dim(three_flat_mean)[1])
-
-four["sample"] <- samples
-four_flat <- melt(four) %>%
-  rename(depth = variable)
-four_flat["depth"] <- rep(four_d, dim(four_flat)[1])
-
-four_flat_mean <- four_flat %>%
-  group_by(sample) %>% 
-  summarise(average=mean(value,na.rm = TRUE)) %>%
-  ungroup()
-
-four_flat_mean["depth"] <- rep(four_d, dim(four_flat_mean)[1])
-
-five["sample"] <- samples
-five_flat <- melt(five) %>%
-  rename(depth=variable)
-five_flat["depth"] <- rep(five_d, dim(five_flat)[1])
-
-five_flat_mean <- five_flat %>%
-  group_by(sample) %>%
-  summarise(average=mean(value,na.rm = TRUE)) %>%
-  ungroup()
-
-five_flat_mean["depth"] <- rep(five_d, dim(five_flat_mean)[1])
-
-six["sample"]<-samples
-six_flat <- melt(six)%>%
-  rename(depth=variable)
-six_flat["depth"]<- rep(six_d, dim(six_flat)[1])
-
-six_flat_mean <- six_flat %>%
-  group_by(sample) %>%
-  summarise(average=mean(value,na.rm = TRUE)) %>%
-  ungroup()
-
-six_flat_mean["depth"] <- rep(six_d, dim(six_flat_mean)[1])
-
-seven["sample"] <- samples
-seven_flat <- melt(seven) %>%
-  rename(depth=variable)
-seven_flat["depth"]<-rep(seven_d, dim(seven_flat)[1])
-
-seven_flat_mean <- seven_flat %>%
-  group_by(sample) %>%
-  summarise(average=mean(value,na.rm = TRUE)) %>%
-  ungroup()
-
-seven_flat_mean["depth"] <- rep(seven_d, dim(seven_flat_mean)[1])
-
-eight["sample"] <- samples
-eight_flat <- melt(eight) %>%
-  rename(depth=variable)
-eight_flat["depth"] <- rep(eight_d, dim(eight_flat)[1])
-
-eight_flat_mean <- eight_flat %>%
-  group_by(sample) %>%
-  summarise(average=mean(value,na.rm = TRUE)) %>%
-  ungroup()
-
-eight_flat_mean["depth"] <- rep(eight_d, dim(eight_flat_mean)[1])
-
-nine["sample"] <- samples
-nine_flat <- melt(nine) %>%
-  rename(depth=variable)
-nine_flat["depth"] <- rep(nine_d, dim(nine_flat)[1])
-
-nine_flat_mean <- nine_flat %>%
-  group_by(sample) %>%
-  summarise(average=mean(value,na.rm = TRUE)) %>%
-  ungroup()
-
-nine_flat_mean["depth"] <- rep(nine_d, dim(nine_flat_mean)[1])
-
-ten["sample"] <- samples
-ten_flat <- melt(ten) %>%
-  rename(depth=variable)
-ten_flat["depth"] <- rep(ten_d, dim(ten_flat)[1])
-
-ten_flat_mean <- ten_flat %>%
-  group_by(sample) %>%
-  summarise(average=mean(value,na.rm = TRUE)) %>%
-  ungroup()
-
-ten_flat_mean["depth"] <- rep(ten_d, dim(ten_flat_mean)[1])
-
-
-bound <- rbind(one_flat,two_flat, three_flat, four_flat, five_flat, six_flat, seven_flat, eight_flat, nine_flat, ten_flat)
-bound_mean <- rbind(one_flat_mean, two_flat_mean, three_flat_mean, four_flat_mean, five_flat_mean, six_flat_mean, seven_flat_mean, eight_flat_mean, nine_flat_mean, ten_flat_mean)
-
-
-
-bound$depth <- as.numeric(as.character(bound$depth))
-
-bound <- bound[order(bound$depth),]
-
-rarefy_curve_by_sample <- ggplot(bound, aes(x=depth, y=value, fill=sample, color=sample))+
-  geom_point(data=bound_mean, mapping=aes(x=as.numeric(depth), y=as.numeric(average)),size=3, show.legend=F) + 
-  geom_line(data=bound_mean, mapping= aes(x=as.numeric(depth), y=as.numeric(average), group=sample, show.legend=F), size=1) + 
-  scale_x_binned("Sampling Depth",n.breaks = 12, nice.breaks = TRUE) + theme_bw() +
-  scale_y_continuous("Observed Species") + 
-  theme(text=element_text(size = 20))
-rarefy_curve_by_sample
-
-ggsave("rarefaction_curve_by_sample.png", plot=rarefy_curve_by_sample, , path=outdir)
-
-samples <- obs_rarefy[1]
-one <- obs_rarefy[2:11]
-two <- obs_rarefy[12:21]
-three <- obs_rarefy[22:31]
-four <- obs_rarefy[32:41]
-five <- obs_rarefy[42:51]
-six <- obs_rarefy[52:61]
-seven <- obs_rarefy[62:71]
-eight <- obs_rarefy[72:81]
-nine <- obs_rarefy[82:91]
-ten <- obs_rarefy[92:101]
-obs_item_of_interest <- obs_rarefy[[ioi]]
-
-
-
-one_d <- numextract(colnames(obs_rarefy[2:11])[1])
-two_d <- numextract(colnames(obs_rarefy[12:21])[1])
-three_d <- numextract(colnames(obs_rarefy[22:31])[1])
-four_d <- numextract(colnames(obs_rarefy[32:41])[1])
-five_d <- numextract(colnames(obs_rarefy[42:51])[1])
-six_d <- numextract(colnames(obs_rarefy[52:61])[1])
-seven_d <- numextract(colnames(obs_rarefy[62:71])[1])
-eight_d <- numextract(colnames(obs_rarefy[72:81])[1])
-nine_d <- numextract(colnames(obs_rarefy[82:91])[1])
-ten_d <- numextract(colnames(obs_rarefy[92:101])[1])
-
-fct_ioi <- factor(obs_item_of_interest, levels=ioi_ord)
-one <- cbind(one,fct_ioi)
-one_flat <- melt(one,id.vars = "fct_ioi") %>%
-  rename(depth = variable) %>%
-  rename(ioi = fct_ioi)
-one_flat["depth"] <- rep(one_d, dim(one_flat)[1])
-
-one_flat_mean <- one_flat %>%
-  group_by(ioi) %>%
-  summarise(average=mean(value,na.rm = TRUE)) %>%
-  ungroup()
-
-one_flat_mean["depth"] <- rep(one_d, dim(one_flat_mean)[1])
-
-two <- cbind(two, fct_ioi)
-two_flat <- melt(two, id.vars = "fct_ioi") %>%
-  rename(depth = variable) %>%
-  rename(ioi = fct_ioi)
-two_flat["depth"] <- rep(two_d, dim(two_flat)[1])
-
-two_flat_mean <- two_flat %>%
-  group_by(ioi) %>%
-  summarise(average=mean(value,na.rm = TRUE)) %>%
-  ungroup()
-
-two_flat_mean["depth"] <- rep(two_d, dim(two_flat_mean)[1])
-
-three <- cbind(three, fct_ioi)
-three_flat <- melt(three, id.vars = "fct_ioi") %>% 
-  rename(depth = variable) %>%
-  rename(ioi = fct_ioi)
-three_flat["depth"] <- rep(three_d, dim(three_flat)[1])
-
-three_flat_mean <- three_flat %>%
-  group_by(ioi) %>%
-  summarise(average=mean(value,na.rm = TRUE)) %>%
-  ungroup()
-
-three_flat_mean["depth"] <- rep(three_d, dim(three_flat_mean)[1])
-
-four<- cbind(four, fct_ioi)
-four_flat <- melt(four, id.vars = "fct_ioi") %>%
-  rename(depth = variable) %>%
-  rename(ioi = fct_ioi)
-four_flat["depth"] <- rep(four_d, dim(four_flat)[1])
-
-four_flat_mean <- four_flat %>%
-  group_by(ioi) %>% 
-  summarise(average=mean(value,na.rm = TRUE)) %>%
-  ungroup()
-
-four_flat_mean["depth"] <- rep(four_d, dim(four_flat_mean)[1])
-
-five <- cbind(five, fct_ioi)
-five_flat <- melt(five, id.vars = "fct_ioi") %>%
-  rename(depth=variable) %>%
-  rename(ioi= fct_ioi)
-five_flat["depth"] <- rep(five_d, dim(five_flat)[1])
-
-five_flat_mean <- five_flat %>%
-  group_by(ioi) %>%
-  summarise(average=mean(value,na.rm = TRUE)) %>%
-  ungroup()
-
-five_flat_mean["depth"] <- rep(five_d, dim(five_flat_mean)[1])
-
-six<-cbind(six, fct_ioi)
-six_flat <- melt(six, id.vars = "fct_ioi")%>%
-  rename(depth=variable) %>%
-  rename(ioi = fct_ioi)
-six_flat["depth"]<- rep(six_d, dim(six_flat)[1])
-
-six_flat_mean <- six_flat %>%
-  group_by(ioi) %>%
-  summarise(average=mean(value,na.rm = TRUE)) %>%
-  ungroup()
-
-six_flat_mean["depth"] <- rep(six_d, dim(six_flat_mean)[1])
-
-seven<- cbind(seven, fct_ioi)
-seven_flat <- melt(seven,id.vars = "fct_ioi") %>%
-  rename(depth=variable) %>%
-  rename(ioi = fct_ioi)
-seven_flat["depth"]<-rep(seven_d, dim(seven_flat)[1])
-
-seven_flat_mean <- seven_flat %>%
-  group_by(ioi) %>%
-  summarise(average=mean(value,na.rm = TRUE)) %>%
-  ungroup()
-
-seven_flat_mean["depth"] <- rep(seven_d, dim(seven_flat_mean)[1])
-
-eight<- cbind(eight, fct_ioi)
-eight_flat <- melt(eight,id.vars = "fct_ioi") %>%
-  rename(depth=variable) %>%
-  rename(ioi = fct_ioi)
-eight_flat["depth"] <- rep(eight_d, dim(eight_flat)[1])
-
-eight_flat_mean <- eight_flat %>%
-  group_by(ioi) %>%
-  summarise(average=mean(value,na.rm = TRUE)) %>%
-  ungroup()
-
-eight_flat_mean["depth"] <- rep(eight_d, dim(eight_flat_mean)[1])
-
-nine <- cbind(nine, fct_ioi)
-nine_flat <- melt(nine,id.vars = "fct_ioi") %>%
-  rename(depth=variable) %>%
-  rename(ioi = fct_ioi)
-nine_flat["depth"] <- rep(nine_d, dim(nine_flat)[1])
-
-nine_flat_mean <- nine_flat %>%
-  group_by(ioi) %>%
-  summarise(average=mean(value,na.rm = TRUE)) %>%
-  ungroup()
-
-nine_flat_mean["depth"] <- rep(nine_d, dim(nine_flat_mean)[1])
-
-ten <- cbind(ten,fct_ioi)
-ten_flat <- melt(ten, id.vars = "fct_ioi") %>%
-  rename(depth=variable) %>%
-  rename(ioi = fct_ioi)
-ten_flat["depth"] <- rep(ten_d, dim(ten_flat)[1])
-
-ten_flat_mean <- ten_flat %>%
-  group_by(ioi) %>%
-  summarise(average=mean(value,na.rm = TRUE)) %>%
-  ungroup()
-
-ten_flat_mean["depth"] <- rep(ten_d, dim(ten_flat_mean)[1])
-
-
-bound <- rbind(one_flat,two_flat, three_flat, four_flat, five_flat, six_flat, seven_flat, eight_flat, nine_flat, ten_flat)
-bound_mean <- rbind(one_flat_mean, two_flat_mean, three_flat_mean, four_flat_mean, five_flat_mean, six_flat_mean, seven_flat_mean, eight_flat_mean, nine_flat_mean, ten_flat_mean)
-
-bound$depth <- as.numeric(as.character(bound$depth))
-
-bound <- bound[order(bound$depth),]
-
-
-rarefy_curve_by_treatment <- ggplot(bound, aes(x=depth, y=value, color=fct_relevel(fct_reorder(ioi, as.numeric(ioi)))))+
-  geom_point(data=bound_mean, mapping=aes(x=as.numeric(depth), y=as.numeric(average)),size=3) + 
-  geom_line(data=bound_mean, mapping= aes(x=as.numeric(depth), y=as.numeric(average), group=ioi), size=1) + 
-  scale_x_binned("Sampling Depth",n.breaks = 12, nice.breaks = TRUE) + theme_bw() +
-  scale_y_continuous("Observed Species") + 
-  theme(text=element_text(size = 20)) + 
-  scale_color_discrete(name = ioi)
-
-rarefy_curve_by_treatment
-ggsave("rarefaction_curve_by_treatment.png", plot=rarefy_curve_by_treatment, path=outdir)
+library(qiime2R)
+#d1ad96657ada993cf6c2841b29113a4f635c6b56
+library(phyloseq)
+library(tidyverse)
+#@1.3.1
+
+#table_dada2 <- "./qiime/table-dada2.qza"
+table_dada2 <- "../qiime/core-metric-results/rarefied_table.qza"
+rooted_tree <- "../qiime/rooted-tree.qza"
+taxonomy_file <- "../qiime/taxonomy.qza"
+metadata_file <- "../metadata.tsv"
+
+devtools::source_gist("8d0ca4206a66be7ff6d76fc4ab8e66c6")
+
+cycle_1 <- qza_to_phyloseq(table_dada2,rooted_tree,taxonomy_file,metadata_file) 
+cycle_1_amp <- phyloseq_to_ampvis2(cycle_1)
+
+by_sample <- ampvis2::amp_rankabundance(cycle_1_amp, group_by = "SampleID") + theme(text=element_text(size = 20))
+by_sample 
+ggsave("rank_abundance_curve_by_sample.png", plot=by_sample, path=outdir)
+
+cycle_1_amp$metadata[[ioi]] <- factor(cycle_1_amp$metadata[[ioi]], levels=ioi_ord)
+
+by_group <- ampvis2::amp_rankabundance(cycle_1_amp, group_by = ioi) + theme(text=element_text(size = 20))
+by_group
+ggsave("rank_abundance_curve_by_treatemnt.png", plot=by_group, path=outdir)
 ```
