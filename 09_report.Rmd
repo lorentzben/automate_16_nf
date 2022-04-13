@@ -1,0 +1,61 @@
+---
+title: "05 16s Analysis Report"
+output:
+  pdf_document:
+    
+    
+    df_print: kable
+  html_document:
+    df_print: kable
+    smart: false
+---
+
+```{r init renv, message=FALSE, warning=FALSE, include=FALSE}
+library(renv)
+#renv::isolate()
+#renv::settings$snapshot.type("all")
+renv::restore()
+```
+
+```{r parse item of interest and make outdir for figures, echo=FALSE, message=FALSE, warning=FALSE}
+#this may be required for each file
+#item of interest, comes from bash and python script that orchestrates everything
+wd <- getwd()
+ioi <- read.csv("../item_of_interest.csv")
+ioi<-as.character(ioi)
+
+ioi_ord <- read.csv("../order_item_of_interest.csv")
+colnames(ioi_ord) <- ioi
+ioi_ord <- as.list(ioi_ord)[[ioi]]
+
+outdir_name <- "Figures"
+if(!dir.exists(paste0("./",outdir_name))) {dir.create(paste0("./",outdir_name))}
+outdir <- paste0("./",outdir_name)
+```
+
+## 9 Unifrac Heatmap 
+
+```{r echo=FALSE,fig.height=8, fig.width=14, message=FALSE, warning=FALSE}
+library(qiime2R)
+library(pheatmap)
+library(ggplot2)
+
+metadata<-read_q2metadata(metadata_file)
+#metadata[[ioi]] <- fct_reorder(metadata[[ioi]])
+w_unifrac_dist <- qiime2R::read_qza("../qiime/core-metric-results/weighted_unifrac_distance_matrix.qza")
+u_unifrac_dist <- qiime2R::read_qza("../qiime/core-metric-results/unweighted_unifrac_distance_matrix.qza")
+
+un_weight_matrix <- as.matrix(u_unifrac_dist$data)
+un_weight_matrix[lower.tri(un_weight_matrix)] <- NA
+un_weight_heatmap <- pheatmap(un_weight_matrix, cluster_rows = F, cluster_cols = F, na_col = "grey", display_numbers = T, number_format ="%.3f",main = "Beta Diversity Heatmap using Unweighted Unifrac Distance")
+un_weight_heatmap
+
+ggsave("beta_div_heatmap_unweight_unifrac.png", plot=un_weight_heatmap, path=outdir)
+
+weight_matrix <- as.matrix(w_unifrac_dist$data)
+weight_matrix[lower.tri(weight_matrix)] <- NA
+weight_heatmap <- pheatmap(weight_matrix, cluster_rows = F, cluster_cols = F, na_col = "grey", display_numbers = T, number_format ="%.3f",main = "Beta Diversity Heatmap using Weighted Unifrac Distance")
+weight_heatmap
+
+ggsave("beta_div_heatmap_Weighted_unifrac.png", plot=weight_heatmap, path=outdir)
+```
