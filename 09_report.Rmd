@@ -39,6 +39,9 @@ outdir <- paste0("./",outdir_name)
 library(qiime2R)
 library(pheatmap)
 library(ggplot2)
+library(BiocManager)
+
+metadata_file <- "../metadata.tsv"
 
 metadata<-read_q2metadata(metadata_file)
 #metadata[[ioi]] <- fct_reorder(metadata[[ioi]])
