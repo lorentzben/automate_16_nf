@@ -1,0 +1,242 @@
+---
+title: "05 16s Analysis Report"
+output:
+  pdf_document:
+    
+    
+    df_print: kable
+  html_document:
+    df_print: kable
+    smart: false
+---
+
+```{r init renv, message=FALSE, warning=FALSE, include=FALSE}
+library(renv)
+#renv::isolate()
+#renv::settings$snapshot.type("all")
+renv::restore()
+```
+
+```{r parse item of interest and make outdir for figures, echo=FALSE, message=FALSE, warning=FALSE}
+#this may be required for each file
+#item of interest, comes from bash and python script that orchestrates everything
+wd <- getwd()
+ioi <- read.csv("../item_of_interest.csv")
+ioi<-as.character(ioi)
+
+ioi_ord <- read.csv("../order_item_of_interest.csv")
+colnames(ioi_ord) <- ioi
+ioi_ord <- as.list(ioi_ord)[[ioi]]
+
+outdir_name <- "Figures"
+if(!dir.exists(paste0("./",outdir_name))) {dir.create(paste0("./",outdir_name))}
+outdir <- paste0("./",outdir_name)
+```
+
+## 11 UPGMA Plots
+### 11.1 UPGMA Plot for Weighted Unifrac Distance
+
+```{r UPGMA Plot of Weighted Unifrac Distance, echo=FALSE, fig.height=8, fig.width=10, message=FALSE, warning=FALSE}
+library(ggplot2)
+library(ggdendro)
+library(qiime2R)
+#d1ad96657ada993cf6c2841b29113a4f635c6b56
+library(phyloseq)
+library(stats)
+library(tidyverse)
+library(ggpubr)
+
+#table_dada2 <- "./qiime/table-dada2.qza"
+table_dada2 <- "../qiime/core-metric-results/rarefied_table.qza"
+rooted_tree <- "../qiime/rooted-tree.qza"
+taxonomy_file <- "../qiime/taxonomy.qza"
+metadata_file <- "../metadata.tsv"
+
+cycle_1 <- qza_to_phyloseq(table_dada2,rooted_tree,taxonomy_file,metadata_file)
+w_unifrac <- UniFrac(cycle_1,weighted=TRUE)
+
+
+hclust_res <- hclust(w_unifrac, method="average")
+
+hclust_dend <- as.dendrogram(hclust_res)
+ddata <- dendro_data(hclust_dend, type="rectangle")
+p <- ggplot(segment(ddata)) +
+  geom_segment(aes(x=x,y=y, xend=xend, yend=yend)) +
+  coord_flip() +
+  scale_y_reverse(expand=c(0.2,0)) + 
+  geom_text(data=ddata$labels,aes(x=x,y=y,label=label, hjust=0)) + 
+  theme(text=element_text(size = 12, face = "plain")) +
+  theme_minimal() + 
+  theme(axis.title.y = element_blank(), 
+        axis.text.y = element_blank(),
+        axis.ticks.y = element_blank(),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank()) +
+  ylab("Weighted Unifrac Distance") 
+  
+#sample_data(cycle_1)[[ioi]] <- reorder(sample_data(cycle_1)[[ioi]])
+
+level <- "Phylum"
+#Select number of taxa at phylum level to plot
+topN <- 10
+
+#selects top n taxa and creates phyloseq object
+cycle_n_names <- sort(tapply(taxa_sums(cycle_1), tax_table(cycle_1)[,as.character(level)], sum), TRUE) [1:topN]
+cycle_n <- subset_taxa(cycle_1, get(level) %in% names(cycle_n_names))
+cycle_n_glom <- tax_glom(cycle_n, taxrank = level)
+
+#selects top n + 1 to the end of table
+rest_tax <- sort(tapply(taxa_sums(cycle_1), tax_table(cycle_1)[,as.character(level)], sum), TRUE) [topN+1:length(tax_table(cycle_1))]
+rest <- subset_taxa(cycle_1, get(level) %in% names(rest_tax))
+rest_glom <- tax_glom(rest, taxrank = level)
+
+#collapse all phyla not in top 10 into one taxon
+rest_merge <- merge_taxa(rest, taxa_names(rest))
+
+#create dummy taxonomy classification for collapsed taxa
+taxvec <- c("Other","Other","Other","Other","Other", "Other","Other")
+taxlist <- list(OTU1=parse_taxonomy_default(taxvec))
+tax_tab <- build_tax_table(taxlist)
+colnames(tax_tab) <- c("Kingdom","Phylum","Class","Order","Family","Genus","Species")
+rownames(tax_tab) <- rownames(tax_table(rest_merge))
+tax_table(rest_merge) <- tax_tab
+
+#attaches top n phyloseq object with the other phyloseq object
+merge_tax <- merge_phyloseq(tax_table(cycle_n), tax_table(rest_merge))
+merge_otu <- merge_phyloseq(otu_table(cycle_n), otu_table(rest_merge))
+merge_samp <- merge_phyloseq(sample_data(cycle_n), sample_data(rest_merge))
+
+merged <- merge_phyloseq(merge_tax, merge_otu, merge_samp)
+
+#calculates relative abundance based on sample provided and turns that into a dataframe for ggplot2 plotting
+cycle_1_phylum <- merged %>%
+  tax_glom(taxrank = level) %>%
+  transform_sample_counts(function(x) {x/sum(x)}) %>%
+  psmelt() %>%
+  arrange(Abundance) 
+
+cycle_1_phylum$Sample <- as.character(cycle_1_phylum$Sample)
+cycle_1_phylum$Sample <- factor(cycle_1_phylum$Sample, levels=ddata$labels$label)
+
+
+#ggplot2 stacked bar chart separated by sample in the metadata from qiime2
+by_sample <- ggplot(cycle_1_phylum, aes(x=Sample, y=Abundance, fill=fct_relevel(fct_reorder(cycle_1_phylum[[level]], Abundance),"Other"))) + 
+  geom_bar(stat= "identity") +
+  guides(fill=guide_legend(title=level))+
+  theme_minimal() +
+  xlab(element_blank())+
+  theme(axis.text.x = element_text(vjust=0.5, hjust=1))+
+  coord_flip() +
+  theme(text=element_text(size = 12,face = "plain"),axis.title.y = element_text(color="Black"), axis.text.y = element_text(color="Black")) + 
+  ylab("Relative Abundance at Phylum Level")
+  
+
+
+arr <- ggarrange(p, by_sample, nrow=1)
+weight_plot <- annotate_figure(arr,  top="UPGMA cluster tree based on Weighted Unifrac distance")
+weight_plot
+
+ggsave("UPGMA_weighted_unifrac_plot.png", plot=weight_plot, path=outdir)
+```
+
+
+
+
+### 11.2 UPGMA Plot for Unweighted Unifrac Distance
+
+```{r UPGMA Plot of Unweighted Unifrac Distances, echo=FALSE, fig.height=8, fig.width=10, message=FALSE, warning=FALSE}
+library(ggplot2)
+library(ggdendro)
+library(qiime2R)
+#d1ad96657ada993cf6c2841b29113a4f635c6b56
+library(phyloseq)
+library(stats)
+library(tidyverse)
+library(ggpubr)
+
+cycle_1 <- qza_to_phyloseq(table_dada2,rooted_tree,taxonomy_file,metadata_file)
+u_unifrac <- UniFrac(cycle_1, weighted = FALSE)
+
+
+hclust_res <- hclust(u_unifrac, method="average")
+
+hclust_dend <- as.dendrogram(hclust_res)
+ddata <- dendro_data(hclust_dend, type="rectangle")
+p <- ggplot(segment(ddata)) +
+  geom_segment(aes(x=x,y=y, xend=xend, yend=yend)) +
+  coord_flip() +
+  scale_y_reverse(expand=c(0.2,0)) + 
+  geom_text(data=ddata$labels,aes(x=x,y=y,label=label, hjust=0)) + 
+  theme(text=element_text(size = 12, face = "plain")) +
+  theme_minimal() + 
+  theme(axis.title.y = element_blank(), 
+        axis.text.y = element_blank(),
+        axis.ticks.y = element_blank(),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank()) +
+  ylab("Unweighted Unifrac Distance") 
+  
+#sample_data(cycle_1)[[ioi]] <- reorder(sample_data(cycle_1)[[ioi]])
+
+level <- "Phylum"
+#Select number of taxa at phylum level to plot
+topN <- 10
+
+#selects top n taxa and creates phyloseq object
+cycle_n_names <- sort(tapply(taxa_sums(cycle_1), tax_table(cycle_1)[,as.character(level)], sum), TRUE) [1:topN]
+cycle_n <- subset_taxa(cycle_1, get(level) %in% names(cycle_n_names))
+cycle_n_glom <- tax_glom(cycle_n, taxrank = level)
+
+#selects top n + 1 to the end of table
+rest_tax <- sort(tapply(taxa_sums(cycle_1), tax_table(cycle_1)[,as.character(level)], sum), TRUE) [topN+1:length(tax_table(cycle_1))]
+rest <- subset_taxa(cycle_1, get(level) %in% names(rest_tax))
+rest_glom <- tax_glom(rest, taxrank = level)
+
+#collapse all phyla not in top 10 into one taxon
+rest_merge <- merge_taxa(rest, taxa_names(rest))
+
+#create dummy taxonomy classification for collapsed taxa
+taxvec <- c("Other","Other","Other","Other","Other", "Other","Other")
+taxlist <- list(OTU1=parse_taxonomy_default(taxvec))
+tax_tab <- build_tax_table(taxlist)
+colnames(tax_tab) <- c("Kingdom","Phylum","Class","Order","Family","Genus","Species")
+rownames(tax_tab) <- rownames(tax_table(rest_merge))
+tax_table(rest_merge) <- tax_tab
+
+#attaches top n phyloseq object with the other phyloseq object
+merge_tax <- merge_phyloseq(tax_table(cycle_n), tax_table(rest_merge))
+merge_otu <- merge_phyloseq(otu_table(cycle_n), otu_table(rest_merge))
+merge_samp <- merge_phyloseq(sample_data(cycle_n), sample_data(rest_merge))
+
+merged <- merge_phyloseq(merge_tax, merge_otu, merge_samp)
+
+#calculates relative abundance based on sample provided and turns that into a dataframe for ggplot2 plotting
+cycle_1_phylum <- merged %>%
+  tax_glom(taxrank = level) %>%
+  transform_sample_counts(function(x) {x/sum(x)}) %>%
+  psmelt() %>%
+  arrange(Abundance) 
+
+cycle_1_phylum$Sample <- as.character(cycle_1_phylum$Sample)
+cycle_1_phylum$Sample <- factor(cycle_1_phylum$Sample, levels=ddata$labels$label)
+
+#ggplot2 stacked bar chart separated by sample in the metadata from qiime2
+by_sample <- ggplot(cycle_1_phylum, aes(x=Sample, y=Abundance, fill=fct_relevel(fct_reorder(cycle_1_phylum[[level]], Abundance),"Other"))) + 
+  geom_bar(stat= "identity") +
+  guides(fill=guide_legend(title=level))+
+  theme_minimal() +
+  xlab(element_blank())+
+  theme(axis.text.x = element_text(vjust=0.5, hjust=1))+
+  coord_flip() +
+  theme(text=element_text(size = 12, face = "plain"),axis.title.x = element_text(color="Black"), axis.text.y = element_text(color="Black")) + 
+  ylab("Relative Abundance at Phylum Level")
+  
+
+
+arr <- ggarrange(p, by_sample, nrow=1)
+unweight_plot <- annotate_figure(arr,  top="UPGMA cluster tree based on Unweighted Unifrac distance")
+unweight_plot
+
+ggsave("UPGMA_unweighted_unifrac_plot.png", plot=unweight_plot, path=outdir)
+
+```
