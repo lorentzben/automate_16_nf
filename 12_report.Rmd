@@ -1,0 +1,690 @@
+---
+title: "05 16s Analysis Report"
+output:
+  pdf_document:
+    
+    
+    df_print: kable
+  html_document:
+    df_print: kable
+    smart: false
+---
+
+```{r init renv, message=FALSE, warning=FALSE, include=FALSE}
+library(renv)
+#renv::isolate()
+#renv::settings$snapshot.type("all")
+renv::restore()
+```
+
+```{r parse item of interest and make outdir for figures, echo=FALSE, message=FALSE, warning=FALSE}
+#this may be required for each file
+#item of interest, comes from bash and python script that orchestrates everything
+wd <- getwd()
+ioi <- read.csv("../item_of_interest.csv")
+ioi<-as.character(ioi)
+
+ioi_ord <- read.csv("../order_item_of_interest.csv")
+colnames(ioi_ord) <- ioi
+ioi_ord <- as.list(ioi_ord)[[ioi]]
+
+outdir_name <- "Figures"
+if(!dir.exists(paste0("./",outdir_name))) {dir.create(paste0("./",outdir_name))}
+outdir <- paste0("./",outdir_name)
+
+# #library(devtools)
+# #llibrary(remotes)
+# #install.packages("BiocManager")
+# #BiocManager::install(version="3.13")
+# library(ampvis2)
+# #b655a307c8431201573096ab57140b46d8733dd7
+# library(ggplot2)
+# library(qiime2R)
+# #d1ad96657ada993cf6c2841b29113a4f635c6b56
+# library(phyloseq)
+# library(tidyverse)
+# #@1.3.1
+```
+
+## 12 Beta Diversity Statistics
+
+### 12.1 PERMANOVA Weighted Unifrac
+
+```{r Methods to do pairwise PERMANOVA comparisons, message=FALSE, warning=FALSE, include=FALSE}
+library(PERMANOVA)
+library(tidyverse)
+library(rstatix)
+library(gtools)
+library(phyloseq)
+
+pairwise_permanova <- function(dat, column_of_int, dissim){
+  all_comparisons <- unique(sample_data(dat)[[column_of_int]])
+  combos <- (t(combn(all_comparisons,2)))
+  p_res <- c()
+  
+  for(i in 1:dim(combos)[1]){
+    comp <- prune_samples(sample_data(dat)[[ioi]] %in% combos[i,], dat)
+    grp <- get_variable(comp, column_of_int)
+  
+    perma <- PERMANOVA::PerMANOVA.Simple(D = as.matrix(distance(comp, dissim)) , grupo = grp)
+    permanova <- tibble::tibble(data.frame(perma$Inicial))
+    permanova_stats <- data.frame(as.character(combos[i,1]), as.character(combos[i,2]), permanova[1,], perma$pval)
+    colnames(permanova_stats)[1] <- "group1"
+    colnames(permanova_stats)[2] <- "group2"
+    colnames(permanova_stats)[10] <- "p"
+    data.frame(permanova_stats)
+    p_res <- rbind(p_res, permanova_stats)
+  
+  }
+  tmp_2 <- data.frame(p_res)
+  #colnames(tmp_2)<- c("group1","group2", "statistic", "permutations", "p")
+  result <- adjust_pvalue(tmp_2, p.col = "p", output.col = "p.adj",method = "BH")
+  result <- add_significance(result, p.col="p.adj",output.col = "p.signif",symbols =c("****", "***", "**", "$*$", "ns"))
+  res_df <- data.frame(result)
+  res_df <- res_df[mixedorder(res_df$group1),]
+  return(res_df)
+  
+}
+
+#out <- pairwise_anosim(cycle_1, ioi , dissim = "bray")
+#out
+```
+
+
+```{r Methods to do pairwise Unifrac PERMANOVA comparisons, message=FALSE, warning=FALSE, include=FALSE}
+library(PERMANOVA)
+library(tidyverse)
+library(rstatix)
+library(gtools)
+library(phyloseq)
+
+pairwise_permanova_uni <- function(dat, column_of_int, weight){
+  all_comparisons <- unique(sample_data(dat)[[column_of_int]])
+  
+  comb_tab <- (t(combn(all_comparisons,2)))
+  
+  p_res <- c()
+
+
+  for(i in 1:dim(comb_tab)[1]){
+    try <- sample_data(dat)[[ioi]]
+    #comp1 <- subset_samples(dat, eval(as.name(ioi)) %in% comb_tab[i,])
+    comp <- prune_samples(sample_data(dat)[[ioi]] %in% comb_tab[i,], dat)
+    grp <- get_variable(comp, column_of_int)
+  
+    tmp <- UniFrac(comp, weighted = weight)
+    perma <- PERMANOVA::PerMANOVA.Simple(D = as.matrix(tmp), grupo = grp)
+    permanova <- tibble::tibble(data.frame(perma$Inicial))
+    permanova_stats <- data.frame(as.character(comb_tab[i,1]), as.character(comb_tab[i,2]), permanova[1,], perma$pval)
+    colnames(permanova_stats)[1] <- "group1"
+    colnames(permanova_stats)[2] <- "group2"
+    colnames(permanova_stats)[10] <- "p"
+    data.frame(permanova_stats)
+    p_res <- rbind(p_res, permanova_stats)
+  
+  }
+  tmp_2 <- data.frame(p_res)
+  #colnames(tmp_2)<- c("group1","group2", "statistic", "permutations", "p")
+  result <- adjust_pvalue(tmp_2, p.col = "p", output.col = "p.adj",method = "BH")
+  result <- add_significance(result, p.col="p.adj",output.col = "p.signif",symbols =c("****", "***", "**", "$*$", "ns"))
+  res_df <- data.frame(result)
+  res_df <- res_df[mixedorder(res_df$group1),]
+  return(res_df)
+  
+}
+
+```
+
+
+```{r Weighted Unifrac PERMANOVA, message=FALSE, warning=FALSE, include=FALSE, results='markup'}
+library(qiime2R)
+#d1ad96657ada993cf6c2841b29113a4f635c6b56
+library(PERMANOVA)
+library(tidyverse)
+
+table_dada2 <- "../qiime/core-metric-results/rarefied_table.qza"
+rooted_tree <- "../qiime/rooted-tree.qza"
+taxonomy_file <- "../qiime/taxonomy.qza"
+metadata_file <- "../metadata.tsv"
+
+cycle_1 <- qza_to_phyloseq(table_dada2,rooted_tree,taxonomy_file,metadata_file)
+sample_data(cycle_1)[[ioi]] <- factor(sample_data(cycle_1)[[ioi]], levels=ioi_ord)
+
+# PERMANOVA of Weighted Unifrac
+u_unifrac <- UniFrac(cycle_1, weighted = T,)
+
+res <- PERMANOVA::PerMANOVA.Simple(D = as.matrix(u_unifrac), grupo = cycle_1@sam_data[[ioi]])
+
+perma_res <- data.frame(data.frame(res$Inicial),res$pval)
+
+# Pairwise PERMANOVA of Weighted Unifrac
+test <- pairwise_permanova_uni(cycle_1, ioi, T)
+
+perma_pairwise <- kable(test) %>% 
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
+
+
+```
+
+
+```{r print weighted unifrac PERMANOVA, echo=FALSE, message=FALSE, warning=FALSE}
+library(kableExtra)
+library(tidyverse)
+kable(perma_res) %>%
+  kable_styling(bootstrap_options = c( "hover", "condensed", "responsive"))
+  
+
+perma_pairwise
+
+```
+
+### 12.2 PERMANOVA Unweighted Unifrac 
+
+```{r Permanova results Weighted Unifrac from qiime, message=FALSE, warning=FALSE, include=FALSE}
+library(qiime2R)
+library(phyloseq)
+library(tidyverse)
+
+cycle_1 <- qza_to_phyloseq(table_dada2,rooted_tree,taxonomy_file,metadata_file)
+sample_data(cycle_1)[[ioi]] <- factor(sample_data(cycle_1)[[ioi]], levels=ioi_ord)
+# PERMANOVA of Unweighted Unifrac
+u_unifrac <- UniFrac(cycle_1, weighted = F)
+grp <- get_variable(cycle_1, ioi)
+
+res <- PERMANOVA::PerMANOVA.Simple(D = as.matrix(u_unifrac), grupo = cycle_1@sam_data[[ioi]])
+
+perma_res <- data.frame(data.frame(res$Inicial),res$pval)
+
+# Pairwise PERMANOVA of Unweighted Unifrac
+test <- pairwise_permanova_uni(cycle_1, ioi, F)
+perma_pairwise <- kable(test) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
+```
+
+```{r print unweighted unifrac PERMANOVA, echo=FALSE, message=FALSE, warning=FALSE}
+library(kableExtra)
+library(tidyverse)
+kable(perma_res) %>%
+  kable_styling(bootstrap_options = c( "hover", "condensed", "responsive"))
+
+perma_pairwise
+
+```
+
+
+
+### 12.3 PERMANOVA Bray Curtis
+
+```{r Bray Curtis PERMANOVA, message=FALSE, warning=FALSE, include=FALSE}
+library(qiime2R)
+library(PERMANOVA)
+library(kableExtra)
+library(tidyverse)
+cycle_1 <- qza_to_phyloseq(table_dada2,rooted_tree,taxonomy_file,metadata_file)
+sample_data(cycle_1)[[ioi]] <- factor(sample_data(cycle_1)[[ioi]], levels=ioi_ord)
+#PERMANOVA Bray Curtis
+grp <- get_variable(cycle_1, ioi)
+
+res <- PERMANOVA::PerMANOVA.Simple(D = as.matrix(distance(cycle_1, 'bray',)) , grupo = cycle_1@sam_data[[ioi]])
+perma_res <- data.frame(data.frame(res$Inicial),res$pval)
+
+#PERMANOVA Bray Curtis Pairwise
+bray_pairwise <- pairwise_permanova(cycle_1,ioi,"bray")
+pairwise_perma <- kable(bray_pairwise) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
+```
+
+```{r print bray PERMANOVA, echo=FALSE, message=FALSE, warning=FALSE}
+library(kableExtra)
+library(tidyverse)
+kable(perma_res) %>%
+  kable_styling(bootstrap_options = c( "hover", "condensed", "responsive"))
+
+pairwise_perma
+
+```
+
+
+### 12.4 PERMANOVA Jaccard 
+
+```{r Jaccard PERMANOVA, message=FALSE, warning=FALSE, include=FALSE}
+library(qiime2R)
+library(PERMANOVA)
+library(kableExtra)
+library(tidyverse)
+cycle_1 <- qza_to_phyloseq(table_dada2,rooted_tree,taxonomy_file,metadata_file)
+sample_data(cycle_1)[[ioi]] <- factor(sample_data(cycle_1)[[ioi]], levels=ioi_ord)
+# PERMANOVA Jaccard distance
+grp <- get_variable(cycle_1, ioi)
+
+res <- PERMANOVA::PerMANOVA.Simple(D = as.matrix(distance(cycle_1, 'jaccard',)) , grupo = cycle_1@sam_data[[ioi]])
+perma_res <- data.frame(data.frame(res$Inicial),res$pval)
+# PERMANOVA Pairwise Jaccard 
+jaccard_pairwise <- pairwise_permanova(cycle_1, ioi, "jaccard")
+pairwise_perma <- kable(jaccard_pairwise) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
+
+```
+
+```{r print jaccard PERMANOVA, echo=FALSE, message=FALSE, warning=FALSE}
+library(kableExtra)
+library(tidyverse)
+kable(perma_res) %>%
+  kable_styling(bootstrap_options = c( "hover", "condensed", "responsive"))
+
+pairwise_perma
+
+
+```
+
+
+
+### 12.5 ANOSIM
+
+```{r Method to do pairwise anosim comparisons, echo=FALSE, message=FALSE, warning=FALSE, include=FALSE, eval=FALSE}
+library(rstatix)
+library(ggpubr)
+library(phyloseq)
+library(vegan)
+
+pairwise_anosim <- function(dat, column_of_int, dissim){
+  all_comparisons <- unique(sample_data(dat)[[column_of_int]])
+  combos <- (t(combn(all_comparisons,2)))
+  p_res <- c()
+  
+  for(i in 1:dim(combos)[1]){
+    comp <- prune_samples(sample_data(dat)[[ioi]] %in% combos[i,], dat)
+    grp <- get_variable(comp, column_of_int)
+  
+    ano <- anosim(distance(comp, dissim), grp)
+    ano_stats <- c(as.character(combos[i,1]), as.character(combos[i,2]), round(ano$statistic,6), ano$permutations, ano$dissimilarity, round(ano$signif,3))
+    #tmp <- c(ano, as.character(item))
+    p_res <- rbind(p_res, ano_stats)
+  
+  }
+  tmp_2 <- data.frame(p_res)
+  colnames(tmp_2)<- c("group1", "group2", "statistic", "permutations", "dissimilarity", "p.val")
+  result <- adjust_pvalue(tmp_2, p.col = "p.val", output.col = "p.adjust",method = "BH")
+  result <- add_significance(result, p.col = "p.adjust", output.col = "p.signif",symbols =c('****', '***', '**', '$*$', 'ns'))
+  result <- add_significance(result, p.col="p.adjust",output.col = "p.signif.box",symbols =c('****', '***', '**', '*', 'ns'))
+  res_df <- data.frame(result)
+  res_df <- res_df[mixedorder(res_df$group1),]
+  return(res_df)
+  
+}
+
+#out <- pairwise_anosim(cycle_1, ioi , dissim = "bray")
+#out
+
+pairwise_anosim_uni <- function(dat, column_of_int, weight){
+  all_comparisons <- unique(sample_data(dat)[[column_of_int]])
+  combos <- (t(combn(all_comparisons,2)))
+  p_res <- c()
+  
+  for(i in 1:dim(combos)[1]){
+    comp <- prune_samples(sample_data(dat)[[ioi]] %in% combos[i,], dat)
+    grp <- get_variable(comp, column_of_int)
+  
+    tmp <- UniFrac(comp, weighted = weight)
+    ano <- anosim(tmp, sample_data(comp)[[ioi]])
+    ano_stats <- c(as.character(combos[i,1]), as.character(combos[i,2]), round(ano$statistic,6), ano$permutations, ano$dissimilarity, round(ano$signif,3))
+    #tmp <- c(ano, as.character(item))
+    p_res <- rbind(p_res, ano_stats)
+  
+  }
+  tmp_2 <- data.frame(p_res)
+  colnames(tmp_2)<- c("group1","group2", "statistic", "permutations", "p")
+  result <- adjust_pvalue(tmp_2, p.col = "p", output.col = "p.adj",method = "BH")
+  result <- add_significance(result, p.col="p.adj",output.col = "p.signif",symbols =c('****', '***', '**', '$*$', 'ns'))
+  result <- add_significance(result, p.col="p.adj",output.col = "p.signif.box",symbols =c('****', '***', '**', '*', 'ns'))
+  res_df <- data.frame(result)
+  res_df <- res_df[mixedorder(res_df$group1),]
+  return(res_df)
+  
+}
+
+```
+
+
+```{r echo=FALSE, fig.height=8, fig.width=10, message=FALSE, warning=FALSE, include=FALSE,eval=FALSE}
+library(rstatix)
+library(ggpubr)
+cycle_1 <- qza_to_phyloseq(table_dada2,rooted_tree,taxonomy_file,metadata_file)
+sample_data(cycle_1)[[ioi]] <- factor(sample_data(cycle_1)[[ioi]], levels=ioi_ord)
+
+#Weighted Unifrac Anosim
+tmp <- UniFrac(cycle_1, weighted=T)
+res <- anosim(tmp, sample_data(cycle_1)[[ioi]])
+res
+
+
+#Weighted Unifrac Anosim Pairwise
+w_uni_pear <- pairwise_anosim_uni(cycle_1, ioi, T) 
+w_uni_pear %>%
+  dplyr::select(group1,group2,statistic,permutations,p,p.adj,p.signif) %>%
+  kable() %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
+
+#Weighted Unifrac ANOSIM Plot
+#w_uni_plot <- autoplot(res, notch=F) + theme_bw()+labs(title = "ANOSIM Weighted Unifrac") + xlab(ioi) + ylab("Rank Value")  + stat_pvalue_manual(w_uni_pear, label = "p.signif.box", y.position = max(res$dis.rank)-(.5*median(res$dis.rank)),step.increase = .03, tip.length = 0.01, guide="none", hide.ns=T) 
+#w_uni_plot
+#Save image to disk
+#ggsave("ANOSIM_weighted_unifrac_boxplot.png", plot = w_uni_plot,path = outdir)
+
+#Weighted Unifrac ANOSIM Plot No Bracket
+w_uni_plot_no_brac <- autoplot(res, notch=F) + theme_bw()+ aes(fill=res$class.vec) +labs(title = "ANOSIM Weighted Unifrac", fill=ioi)+ xlab(as.character(ioi)) + ylab("Rank Value")
+w_uni_plot_no_brac
+#Save image to disk
+ggsave("ANOSIM_weighted_unifrac_boxplot_no_signif.png", plot = w_uni_plot_no_brac,path = outdir)
+
+#Unweighted Unifrac
+tmp <- UniFrac(cycle_1, weighted = F)
+res <- anosim(tmp, sample_data(cycle_1)[[ioi]])
+res
+#Unweighted Unifrac Anosim Pairwise
+uw_uni_pair <- pairwise_anosim_uni(cycle_1, ioi, T)
+
+uw_uni_pair %>%
+  dplyr::select(group1,group2,statistic,permutations,p,p.adj,p.signif) %>%
+  kable() %>% 
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
+
+#Unweighted Unifrac ANOSIM plot
+#uw_uni_plot <- autoplot(res,notch = F) +theme_bw() + labs(title = "ANOSIM Unweighted Unifrac") +
+  stat_pvalue_manual(uw_uni_pair, label="p.signif.box", y.position = max(res$dis.rank)-(.5*median(res$dis.rank)),step.increase = .03, tip.length = 0.01, hide.ns=T)+ xlab(as.character(ioi)) + ylab("Rank Value")
+#uw_uni_plot
+#save to disk
+#ggsave("ANOSIM_unweighted_unifrac_boxplot.png", plot=uw_uni_plot, path=outdir)
+#Unweighted Unifrac ANOSIM plot No bracket
+uw_uni_plot_no_brac <- autoplot(res,notch = F) +theme_bw() +aes(fill=res$class.vec)+ labs(title = "ANOSIM Unweighted Unifrac", fill=ioi) + xlab(as.character(ioi)) + ylab("Rank Value")
+uw_uni_plot_no_brac
+#save to disk
+ggsave("ANOSIM_unweighted_unifrac_boxplot_no_brackets.png", plot=uw_uni_plot_no_brac, path=outdir)
+
+#Bray Curtis Distance
+grp <- get_variable(cycle_1, ioi)
+ano <- anosim(distance(cycle_1, "bray"), grp)
+ano
+#Bray Curtis ANOSIM pairwise
+bray_pair <- pairwise_anosim(cycle_1, ioi, "bray")
+bray_pair %>%
+  dplyr::select(group1,group2,statistic,permutations,dissimilarity,p.val,p.adjust,p.signif) %>%
+  kable() %>% 
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
+#Bray Curtis ANOSIM plot
+#bray_plot <- autoplot(ano, notch=F) + theme_bw() + labs(title ="ANOSIM Bray Curtis") + stat_pvalue_manual(bray_pair, label="p.signif.box", y.position = max(ano$dis.rank)-(.5*median(res$dis.rank)), step.increase = .03, tip.length = 0.01, hide.ns=T) + xlab(as.character(ioi)) + ylab("Rank Value")
+#bray_plot
+#save to disk
+#ggsave("ANOSIM_bray_curtis_boxplot.png", plot=bray_plot, path=outdir)
+#Bray Curtis ANOSIM plot No Bracket
+bray_plot_no_brac <- autoplot(ano, notch=F) + theme_bw() +aes(fill=ano$class.vec) + labs(title ="ANOSIM Bray Curtis", fill=ioi) + xlab(as.character(ioi)) + ylab("Rank Value")
+bray_plot_no_brac
+#save to disk
+ggsave("ANOSIM_bray_curtis_boxplot_no_bracket.png", plot=bray_plot_no_brac, path=outdir)
+
+#Jaccard Distance
+grp <- get_variable(cycle_1, ioi)
+ano <- anosim(distance(cycle_1, "jaccard"), grp)
+ano
+#Jaccard ANOSIM pairwise
+jaccard_pair <- pairwise_anosim(cycle_1, ioi, "jaccard")
+jaccard_pair %>%
+  dplyr::select(group1,group2,statistic,permutations,dissimilarity,p.val,p.adjust,p.signif) %>%
+  kable() %>% 
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
+#Jaccard ANOSIM plot
+#jaccard_plot <- autoplot(ano, notch =F) + theme_bw() + labs(title = "ANOSIM Jaccard") + stat_pvalue_manual(jaccard_pair, label = "p.signif.box", y.position = max(ano$dis.rank)-(.5*median(res$dis.rank)), step.increase = .03, tip.length = 0.01, hide.ns=T) + xlab(as.character(ioi)) + ylab("Rank Value")
+#jaccard_plot
+#save to disk 
+#ggsave("ANOSIM_jaccard_boxplot.png", plot=jaccard_plot, path = outdir)
+#Jaccard ANOSIM plot No Bracket
+jaccard_plot_no_brac <- autoplot(ano, notch =F) + theme_bw() +aes(fill=ano$class.vec) + labs(title = "ANOSIM Jaccard", fill=ioi) +  xlab(as.character(ioi)) + ylab("Rank Value")
+jaccard_plot_no_brac
+#save to disk 
+ggsave("ANOSIM_jaccard_boxplot_no_bracket.png", plot=jaccard_plot_no_brac, path = outdir)
+
+```
+
+
+
+
+### 12.6 Multi-response permutation procedure (MRPP)
+
+```{r Methods to do pairwise MRPP comparisons, echo=FALSE, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(phyloseq)
+library(vegan)
+library(rstatix)
+
+pairwise_MRPP <- function(dat, column_of_int, dissim){
+  all_comparisons <- unique(sample_data(dat)[[column_of_int]])
+  combos <- (t(combn(all_comparisons,2)))
+  p_res <- c()
+  
+  for(i in 1:dim(combos)[1]){
+    comp <- prune_samples(sample_data(dat)[[ioi]] %in% combos[i,], dat)
+    grp <- get_variable(comp, column_of_int)
+  
+    mrpp_res <- mrpp(distance(comp, dissim), grp)
+    mrpp_stats <- c(as.character(combos[i,1]), as.character(combos[i,2]), round(mrpp_res$delta,6), mrpp_res$permutations, mrpp_res$distance, round(mrpp_res$Pvalue,3))
+    #tmp <- c(ano, as.character(item))
+    p_res <- rbind(p_res, mrpp_stats)
+  
+  }
+  tmp_2 <- data.frame(p_res)
+  colnames(tmp_2)<- c("group1", "group2", "delta", "permutations", "dissimilarity", "p.val")
+  result <- adjust_pvalue(tmp_2, p.col = "p.val", output.col = "p.adjust",method = "BH")
+  result <- add_significance(result, p.col = "p.adjust", output.col = "p.signif",symbols =c("****", "***", "**", "$*$", "ns"))
+  res_df <- data.frame(result)
+  res_df <- res_df[mixedorder(res_df$group1),]
+  return(res_df)
+  
+}
+
+#out <- pairwise_anosim(cycle_1, ioi , dissim = "bray")
+#out
+
+pairwise_MRPP_uni <- function(dat, column_of_int, weight){
+  all_comparisons <- unique(sample_data(dat)[[column_of_int]])
+  combos <- (t(combn(all_comparisons,2)))
+  p_res <- c()
+  
+  for(i in 1:dim(combos)[1]){
+    comp <- prune_samples(sample_data(dat)[[ioi]] %in% combos[i,], dat)
+    grp <- get_variable(comp, column_of_int)
+  
+    tmp <- UniFrac(comp, weighted = weight)
+    mrpp_res <- mrpp(tmp, grp)
+    mrpp_stats <- c(as.character(combos[i,1]), as.character(combos[i,2]), round(mrpp_res$delta,6), mrpp_res$permutations, round(mrpp_res$Pvalue,3))
+    #tmp <- c(ano, as.character(item))
+    p_res <- rbind(p_res, mrpp_stats)
+  
+  }
+  tmp_2 <- data.frame(p_res)
+  colnames(tmp_2)<- c("group1","group2", "delta", "permutations", "p")
+  result <- adjust_pvalue(tmp_2, p.col = "p", output.col = "p.adj",method = "BH")
+  result <- add_significance(result, p.col="p.adj",output.col = "p.signif",symbols =c("****", "***", "**", "$*$", "ns"))
+  res_df <- data.frame(result)
+  res_df <- res_df[mixedorder(res_df$group1),]
+  return(res_df)
+  
+}
+```
+
+
+```{r MRPP analysis, echo=FALSE, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(phyloseq)
+library(vegan)
+library(rstatix)
+libray(qiime2R)
+
+cycle_1 <- qza_to_phyloseq(table_dada2,rooted_tree,taxonomy_file,metadata_file)
+sample_data(cycle_1)[[ioi]] <- factor(sample_data(cycle_1)[[ioi]], levels=ioi_ord)
+
+# Weighted Unifrac
+w_uni <- UniFrac(cycle_1, weighted = T)
+print("MRPP based on Weighted Unifrac distance")
+grp <- get_variable(cycle_1, ioi)
+mrpp(w_uni, grouping =  grp)
+#MRPP pairwise Weighted Unifrac
+w_uni_res <- pairwise_MRPP_uni(cycle_1, ioi, T)
+kable(w_uni_res) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
+
+
+# Unweighted Unifrac
+u_uni <- UniFrac(cycle_1, weighted = F)
+grp <- get_variable(cycle_1, ioi)
+print("MRPP based on Unweighted Unifrac distance")
+mrpp(u_uni, grouping = grp)
+# MRPP pairwise Unweighted Unifrac
+u_uni_res <- pairwise_MRPP_uni(cycle_1, ioi, F)
+kable(u_uni_res) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
+
+# Bray Curtis
+print("MRPP based on Bray-Curtis distance")
+grp <- get_variable(cycle_1, ioi)
+mrpp(distance(cycle_1, "bray"), grouping =  grp)
+# MRPP pairwise Bray
+bray_res <- pairwise_MRPP(cycle_1, ioi, "bray")
+kable(bray_res) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
+
+jaccard <- qiime2R::read_qza("./qiime/core-metric-results/jaccard_distance_matrix.qza")
+# Jaccard 
+print("MRPP based on Jaccard distance")
+grp <- get_variable(cycle_1, ioi)
+mrpp(distance(cycle_1, "jaccard"), grouping =  grp)
+# MRPP pairwise Jaccard
+jaccard_res <- pairwise_MRPP(cycle_1, ioi, "jaccard")
+kable(jaccard_res) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
+
+
+```
+
+
+
+
+### 12.7 AMOVA
+
+```{r Methods to do pairwise AMOVA comparisons, echo=FALSE, message=FALSE, warning=FALSE}
+library(pegas)
+library(phyloseq)
+library(rstatix)
+
+
+pairwise_AMOVA <- function(dat, column_of_int, dissim){
+  all_comparisons <- unique(sample_data(dat)[[column_of_int]])
+  combos <- (t(combn(all_comparisons,2)))
+  p_res <- c()
+  
+  for(i in 1:dim(combos)[1]){
+    comp <- prune_samples(sample_data(dat)[[ioi]] %in% combos[i,], dat)
+    grp <- get_variable(comp, column_of_int)
+    dist <- distance(comp, dissim)
+    amova_res <- pegas::amova(as.formula(dist ~ grp))
+    amova_stats <- c(as.character(combos[i,1]), as.character(combos[i,2]), round(amova_res$tab$MSD[1],6), dissim, round(amova_res$varcomp$P.value[1],3))
+  
+    p_res <- rbind(p_res, amova_stats)
+  
+  }
+  tmp_2 <- data.frame(p_res)
+  colnames(tmp_2)<- c("group1", "group2", "MSD","distance", "p.val")
+  result <- adjust_pvalue(tmp_2, p.col = "p.val", output.col = "p.adjust",method = "BH")
+  result <- add_significance(result, p.col = "p.adjust", output.col = "p.signif",symbols =c("****", "***", "**", "$*$", "ns"))
+  res_df <- data.frame(result)
+  res_df <- res_df[mixedorder(res_df$group1),]
+  return(res_df)
+  
+}
+
+#out <- pairwise_anosim(cycle_1, ioi , dissim = "bray")
+#out
+
+pairwise_AMOVA_uni <- function(dat, column_of_int, weight){
+  all_comparisons <- unique(sample_data(dat)[[column_of_int]])
+  combos <- (t(combn(all_comparisons,2)))
+  p_res <- c()
+  
+  for(i in 1:dim(combos)[1]){
+    comp <- prune_samples(sample_data(dat)[[ioi]] %in% combos[i,], dat)
+    grp <- get_variable(comp, column_of_int)
+  
+    tmp <- UniFrac(comp, weighted = weight)
+    amova_res <- pegas::amova(as.formula(tmp ~ grp))
+    amova_stats <- c(as.character(combos[i,1]), as.character(combos[i,2]),weight, round(amova_res$tab$MSD[1],6),  round(amova_res$varcomp$P.value[1],3))
+ 
+    p_res <- rbind(p_res, amova_stats)
+  
+  }
+  tmp_2 <- data.frame(p_res)
+  colnames(tmp_2)<- c("group1", "group2", "MSD","weighted", "p.val")
+  result <- adjust_pvalue(tmp_2, p.col = "p.val", output.col = "p.adj",method = "BH")
+  result <- add_significance(result, p.col="p.adj",output.col = "p.signif",symbols =c("****", "***", "**", "$*$", "ns"))
+  res_df <- data.frame(result)
+  res_df <- res_df[mixedorder(res_df$group1),]
+  return(res_df)
+  
+}
+```
+
+
+```{r AMOVA testing, echo=FALSE, message=FALSE, warning=FALSE}
+library(pegas)
+library(phyloseq)
+library(rstatix)
+library(qiime2R)
+library(kableExtra)
+library(tidyverse)
+
+cycle_1 <- qza_to_phyloseq(table_dada2,rooted_tree,taxonomy_file,metadata_file)
+sample_data(cycle_1)[[ioi]] <- factor(sample_data(cycle_1)[[ioi]], levels=ioi_ord)
+
+#AMOVA Weighted Unifrac
+tmp <- UniFrac(cycle_1, weighted = T)
+w_uni_grp <- get_variable(cycle_1, ioi)
+res <- pegas::amova(tmp ~ w_uni_grp)
+res
+#AMOVA Weighted unifrac pairwise
+w_uni_pair <- pairwise_AMOVA_uni(cycle_1, ioi, T)
+kable(w_uni_pair) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
+
+#AMOVA Unweighted Unifrac
+tmp <- UniFrac(cycle_1, weighted=F)
+u_uni_grp <- get_variable(cycle_1, ioi)
+res <- pegas::amova(tmp ~ u_uni_grp)
+res
+#AMOVA Unweighted Unifrac pairwise
+u_uni_pair <- pairwise_AMOVA_uni(cycle_1, ioi, F)
+kable(u_uni_pair) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
+
+
+#AMOVA bray curtis
+dist <- distance(cycle_1, 'bray')
+bray_grp <- get_variable(cycle_1, ioi)
+res <- pegas::amova(as.formula(dist ~ bray_grp))
+res
+#AMOVA bray curtis pairwise
+bray_amova_pairwise <- pairwise_AMOVA(cycle_1, ioi, 'bray')
+kable(bray_amova_pairwise) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
+
+#AMOVA Jaccard 
+dist <- distance(cycle_1, 'jaccard')
+jaccard_grp <- get_variable(cycle_1, ioi)
+res <- pegas::amova(dist ~ jaccard_grp)
+res
+#AMOVA Jaccard Pairwise 
+jaccard_amova_pairwise <- pairwise_AMOVA(cycle_1, ioi, 'jaccard')
+kable(jaccard_amova_pairwise) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
+
+```
+
+
+
