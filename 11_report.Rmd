@@ -82,12 +82,12 @@ level <- "Phylum"
 topN <- 10
 
 #selects top n taxa and creates phyloseq object
-cycle_n_names <- sort(tapply(taxa_sums(cycle_1), tax_table(cycle_1)[,as.character(level)], sum), TRUE) [1:topN]
+cycle_n_names <- sort(tapply(taxa_sums(cycle_1), tax_table(cycle_1)[,as.character(level)], sum), TRUE)[1:topN]
 cycle_n <- subset_taxa(cycle_1, get(level) %in% as.vector(na.exclude(names(cycle_n_names))))
 cycle_n_glom <- tax_glom(cycle_n, taxrank = level)
 
 #selects top n + 1 to the end of table
-rest_tax <- sort(tapply(taxa_sums(cycle_1), tax_table(cycle_1)[,as.character(level)], sum), TRUE) [topN+1:length(tax_table(cycle_1))]
+rest_tax <- sort(tapply(taxa_sums(cycle_1), tax_table(cycle_1)[,as.character(level)], sum), TRUE)[topN+1:length(tax_table(cycle_1))]
 rest <- subset_taxa(cycle_1, get(level) %in% as.vector(na.exclude(names(rest_tax))))
 rest_glom <- tax_glom(rest, taxrank = level)
 
