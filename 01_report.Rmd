@@ -12,8 +12,8 @@ output:
 
 ```{r init renv}
 library(renv)
-#renv::isolate()
-#renv::settings$snapshot.type("all")
+renv::isolate()
+renv::settings$snapshot.type("all")
 renv::restore()
 ```
 
@@ -49,11 +49,11 @@ library(tidyverse)
 options(bitmapType='cairo')
 level = "Phylum"
 
-#table_dada2 <- "../qiime/table-dada2.qza"
-table_dada2 <- "../qiime/core-metric-results/rarefied_table.qza"
-rooted_tree <- "../qiime/rooted-tree.qza"
-taxonomy_file <- "../qiime/taxonomy.qza"
-metadata_file <- "../metadata.tsv"
+#table_dada2 <- "qiime/table-dada2.qza"
+table_dada2 <- "qiime/core-metric-results/rarefied_table.qza"
+rooted_tree <- "qiime/rooted-tree.qza"
+taxonomy_file <- "qiime/taxonomy.qza"
+metadata_file <- "metadata.tsv"
 
 
 #Create phyloseq object from qiime objects
@@ -70,7 +70,7 @@ cycle_n_glom <- tax_glom(cycle_n, taxrank = level)
 
 #selects top n + 1 to the end of table
 rest_tax <- sort(tapply(taxa_sums(cycle_1), tax_table(cycle_1)[,as.character(level)], sum), TRUE)[topN+1:length(tax_table(cycle_1))]
-rest <- subset_taxa(cycle_1, get(level) %in% as.vector(na.exclude(names(cycle_n_names))))
+rest <- subset_taxa(cycle_1, get(level) %in% as.vector(na.exclude(names(rest_tax))))
 rest_glom <- tax_glom(rest, taxrank = level)
 
 #collapse all phyla not in top 10 into one taxon
@@ -139,7 +139,6 @@ print(by_treatment)
 #saves charts to directory
 
 ggsave("stacked_bar_phylum_by_treatment.png", plot=by_treatment, path=outdir)
-
 ```
 
 ### 1.2 Relative Abundance of Top 10 Genera
@@ -148,7 +147,6 @@ ggsave("stacked_bar_phylum_by_treatment.png", plot=by_treatment, path=outdir)
 library(qiime2R)
 library(phyloseq)
 library(ggplot2)
-library(tidyverse)
 
 level = "Genus"
 
@@ -160,12 +158,12 @@ topN <- 10
 
 #selects top n taxa and creates phyloseq object
 cycle_n_names <- sort(tapply(taxa_sums(cycle_1), tax_table(cycle_1)[,as.character(level)], sum), TRUE) [1:topN]
-cycle_n <- subset_taxa(cycle_1, get(level) %in% as.vector(na.exclude(names(cycle_n_names))))
+cycle_n <- subset_taxa(cycle_1, get(level) %in% names(cycle_n_names))
 cycle_n_glom <- tax_glom(cycle_n, taxrank = level)
 
 #selects top n + 1 to the end of table
 rest_tax <- sort(tapply(taxa_sums(cycle_1), tax_table(cycle_1)[,as.character(level)], sum), TRUE) [topN+1:length(tax_table(cycle_1))]
-rest <- subset_taxa(cycle_1, get(level) %in% as.vector(na.exclude(names(rest_tax))))
+rest <- subset_taxa(cycle_1, get(level) %in% names(rest_tax))
 rest_glom <- tax_glom(rest, taxrank = level)
 
 #collapse all genera not in top 10 into one taxon
@@ -242,7 +240,6 @@ ggsave("stacked_bar_genus_by_treatment.png", plot = by_treatment, path=outdir)
 library(qiime2R)
 library(phyloseq)
 library(ggplot2)
-library(tidyverse)
 
 level = "Species"
 
@@ -254,12 +251,12 @@ topN <- 10
 
 #selects top n taxa and creates phyloseq object
 cycle_n_names <- sort(tapply(taxa_sums(cycle_1), tax_table(cycle_1)[,as.character(level)], sum), TRUE) [1:topN]
-cycle_n <- subset_taxa(cycle_1, get(level) %in% as.vector(na.exclude(names(cycle_n_names))))
+cycle_n <- subset_taxa(cycle_1, get(level) %in% names(cycle_n_names))
 cycle_n_glom <- tax_glom(cycle_n, taxrank = level)
 
 #selects top n + 1 to the end of table
 rest_tax <- sort(tapply(taxa_sums(cycle_1), tax_table(cycle_1)[,as.character(level)], sum), TRUE) [topN+1:length(tax_table(cycle_1))]
-rest <- subset_taxa(cycle_1, get(level) %in% as.vector(na.exclude(names(rest_tax))))
+rest <- subset_taxa(cycle_1, get(level) %in% names(rest_tax))
 rest_glom <- tax_glom(rest, taxrank = level)
 
 #collapse all species not in top 10 into one taxon
