@@ -1,0 +1,81 @@
+---
+title: "05 16s Analysis Report"
+output:
+  pdf_document:
+    
+    
+    df_print: kable
+  html_document:
+    df_print: kable
+    smart: false
+---
+
+```{r init renv, message=FALSE, warning=FALSE, include=FALSE}
+library(renv)
+#renv::isolate()
+#renv::settings$snapshot.type("all")
+renv::restore()
+```
+
+```{r parse item of interest and make outdir for figures, echo=FALSE, message=FALSE, warning=FALSE}
+#this may be required for each file
+#item of interest, comes from bash and python script that orchestrates everything
+wd <- getwd()
+ioi <- read.csv("../item_of_interest.csv")
+ioi<-as.character(ioi)
+
+ioi_ord <- read.csv("../order_item_of_interest.csv")
+colnames(ioi_ord) <- ioi
+ioi_ord <- as.list(ioi_ord)[[ioi]]
+
+outdir_name <- "Figures"
+if(!dir.exists(paste0("./",outdir_name))) {dir.create(paste0("./",outdir_name))}
+outdir <- paste0("./",outdir_name)
+```
+
+## 10 Beta Diversity Between Groups
+
+### 10.1 Weighted boxplots
+
+```{r generated Weighted boxplots, echo=FALSE, message=FALSE, warning=FALSE}
+library(ggplot2)
+
+weighted_measurements <- read.csv("../qiime/weighted-sig/raw_data.tsv", sep="\t")
+
+split_weighted_measure <- split(weighted_measurements, weighted_measurements$Group1)
+
+for(frame in split_weighted_measure){
+  
+  frame$Group2 <- factor(frame$Group2, levels=ioi_ord)
+  p <- ggplot(frame, aes(x=frame$Group2, y=Distance)) + geom_violin()+ geom_boxplot(width=0.1)
+  p<- p + stat_summary(fun.y=mean, geom="point", shape=23, size=2)
+  p<-p + stat_summary(fun.y=median, geom="point", size=2, color="red")
+  p <- p+geom_jitter(shape=16, position=position_jitter(0.2)) + xlab(ioi) + ylab("Weighted Unifrac Distance") + theme_bw() + labs(title = (as.character(paste0("Distance to ",frame$Group1[1]))))
+  print(p)
+  ggsave(paste0("weighted_unifrac_boxplot_",frame$Group1[1],".png"), plot=p,path=outdir)
+}
+```
+
+
+
+
+### 10.2 Unweighted boxplots
+
+```{r generated Unweighted boxplots, echo=FALSE, message=FALSE, warning=FALSE}
+library(ggplot2)
+unweighted_measurements <- read.csv("../qiime/unweighted-sig/raw_data.tsv", sep="\t")
+
+split_data_frames <- split(unweighted_measurements, unweighted_measurements$Group1)
+
+
+for(frame in split_data_frames){
+  
+  frame$Group2 <- factor(frame$Group2, levels=ioi_ord)
+  p <- ggplot(frame, aes(x=frame$Group2, y=Distance)) + geom_violin()+ geom_boxplot(width=0.1)
+  p<- p + stat_summary(fun.y=mean, geom="point", shape=23, size=2)
+  p<-p + stat_summary(fun.y=median, geom="point", size=2, color="red")
+  p <- p+geom_jitter(shape=16, position=position_jitter(0.2)) + xlab(ioi) + ylab("Unweighted Unifrac Distance") + theme_bw() + labs(title = (as.character(paste0("Distance to ",frame$Group1[1]))))
+  print(p)
+  ggsave(paste0("unweighted_unifrac_boxplot_",frame$Group1[1],".png"), plot=p,path=outdir)
+}
+```
