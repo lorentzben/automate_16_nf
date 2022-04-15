@@ -518,7 +518,7 @@ library(tidyverse)
 library(phyloseq)
 library(vegan)
 library(rstatix)
-libray(qiime2R)
+library(qiime2R)
 
 cycle_1 <- qza_to_phyloseq(table_dada2,rooted_tree,taxonomy_file,metadata_file)
 sample_data(cycle_1)[[ioi]] <- factor(sample_data(cycle_1)[[ioi]], levels=ioi_ord)
