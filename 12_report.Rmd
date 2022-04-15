@@ -553,7 +553,7 @@ bray_res <- pairwise_MRPP(cycle_1, ioi, "bray")
 kable(bray_res) %>%
   kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
 
-jaccard <- qiime2R::read_qza("./qiime/core-metric-results/jaccard_distance_matrix.qza")
+jaccard <- qiime2R::read_qza("../qiime/core-metric-results/jaccard_distance_matrix.qza")
 # Jaccard 
 print("MRPP based on Jaccard distance")
 grp <- get_variable(cycle_1, ioi)
