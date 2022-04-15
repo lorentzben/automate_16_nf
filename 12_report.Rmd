@@ -141,6 +141,7 @@ library(qiime2R)
 #d1ad96657ada993cf6c2841b29113a4f635c6b56
 library(PERMANOVA)
 library(tidyverse)
+library(kableExtra)
 
 table_dada2 <- "../qiime/core-metric-results/rarefied_table.qza"
 rooted_tree <- "../qiime/rooted-tree.qza"
