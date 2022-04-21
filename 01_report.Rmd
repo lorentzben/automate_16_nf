@@ -119,9 +119,7 @@ if (length(as.vector(na.exclude(names(cycle_n_names)))) < topN){
   #saves charts to directory
   
   ggsave("stacked_bar_phylum_by_treatment.png", plot=by_treatment, path=outdir)
-}
-
-else{
+} else {
     #selects top n taxa and creates phyloseq object
   cycle_n <- subset_taxa(cycle_1, get(level) %in% as.vector(na.exclude(names(cycle_n_names))))
   cycle_n_glom <- tax_glom(cycle_n, taxrank = level)
