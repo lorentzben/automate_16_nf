@@ -1,0 +1,101 @@
+---
+title: "05 16s Analysis Report"
+output:
+  pdf_document:
+    
+    
+    df_print: kable
+  html_document:
+    df_print: kable
+    smart: false
+---
+
+```{r init renv, message=FALSE, warning=FALSE, include=FALSE}
+library(renv)
+#renv::isolate()
+#renv::settings$snapshot.type("all")
+renv::restore()
+```
+
+```{r parse item of interest and make outdir for figures, echo=FALSE, message=FALSE, warning=FALSE}
+#this may be required for each file
+#item of interest, comes from bash and python script that orchestrates everything
+wd <- getwd()
+ioi <- read.csv("../item_of_interest.csv")
+ioi<-as.character(ioi)
+
+ioi_ord <- read.csv("../order_item_of_interest.csv")
+colnames(ioi_ord) <- ioi
+ioi_ord <- as.list(ioi_ord)[[ioi]]
+
+outdir_name <- "Figures"
+if(!dir.exists(paste0("./",outdir_name))) {dir.create(paste0("./",outdir_name))}
+outdir <- paste0("./",outdir_name)
+```
+
+## 13 Lefse
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+if(getOutputFormat() =='pdf_document'){
+  print("see end of report")
+}
+
+```
+
+```{r Lefse analysis Results, echo=FALSE, message=FALSE, warning=FALSE, fig.height=25, fig.width=10, out.height="85%", out.width="85%", fig.cap="\\newline{}"}
+
+if(getOutputFormat() == 'html_document') {
+
+  lefse_res_filenames <- list.files("lefse/result",pattern="*_res.png",full.names = T)
+
+  lefse_filenames <- mixedsort(lefse_res_filenames)
+
+  include_graphics(lefse_filenames)
+  
+} 
+```
+
+
+```{r Lefse analysis Results pdf style, echo=FALSE, message=FALSE, warning=FALSE, out.height="85%",dpi=36, out.width="85%", fig.cap="\\newline{}"}
+library(gtools)
+library(knitr)
+if(getOutputFormat() =='pdf_document'){
+  print("see end of report")
+   
+  lefse_res_filenames <- list.files("../lefse/result",pattern="*_pdf_r.png",full.names=T)
+
+  lefse_filenames <- mixedsort(lefse_res_filenames)
+  
+  include_graphics(lefse_filenames)
+ 
+}
+
+```
+
+
+```{r Lefse cladograms, echo=FALSE, message=FALSE, warning=FALSE, fig.height=25, fig.width=10, fig.pos='h', out.width="100%", fig.cap="\\newline{}"}
+library(gtools)
+library(knitr)
+if(getOutputFormat() == 'html_document') {
+ 
+  
+  lefse_clado_filenames <- list.files("lefse/result",pattern="*_cladogram.png",full.names=T)
+  
+  lefse_filenames <- mixedsort(lefse_clado_filenames)
+
+  include_graphics(lefse_filenames)
+  
+} 
+ 
+if(getOutputFormat() =='pdf_document'){
+  print("see end of report")
+  
+  lefse_clado_filenames <- list.files("lefse/result",pattern="result/*_pdf_qual_clad.png",full.names=T)
+  
+  lefse_filenames <- mixedsort(lefse_clado_filenames)
+
+  include_graphics(lefse_filenames)
+  
+}
+
+```
