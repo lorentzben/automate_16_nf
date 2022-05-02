@@ -36,7 +36,7 @@ outdir <- paste0("./",outdir_name)
 ## 13 Lefse
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
-
+library(knitr)
 if(!is_html_output()){
   print("see end of report")
 }
@@ -44,7 +44,7 @@ if(!is_html_output()){
 ```
 
 ```{r Lefse analysis Results, echo=FALSE, message=FALSE, warning=FALSE, fig.height=25, fig.width=10, out.height="85%", out.width="85%", fig.cap="\\newline{}"}
-
+library(knitr)
 if(is_html_output()) {
 
   lefse_res_filenames <- list.files("lefse/result",pattern="*_res.png",full.names = T)
