@@ -1,0 +1,133 @@
+---
+title: "14 References"
+output:
+  pdf_document:
+    
+    
+    df_print: kable
+  html_document:
+    df_print: kable
+    smart: false
+---
+
+## 14 References
+
+Report Generation Resources
+
+R Core Team (2020). R: A language and environment for statistical computing. R Foundation for Statistical Computing, Vienna, Austria.URL https://www.R-project.org/.
+
+Yihui Xie (2021). knitr: A General-Purpose Package for Dynamic Report Generation in R. R package version 1.31.
+
+\
+
+1 Species Distribution
+
+---
+
+* Bolyen, E., Rideout, J.R., Dillon, M.R. et al. Reproducible, interactive, scalable and extensible microbiome data science using QIIME 2. Nat Biotechnol 37, 852–857 (2019). https://doi.org/10.1038/s41587-019-0209-9
+
+* qiime2R: Importing QIIME2 artifacts and associated data into R sessions. Jordan E Bisanz (2018) https://github.com/jbisanz/qiime2R.
+
+* phyloseq: An R package for reproducible interactive analysis and graphics of microbiome census data. Paul J. McMurdie and Susan Holmes (2013) PLoS ONE 8(4):e61217. 
+
+* Hadley Wickham (2021). forcats: Tools for Working with Categorical Variables (Factors). R package version 0.5.1.
+https://CRAN.R-project.org/package=forcats
+
+* H. Wickham. ggplot2: Elegant Graphics for Data Analysis. Springer-Verlag New York, 2016.
+
+\
+
+2 Phylogentic Trees
+
+---
+
+* export2graphlan.py (ver. 0.2.1 of 27 October 2018). Convert MetaPhlAn, LEfSe, and/or HUMAnN output to GraPhlAn input format. Authors: Francesco Asnicar 
+(f.asnicar@unitn.it)
+
+* Asnicar F, Weingart G, Tickle TL, Huttenhower C, Segata N. 2015. Compact graphical representation of phylogenetic data and metadata with GraPhlAn. PeerJ 3:e1029 https://doi.org/10.7717/peerj.1029
+
+\
+
+3 Species Abundance Heatmap
+
+---
+
+* phyloseq_to_ampvis2.R Andersen K.S. (2019), GitHub gist, https://gist.github.com/KasperSkytte/8d0ca4206a66be7ff6d76fc4ab8e66c6 
+
+* ampvis2: an R package to analyse and visualise 16S rRNA amplicon  data. Andersen K.S., Kirkegaard R.H., Karst S.M., Albertsen M. (2018)  bioRxiv. doi: https://doi.org/10.1101/299537
+
+\
+
+5 Alpha Diversity Plots
+
+---
+
+* Alboukadel Kassambara (2020). rstatix: Pipe-Friendly Framework for Basic Statistical Tests. R package version 0.6.0. https://CRAN.R-project.org/package=rstatix
+
+* Alboukadel Kassambara (2020). ggpubr: 'ggplot2' Based Publication Ready Plots. R package version 0.4.0.  https://CRAN.R-project.org/package=ggpubr
+
+\
+
+6 Beta Diversity Ordinations
+
+---
+
+* Charles A. Martin (2017). ggConvexHull: Add a convex hull geom to ggplot2. R package version 0.1.0. http://github.com/cmartin/ggConvexHull
+
+*  Legendre, P. and Gallagher, E.D. (2001). Ecologically meaningful transformations for ordination of
+species data. Oecologia 129, 271-280.
+
+\
+
+7 Rarefaction Curve
+
+---
+
+* Hadley Wickham (2007). Reshaping Data with the reshape Package. Journal of Statistical Software, 21(12), 1-20. URL http://www.jstatsoft.org/v21/i12/
+
+\
+
+9 Unifrac Heatmap
+
+---
+
+* Raivo Kolde (2019). pheatmap: Pretty Heatmaps. R package version 1.0.12. https://CRAN.R-project.org/package=pheatmap
+
+\
+
+11 UPGMA Plots
+
+---
+
+* Andrie de Vries and Brian D. Ripley (2020). ggdendro: Create Dendrograms and Tree Diagrams Using 'ggplot2'. R package version 0.1.22. https://CRAN.R-project.org/package=ggdendro
+
+* Sarkar, Deepayan (2008) Lattice: Multivariate Data Visualization with R. Springer, New York. ISBN 978-0-387-75968-5
+
+\
+
+12 Beta Diversity Statistical Tests
+
+---
+
+* Jari Oksanen, F. Guillaume Blanchet, Michael Friendly, Roeland Kindt, Pierre Legendre, Dan McGlinn, Peter R. Minchin, R. B. O'Hara, Gavin L. Simpson, Peter Solymos, M. Henry H. Stevens, Eduard Szoecs and Helene Wagner (2020). vegan: Community Ecology Package. R package version 2.5-7. https://CRAN.R-project.org/package=vegan
+
+* Kirill Müller and Hadley Wickham (2021). tibble: Simple Data Frames. R package version 3.0.6. https://CRAN.R-project.org/package=tibble
+
+* Gregory R. Warnes, Ben Bolker and Thomas Lumley (2020). gtools: Various R Programming Tools. R package version 3.8.2. https://CRAN.R-project.org/package=gtools
+
+* James M. Ward (2021). jamba: Jam Base Methods. R package version 0.0.61.900. http://github.com/jmw86069/jamba
+
+* Hao Zhu (2020). kableExtra: Construct Complex Table with 'kable' and Pipe Syntax. R package version 1.3.1. https://CRAN.R-project.org/package=kableExtra
+
+* Paradis E. 2010. pegas: an R package for population genetics with an integrated-modular approach. Bioinformatics 26: 419-420.
+
+\
+
+13 Lefse
+
+---
+
+* Segata N, Izard J, Waldron L, Gevers D, Miropolsky L, Garrett WS, Huttenhower C. Metagenomic biomarker discovery and explanation. Genome Biol. 2011 Jun 24;12(6):R60. doi: 10.1186/gb-2011-12-6-r60. PMID: 21702898; PMCID: PMC3218848.
+
+* Hadley Wickham, Romain François, Lionel Henry and Kirill Müller (2021). dplyr: A Grammar of Data Manipulation. R package version 1.0.4. https://CRAN.R-project.org/package=dplyr
+
