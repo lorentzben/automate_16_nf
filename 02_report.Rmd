@@ -2,15 +2,13 @@
 title: "02 16s Analysis Report"
 output:
   pdf_document:
-    
-    
     df_print: kable
   html_document:
     df_print: kable
     smart: false
 ---
 
-```{r init renv}
+```{r init renv, message=FALSE, warning=FALSE, include=FALSE}
 library(renv)
 #renv::isolate()
 #renv::settings$snapshot.type("all")
@@ -29,8 +27,8 @@ colnames(ioi_ord) <- ioi
 ioi_ord <- as.list(ioi_ord)[[ioi]]
 
 outdir_name <- "Figures"
-if(!dir.exists(paste0("./",outdir_name))) {dir.create(paste0("./",outdir_name))}
-outdir <- paste0("./",outdir_name)
+if(!dir.exists(paste0("../",outdir_name))) {dir.create(paste0("../",outdir_name))}
+outdir <- paste0("../",outdir_name)
 ```
 
 ## 2 Phylogentic Trees

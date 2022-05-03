@@ -1,5 +1,5 @@
 ---
-title: "05 16s Analysis Report"
+title: "12 16s Analysis Report"
 output:
   pdf_document:
     
@@ -29,8 +29,8 @@ colnames(ioi_ord) <- ioi
 ioi_ord <- as.list(ioi_ord)[[ioi]]
 
 outdir_name <- "Figures"
-if(!dir.exists(paste0("./",outdir_name))) {dir.create(paste0("./",outdir_name))}
-outdir <- paste0("./",outdir_name)
+if(!dir.exists(paste0("../",outdir_name))) {dir.create(paste0("../",outdir_name))}
+outdir <- paste0("../",outdir_name)
 
 # #library(devtools)
 # #llibrary(remotes)
