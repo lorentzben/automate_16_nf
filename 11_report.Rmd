@@ -81,7 +81,7 @@ topN <- 10
 
 cycle_n_names <- sort(tapply(taxa_sums(cycle_1), tax_table(cycle_1)[,as.character(level)], sum), TRUE) [1:topN]
 
-if (length(as.vector(na.exclude(names(cycle_n_names)))) < topN){
+if (length(as.vector(na.exclude(names(cycle_n_names)))) <= topN){
   topN <- length(as.vector(na.exclude(names(cycle_n_names))))
   #selects top n taxa and creates phyloseq object
   cycle_n <- subset_taxa(cycle_1, get(level) %in% as.vector(na.exclude(names(cycle_n_names))))
@@ -204,7 +204,7 @@ topN <- 10
 
 cycle_n_names <- sort(tapply(taxa_sums(cycle_1), tax_table(cycle_1)[,as.character(level)], sum), TRUE) [1:topN]
 
-if (length(as.vector(na.exclude(names(cycle_n_names)))) < topN){
+if (length(as.vector(na.exclude(names(cycle_n_names)))) <= topN){
   topN <- length(as.vector(na.exclude(names(cycle_n_names))))
   #selects top n taxa and creates phyloseq object
   cycle_n <- subset_taxa(cycle_1, get(level) %in% as.vector(na.exclude(names(cycle_n_names))))
