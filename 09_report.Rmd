@@ -37,7 +37,7 @@ outdir <- paste0("../",outdir_name)
 library(qiime2R)
 library(pheatmap)
 library(ggplot2)
-library(BiocManager)
+#library(BiocManager)
 
 metadata_file <- "../metadata.tsv"
 
