@@ -50,7 +50,7 @@ if(params.metadata) {
     Channel
         .fromPath(params.metadata)
         .ifEmpty { exit 1, log.info "Cannot find path file ${tsvFile}"}
-        .into{ ch_meta_veri ; ch_meta_feature_viz; ch_alpha_metadata ; ch_metadata_rare_curve ; ch_metadata_alpha_sig ; ch_metadata_beta_sig ; ch_metadata_phylo_tree ; ch_metadata_lefse ; ch_metadata_finalize}
+        .into{ ch_meta_veri ; ch_meta_feature_viz; ch_alpha_metadata ; ch_metadata_rare_curve ; ch_metadata_alpha_sig ; ch_metadata_beta_sig ; ch_metadata_phylo_tree ; ch_metadata_phylo_tree_run ; ch_metadata_lefse ; ch_metadata_finalize}
 }
 //TODO add a channel that will pull in cutoffs in a txt if the user submits them
 if(params.sampDepth){
@@ -122,7 +122,7 @@ Channel
 Channel
     .from(params.itemOfInterest)
     .ifEmpty {exit 1, log.info "Cannot find Item of interest"}
-    .into{ ch_ioi_veri ; ch_ioi_beta_sig ; ch_ioi_phylo_tree ; ch_ioi_lefse ; ch_ioi_denoise_to_file }
+    .into{ ch_ioi_veri ; ch_ioi_beta_sig ; ch_ioi_phylo_tree ; ch_ioi_phylo_tree_run ; ch_ioi_lefse ; ch_ioi_denoise_to_file }
 
 Channel
     .fromPath("${baseDir}/graph.sh")
@@ -895,6 +895,7 @@ process AlphaDiversityMeasure{
     path "core-metric-results/*" into ch_core_beta_significance 
     path "core-metric-results/*" into ch_core_report
     file "core-metric-results/rarefied_table.qza" into ch_phylo_tree_rare_table
+    file "core-metric-results/rarefied_table.qza" into ch_phylo_tree_rare_table_run
     file "shannon.qza" into ch_shannon_qza
     file "simpson.qza" into ch_simpson_qza 
     file "chao1.qza" into ch_chao_qza
@@ -976,6 +977,7 @@ process AssignTaxonomy{
 
     output:
     file "taxonomy.qza" into ch_taxonomy_phylo_tree
+    file "taxonomy.qza" into ch_taxonomy_phylo_tree_run
     file "taxonomy.qzv" into ch_classified_qzv
     
 
@@ -1224,7 +1226,7 @@ process GeneratePhylogeneticTrees{
     //file "table-dada2.qza" from ch_table_phylo_tree
     file "rarefied_table.qza" from ch_phylo_tree_rare_table
     file "taxonomy.qza" from ch_taxonomy_phylo_tree
-    file "graph.sh" from ch_graph_script
+    //file "graph.sh" from ch_graph_script
     file "filter_samples.py" from ch_filter_script
 
     output:
@@ -1313,16 +1315,80 @@ process GeneratePhylogeneticTrees{
         
         result = subprocess.run([rename_table],shell=True)
 
+        # This will be handled outside of the for loop
         # renaming the output of the graping bash script so that it has meaning
-        rename_image = 'cp image_graph.png phylo_trees/image_'+str(item)+'_graph.png'
+        #rename_image = 'cp image_graph.png phylo_trees/image_'+str(item)+'_graph.png'
 
-        result = subprocess.run([rename_image], shell=True)
+        #result = subprocess.run([rename_image], shell=True)
 
         # rename pdf quality image so that it has meaning
-        rename_pdf_image = 'cp image_pdf_graph.png phylo_trees/image_'+str(item)+'_pdf_g.png'
+        #rename_pdf_image = 'cp image_pdf_graph.png phylo_trees/image_'+str(item)+'_pdf_g.png'
 
-        result = subprocess.run([rename_pdf_image], shell=True)
-        
+        #result = subprocess.run([rename_pdf_image], shell=True)
+
+    
+    """
+
+}
+
+process runGraphlan{
+    publishDir "${params.outdir}/graphlan", mode: 'copy'
+
+    //conda "${projectDir}/environment.yml"
+    //conda "environment.yml"
+    container "docker://lorentzb/py2_test"
+
+    input:
+    file metadata from ch_metadata_phylo_tree_run
+    val ioi from ch_ioi_phylo_tree_run
+    //file "table-dada2.qza" from ch_table_phylo_tree
+    file "rarefied_table.qza" from ch_phylo_tree_rare_table_run
+    file "taxonomy.qza" from ch_taxonomy_phylo_tree_run
+    file "graph.sh" from ch_graph_script
+    path "phylo_trees/*" from ch_png_phylo_tree
+    //file "filter_samples.py" from ch_filter_script
+
+    output:
+    path "phylo_trees/*" into ch_png_phylo_tree_ran
+    //file "table-dada2.qza" into ch_table_lefse
+    //file "rarefied_table.qza" into ch_table_lefse
+    //file "taxonomy.qza" into ch_tax_lefse
+    
+    script:
+    """
+    #!/usr/bin/env python2
+    import subprocess
+    import csv
+    #import pandas as pd
+    #import numpy as np 
+    import time
+
+    metadata_table= pd.read_table(\"${metadata}\", sep='\t')
+    metadata_table = metadata_table.drop([0,1])
+
+    ioi_set = set(metadata_table[\"${ioi}\"])
+    ioi = '${ioi}'
+
+    subprocess.run(['mkdir phylo_trees'], shell=True)
+
+    # iterates over the items of interest to produce a circular phylogenetic tree per category e.g. CONTROL TREATMENT
+    for item in ioi_set:
+        item = str(item)
+        # filters/splits the feature table based on the current ioi
+
+        # Outputs the current ioi so that it can be annotated in the graphlan image
+        with open('current.txt', 'w') as file:
+            file.write(item)
+
+        # bash script call to handle the steps within a conda python 2.7.17 envionment
+        generate_image_command = 'bash graph.sh'
+        result = subprocess.run([generate_image_command], shell=True)
+
+    rename_image = 'cp *_image_graph.png phylo_trees/.'
+    result = subprocess.run([rename_image], shell=True)
+
+    rename_pdf_image = 'cp *_image_pdf_graph.png phylo_trees/.'
+    result = subprocess.run([rename_pdf_image], shell=True)
     """
 
 }
@@ -1336,8 +1402,8 @@ process LefseFormat {
 
     input:
     val ioi from ch_ioi_lefse
-    //file "table-dada2.qza" from ch_table_lefse
-    file "rarefied_table.qza" from ch_table_lefse
+    file "table-dada2.qza" from ch_table_lefse
+    //file "rarefied_table.qza" from ch_table_lefse
     file "rooted-tree.qza" from ch_tree_lefse
     file "taxonomy.qza" from ch_tax_lefse
     file metadata from ch_metadata_lefse
@@ -1436,7 +1502,7 @@ process GenerateReport{
     file "rooted-tree.qza" from ch_tree_report
     file "taxonomy.qza" from ch_tax_report
     file metadata from ch_metadata_report
-    path "phylo_trees/*" from ch_png_phylo_tree
+    path "phylo_trees/*" from ch_png_phylo_tree_ran
     path "shannon/*" from ch_shannon_path
     path "simpson/*" from ch_simpson_path
     path "chao1/*" from ch_chao_path

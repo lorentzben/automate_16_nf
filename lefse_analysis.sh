@@ -3,7 +3,7 @@
 eval "$(conda shell.bash hook)"
 conda activate python2
     
-LEFSE=$(which lefse.py)
+LEFSE=$(which run_lefse.py)
 LEFSE_DIR=${LEFSE::-8}
 cp plot_res.py $LEFSE_DIR
 cp plot_cladogram.py $LEFSE_DIR
