@@ -911,6 +911,8 @@ process AlphaDiversityMeasure{
     '''
     #!/usr/bin/env bash
 
+    echo !{user_depth} > test_samp_depth.txt
+
     if [ !{user_depth} == 0 ];then
         SAMP_DEPTH=$(head samp_depth_simple.txt)
     fi
