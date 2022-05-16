@@ -1341,7 +1341,7 @@ process runGraphlan{
     input:
     file metadata from ch_metadata_phylo_tree_run
     val ioi from ch_ioi_phylo_tree_run
-    //file "table-dada2.qza" from ch_table_phylo_tree
+    file "table-dada2.qza" from ch_table_phylo_tree
     file "rarefied_table.qza" from ch_phylo_tree_rare_table_run
     file "taxonomy.qza" from ch_taxonomy_phylo_tree_run
     file "graph.sh" from ch_graph_script
@@ -1350,7 +1350,7 @@ process runGraphlan{
 
     output:
     path "phylo_trees/*" into ch_png_phylo_tree_ran
-    //file "table-dada2.qza" into ch_table_lefse
+    file "table-dada2.qza" into ch_table_lefse
     //file "rarefied_table.qza" into ch_table_lefse
     //file "taxonomy.qza" into ch_tax_lefse
     
@@ -1359,8 +1359,8 @@ process runGraphlan{
     #!/usr/bin/env python2
     import subprocess
     import csv
-    #import pandas as pd
-    #import numpy as np 
+    import pandas as pd
+    import numpy as np 
     import time
 
     metadata_table= pd.read_table(\"${metadata}\", sep='\t')
