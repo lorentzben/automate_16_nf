@@ -1367,6 +1367,7 @@ process runGraphlan{
     import pandas as pd
     import numpy as np 
     import time
+    import os
 
     metadata_table= pd.read_table(\"${metadata}\", sep='\t')
     metadata_table = metadata_table.drop([0,1])
@@ -1374,7 +1375,7 @@ process runGraphlan{
     ioi_set = set(metadata_table[\"${ioi}\"])
     ioi = '${ioi}'
 
-    subprocess.run(['mkdir phylo_trees'], shell=True)
+    os.system('mkdir phylo_trees')
 
     # iterates over the items of interest to produce a circular phylogenetic tree per category e.g. CONTROL TREATMENT
     for item in ioi_set:
@@ -1387,13 +1388,13 @@ process runGraphlan{
 
         # bash script call to handle the steps within a conda python 2.7.17 envionment
         generate_image_command = 'bash graph.sh'
-        result = subprocess.run([generate_image_command], shell=True)
+        result = os.system(generate_image_command)
 
     rename_image = 'cp *_image_graph.png phylo_trees/.'
-    result = subprocess.run([rename_image], shell=True)
+    result = os.system(rename_image)
 
     rename_pdf_image = 'cp *_image_pdf_graph.png phylo_trees/.'
-    result = subprocess.run([rename_pdf_image], shell=True)
+    result = os.system(rename_pdf_image)
     """
 
 }
