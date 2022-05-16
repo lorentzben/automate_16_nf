@@ -1362,7 +1362,7 @@ process runGraphlan{
     output:
     path "phylo_trees/*" into ch_png_phylo_tree
     file "table-dada2.qza" into ch_table_lefse_graphlan
-    //file "rarefied_table.qza" into ch_table_lefse
+    file "rarefied_table.qza" into ch_table_lefse
     //file "taxonomy.qza" into ch_tax_lefse
     
     script:
@@ -1417,7 +1417,7 @@ process LefseFormat {
     input:
     val ioi from ch_ioi_lefse
     file "table-dada2.qza" from ch_table_lefse_graphlan
-    //file "rarefied_table.qza" from ch_table_lefse
+    file "rarefied_table.qza" from ch_table_lefse
     file "rooted-tree.qza" from ch_tree_lefse
     file "taxonomy.qza" from ch_tax_lefse
     file metadata from ch_metadata_lefse
@@ -1429,8 +1429,8 @@ process LefseFormat {
 
     output:
     path "combos/*" into ch_paired_lefse_format
-    //file "table-dada2.qza" into ch_table_report
-    file "rarefied_table.qza" into ch_table_report
+    file "table-dada2.qza" into ch_table_report_raw
+    file "rarefied_table.qza" into ch_table_report_rare
     file "rooted-tree.qza" into ch_tree_report
     file "taxonomy.qza" into ch_tax_report
     file "metadata.tsv" into ch_metadata_report
@@ -1511,8 +1511,8 @@ process GenerateReport{
 
     input:
     file "item_of_interest.csv" from ch_ioi_file_out
-    //file "table-dada2.qza" from ch_table_report
-    file "rarefied_table.qza" from ch_table_report
+    file "table-dada2.qza" from ch_table_report_raw
+    file "rarefied_table.qza" from ch_table_report_rare
     file "rooted-tree.qza" from ch_tree_report
     file "taxonomy.qza" from ch_tax_report
     file metadata from ch_metadata_report
