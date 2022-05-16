@@ -1507,7 +1507,7 @@ process GenerateReport{
     file "rooted-tree.qza" from ch_tree_report
     file "taxonomy.qza" from ch_tax_report
     file metadata from ch_metadata_report
-    path "phylo_trees/*" from ch_png_phylo_tree_ran
+    path "phylo_trees/*" from ch_png_phylo_tree
     path "shannon/*" from ch_shannon_path
     path "simpson/*" from ch_simpson_path
     path "chao1/*" from ch_chao_path
