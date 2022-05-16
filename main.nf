@@ -1232,7 +1232,7 @@ process GeneratePhylogeneticTrees{
     file "filter_samples.py" from ch_filter_script
 
     output:
-    path "phylo_trees/*" into ch_png_phylo_tree
+    //path "phylo_trees/*" into ch_png_phylo_tree
     file "table-dada2.qza" into ch_table_lefse
     file "table-dada2.qza" into ch_table_graphlan2
     //file "rarefied_table.qza" into ch_table_lefse
@@ -1350,11 +1350,11 @@ process runGraphlan{
     file "rarefied_table.qza" from ch_phylo_tree_rare_table_run
     file "taxonomy.qza" from ch_taxonomy_phylo_tree_run
     file "graph.sh" from ch_graph_script
-    path "phylo_trees/*" from ch_png_phylo_tree
+    //path "phylo_trees/*" from ch_png_phylo_tree
     //file "filter_samples.py" from ch_filter_script
 
     output:
-    path "phylo_trees/*" into ch_png_phylo_tree_ran
+    path "phylo_trees/*" into ch_png_phylo_tree
     file "table-dada2.qza" into ch_table_lefse_graphlan
     //file "rarefied_table.qza" into ch_table_lefse
     //file "taxonomy.qza" into ch_tax_lefse
