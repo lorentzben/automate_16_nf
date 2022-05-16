@@ -1303,19 +1303,21 @@ process GeneratePhylogeneticTrees{
 
         result = subprocess.run([biom_format_command], shell=True)
 
+        #TODO remove these lines if the next process works
+        
         # Outputs the current ioi so that it can be annotated in the graphlan image
         with open('current.txt', 'w') as file:
             file.write(item)
 
         # bash script call to handle the steps within a conda python 2.7.17 envionment
-        generate_image_command = 'bash graph.sh'
+        #generate_image_command = 'bash graph.sh'
 
-        result = subprocess.run([generate_image_command], shell=True)
+        #result = subprocess.run([generate_image_command], shell=True)
 
         # renaming otu tables so they have meaning
-        rename_table = 'cp otu-table-mod.biom phylo_trees/otu-table-'+str(item)+'-mod.biom'
+        #rename_table = 'cp otu-table-mod.biom phylo_trees/otu-table-'+str(item)+'-mod.biom'
         
-        result = subprocess.run([rename_table],shell=True)
+        #result = subprocess.run([rename_table],shell=True)
 
         # This will be handled outside of the for loop
         # renaming the output of the graping bash script so that it has meaning
