@@ -1055,7 +1055,7 @@ process RareCurveCalc{
     output:
     file "alpha-rarefaction.qzv" into ch_alpha_rare_obj
     path "alpha-rareplot/*" into ch_alpha_rare_viz
-    file "table-dada2.qza" into ch_table_phylo_tree
+    file "table-dada2.qza" into ch_table_phylo_tree_rare
     file "rooted-tree.qza" into ch_tree_lefse
     
 
@@ -1225,8 +1225,8 @@ process GeneratePhylogeneticTrees{
     input:
     file metadata from ch_metadata_phylo_tree
     val ioi from ch_ioi_phylo_tree
-    //file "table-dada2.qza" from ch_table_phylo_tree
-    file "rarefied_table.qza" from ch_phylo_tree_rare_table
+    file "table-dada2.qza" from ch_table_phylo_tree_rare
+    //file "rarefied_table.qza" from ch_phylo_tree_rare_table
     file "taxonomy.qza" from ch_taxonomy_phylo_tree
     //file "graph.sh" from ch_graph_script
     file "filter_samples.py" from ch_filter_script
