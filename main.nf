@@ -1229,8 +1229,8 @@ process GeneratePhylogeneticTrees{
 
     output:
     path "phylo_trees/*" into ch_png_phylo_tree
-    //file "table-dada2.qza" into ch_table_lefse
-    file "rarefied_table.qza" into ch_table_lefse
+    file "table-dada2.qza" into ch_table_lefse
+    //file "rarefied_table.qza" into ch_table_lefse
     file "taxonomy.qza" into ch_tax_lefse
     
 
@@ -1348,7 +1348,7 @@ process runGraphlan{
 
     output:
     path "phylo_trees/*" into ch_png_phylo_tree_ran
-    file "table-dada2.qza" into ch_table_lefse
+    file "table-dada2.qza" into ch_table_lefse_graphlan
     //file "rarefied_table.qza" into ch_table_lefse
     //file "taxonomy.qza" into ch_tax_lefse
     
