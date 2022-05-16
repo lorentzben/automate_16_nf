@@ -1237,7 +1237,7 @@ process GeneratePhylogeneticTrees{
     file "table-dada2.qza" into ch_table_graphlan2
     //file "rarefied_table.qza" into ch_table_lefse
     file "taxonomy.qza" into ch_tax_lefse
-    file "otu-table-mod.biom" into ch_table_mod
+    path "biom_tabs" into ch_biom_tabs
 
     
 
@@ -1302,9 +1302,11 @@ process GeneratePhylogeneticTrees{
 
         # human readable table into compressed computer-readble format
         biom_format_command='biom convert -i otu-'+str(item)+ \
-        '-mod-table.tsv -o otu-table-mod.biom --to-hdf5 --table-type=\"OTU table\" --process-obs-metadata taxonomy'
+        '-mod-table.tsv -o str(item)+-otu-table-mod.biom --to-hdf5 --table-type=\"OTU table\" --process-obs-metadata taxonomy'
 
         result = subprocess.run([biom_format_command], shell=True)
+
+        result = subprocess.run(["cp *-otu-table-mod.biom biom_tabs"])
 
         #TODO remove these lines if the next process works
 
@@ -1352,7 +1354,7 @@ process runGraphlan{
     file "rarefied_table.qza" from ch_phylo_tree_rare_table_run
     file "taxonomy.qza" from ch_taxonomy_phylo_tree_run
     file "graph.sh" from ch_graph_script
-    file "otu-table-mod.biom" from ch_table_mod
+    path "biom_tabs" from ch_biom_tabs
     //path "phylo_trees/*" from ch_png_phylo_tree
     //file "filter_samples.py" from ch_filter_script
 
@@ -1377,6 +1379,8 @@ process runGraphlan{
 
     ioi_set = set(metadata_table[\"${ioi}\"])
     ioi = '${ioi}'
+    
+    os.system('cp biom_tabs/*-otu-table-mod.biom .')
 
     os.system('mkdir phylo_trees')
 
