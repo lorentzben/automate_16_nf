@@ -921,6 +921,8 @@ process AlphaDiversityMeasure{
     then
         SAMP_DEPTH=!{user_depth}
     fi
+
+    echo !{user_depth} > used_samp_depth.txt
   
     qiime diversity core-metrics-phylogenetic \
     --i-phylogeny rooted-tree.qza \
