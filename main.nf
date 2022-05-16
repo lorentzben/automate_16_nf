@@ -914,9 +914,11 @@ process AlphaDiversityMeasure{
 
     echo !{user_depth} > test_samp_depth.txt
 
-    if [ !{user_depth} == 0 ];then
+    if [[ !{user_depth} == 0 ]]
+    then
         SAMP_DEPTH=$(head samp_depth_simple.txt)
-    else [ !{user_depth} != 0 ];then
+    elif [[ !{user_depth} != 0 ]]
+    then
         SAMP_DEPTH=!{user_depth}
     fi
   
@@ -1059,11 +1061,11 @@ process RareCurveCalc{
     '''
     #!/usr/bin/env bash
 
-    if [ !{user_rare_depth} == 0 ];then
+    if [[ !{user_rare_depth} == 0 ]]
+    then
         DEPTH=$(head rare_depth.txt)
-    fi
-    
-    if [ !{user_rare_depth} != 0 ];then
+    elif [[ !{user_rare_depth} != 0 ]]
+    then
         DEPTH=!{user_rare_depth}
     fi
 
