@@ -916,9 +916,7 @@ process AlphaDiversityMeasure{
 
     if [ !{user_depth} == 0 ];then
         SAMP_DEPTH=$(head samp_depth_simple.txt)
-    fi
-    
-    if [ !{user_depth} != 0 ];then
+    else [ !{user_depth} != 0 ];then
         SAMP_DEPTH=!{user_depth}
     fi
   
