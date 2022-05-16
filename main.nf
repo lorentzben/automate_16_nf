@@ -1256,6 +1256,7 @@ process GeneratePhylogeneticTrees{
     ioi = '${ioi}'
 
     subprocess.run(['mkdir phylo_trees'], shell=True)
+    subprocess.run(['mkdir biom_tabs'], shell=True)
 
     # iterates over the items of interest to produce a circular phylogenetic tree per category e.g. CONTROL TREATMENT
     for item in ioi_set:
@@ -1306,7 +1307,7 @@ process GeneratePhylogeneticTrees{
 
         result = subprocess.run([biom_format_command], shell=True)
 
-        result = subprocess.run(["cp *-otu-table-mod.biom biom_tabs"])
+        result = subprocess.run(['cp str(item)+-otu-table-mod.biom biom_tabs'],shell=True)
 
         #TODO remove these lines if the next process works
 
@@ -1379,7 +1380,7 @@ process runGraphlan{
 
     ioi_set = set(metadata_table[\"${ioi}\"])
     ioi = '${ioi}'
-    
+
     os.system('cp biom_tabs/*-otu-table-mod.biom .')
 
     os.system('mkdir phylo_trees')
