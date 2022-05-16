@@ -1234,6 +1234,7 @@ process GeneratePhylogeneticTrees{
     output:
     path "phylo_trees/*" into ch_png_phylo_tree
     file "table-dada2.qza" into ch_table_lefse
+    file "table-dada2.qza" into ch_table_graphlan2
     //file "rarefied_table.qza" into ch_table_lefse
     file "taxonomy.qza" into ch_tax_lefse
     
@@ -1304,7 +1305,7 @@ process GeneratePhylogeneticTrees{
         result = subprocess.run([biom_format_command], shell=True)
 
         #TODO remove these lines if the next process works
-        
+
         # Outputs the current ioi so that it can be annotated in the graphlan image
         with open('current.txt', 'w') as file:
             file.write(item)
@@ -1345,7 +1346,7 @@ process runGraphlan{
     input:
     file metadata from ch_metadata_phylo_tree_run
     val ioi from ch_ioi_phylo_tree_run
-    file "table-dada2.qza" from ch_table_phylo_tree
+    file "table-dada2.qza" from ch_table_graphlan2
     file "rarefied_table.qza" from ch_phylo_tree_rare_table_run
     file "taxonomy.qza" from ch_taxonomy_phylo_tree_run
     file "graph.sh" from ch_graph_script
@@ -1406,7 +1407,7 @@ process LefseFormat {
 
     input:
     val ioi from ch_ioi_lefse
-    file "table-dada2.qza" from ch_table_lefse
+    file "table-dada2.qza" from ch_table_lefse_graphlan
     //file "rarefied_table.qza" from ch_table_lefse
     file "rooted-tree.qza" from ch_tree_lefse
     file "taxonomy.qza" from ch_tax_lefse
