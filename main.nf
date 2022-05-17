@@ -1306,7 +1306,7 @@ process GeneratePhylogeneticTrees{
 
         result = subprocess.run([biom_format_command], shell=True)
 
-        result = subprocess.run(['cp str(item)+-otu-table-mod.biom biom_tabs'],shell=True)
+        result = subprocess.run(['cp '+str(item)+'-otu-table-mod.biom biom_tabs'],shell=True)
 
         #TODO remove these lines if the next process works
 
