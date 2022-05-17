@@ -3,7 +3,6 @@ title: "04 16s Analysis Report"
 output:
   pdf_document:
     df_print: kable
-    classoption: landscape
   html_document:
     df_print: kable
     smart: false
@@ -32,6 +31,8 @@ if(!dir.exists(paste0("../",outdir_name))) {dir.create(paste0("../",outdir_name)
 outdir <- paste0("../",outdir_name)
 ```
 
+\blandscape
+
 ## 4 Alpha Diversity Table
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
@@ -56,3 +57,5 @@ alpha_summary <- Reduce(function(...) merge(..., by='id', all.x=TRUE), list(obs,
 kable(alpha_summary) %>% 
   kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
 ```
+
+\elandscape
