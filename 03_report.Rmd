@@ -33,7 +33,8 @@ outdir <- paste0("../",outdir_name)
 
 ## 3 Species Abundance Heatmap
 
-```{r heatmap at the Genus level annotatted with item of interest, echo=FALSE, fig.height=10, fig.width=14, message=FALSE, warning=FALSE}
+```{r heatmap at the Genus level annotatted with item of interest, echo=FALSE, fig.height=14, fig.width=28, message=FALSE, warning=FALSE}
+#original height 10 width 14
 library(qiime2R)
 library(phyloseq)
 library(ampvis2)
