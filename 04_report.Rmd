@@ -1,9 +1,5 @@
 ---
 title: "04 16s Analysis Report"
-header-includes:
-- \usepackage{pdflscape}
-- \newcommand{\blandscape}{\begin{landscape}}
-- \newcommand{\elandscape}{\end{landscape}}
 output:
   pdf_document:
     df_print: kable
@@ -35,7 +31,7 @@ if(!dir.exists(paste0("../",outdir_name))) {dir.create(paste0("../",outdir_name)
 outdir <- paste0("../",outdir_name)
 ```
 
-\blandscape
+
 
 ## 4 Alpha Diversity Table
 
@@ -62,4 +58,3 @@ kable(alpha_summary) %>%
   kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
 ```
 
-\elandscape
