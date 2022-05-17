@@ -1,5 +1,9 @@
 ---
 title: "04 16s Analysis Report"
+header-includes:
+- \usepackage{pdflscape}
+- \newcommand{\blandscape}{\begin{landscape}}
+- \newcommand{\elandscape}{\end{landscape}}
 output:
   pdf_document:
     df_print: kable
