@@ -44,7 +44,7 @@ if(!is_html_output()){
 ```{r Lefse analysis Results, echo=FALSE, message=FALSE, warning=FALSE, fig.height=25, fig.width=10, out.height="85%", out.width="85%", fig.cap="\\newline{}"}
 library(knitr)
 library(gtools)
-if(is_html_output()) {
+#if(is_html_output()) {
 
   lefse_res_filenames <- list.files("lefse/result",pattern="*_res.png",full.names = T)
 
@@ -52,11 +52,11 @@ if(is_html_output()) {
 
   include_graphics(lefse_filenames)
   
-} 
+#} 
 ```
 
 
-```{r Lefse analysis Results pdf style, echo=FALSE, message=FALSE, warning=FALSE, out.height="85%",dpi=36, out.width="85%", fig.cap="\\newline{}"}
+```{r Lefse analysis Results pdf style, echo=FALSE, message=FALSE, warning=FALSE, include=FALSE, out.height="85%",dpi=36, out.width="85%", fig.cap="\\newline{}"}
 library(gtools)
 library(knitr)
 
@@ -78,7 +78,7 @@ if(!is_html_output()){
 library(gtools)
 library(knitr)
 
-if(is_html_output()) {
+#if(is_html_output()) {
  
   
   lefse_clado_filenames <- list.files("lefse/result",pattern="*_cladogram.png",full.names=T)
@@ -87,17 +87,17 @@ if(is_html_output()) {
 
   include_graphics(lefse_filenames)
   
-} 
+#} 
  
-if(!is_html_output()){
-  print("see end of report")
-  
-  lefse_clado_filenames <- list.files("lefse/result",pattern="result/*_pdf_qual_clad.png",full.names=T)
-  
-  lefse_filenames <- mixedsort(lefse_clado_filenames)
-
-  include_graphics(lefse_filenames)
-  
-}
+#if(!is_html_output()){
+#  print("see end of report")
+#  
+#  lefse_clado_filenames <- list.files("lefse/result",pattern="result/*_pdf_qual_clad.png",full.names=T)
+#  
+#  lefse_filenames <- mixedsort(lefse_clado_filenames)
+#
+#  include_graphics(lefse_filenames)
+#  
+#}
 
 ```
