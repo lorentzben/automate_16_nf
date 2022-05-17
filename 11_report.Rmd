@@ -34,7 +34,8 @@ outdir <- paste0("../",outdir_name)
 ## 11 UPGMA Plots
 ### 11.1 UPGMA Plot for Weighted Unifrac Distance
 
-```{r UPGMA Plot of Weighted Unifrac Distance, echo=FALSE, fig.height=8, fig.width=10, message=FALSE, warning=FALSE}
+```{r UPGMA Plot of Weighted Unifrac Distance, echo=FALSE, fig.height=10, fig.width=15, message=FALSE, warning=FALSE}
+#original height 8 width 10 
 library(ggplot2)
 library(ggdendro)
 library(qiime2R)
@@ -163,7 +164,8 @@ ggsave("UPGMA_weighted_unifrac_plot.png", plot=weight_plot, path=outdir)
 
 ### 11.2 UPGMA Plot for Unweighted Unifrac Distance
 
-```{r UPGMA Plot of Unweighted Unifrac Distances, echo=FALSE, fig.height=8, fig.width=10, message=FALSE, warning=FALSE}
+```{r UPGMA Plot of Unweighted Unifrac Distances, echo=FALSE, fig.height=10, fig.width=15, message=FALSE, warning=FALSE}
+#original height 8 width 10 
 library(ggplot2)
 library(ggdendro)
 library(qiime2R)
