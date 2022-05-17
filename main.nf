@@ -1302,7 +1302,7 @@ process GeneratePhylogeneticTrees{
 
         # human readable table into compressed computer-readble format
         biom_format_command='biom convert -i otu-'+str(item)+ \
-        '-mod-table.tsv -o str(item)+-otu-table-mod.biom --to-hdf5 --table-type=\"OTU table\" --process-obs-metadata taxonomy'
+        '-mod-table.tsv -o '+str(item)+'-otu-table-mod.biom --to-hdf5 --table-type=\"OTU table\" --process-obs-metadata taxonomy'
 
         result = subprocess.run([biom_format_command], shell=True)
 
