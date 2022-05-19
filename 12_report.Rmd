@@ -284,6 +284,7 @@ pairwise_perma
 
 ```{r Method to do pairwise anosim comparisons, message=FALSE, warning=FALSE, include=FALSE}
 library(rstatix)
+library(ggplot2)
 library(ggpubr)
 library(phyloseq)
 library(vegan)
