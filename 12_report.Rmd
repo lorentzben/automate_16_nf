@@ -282,7 +282,7 @@ pairwise_perma
 
 ### 12.5 ANOSIM
 
-```{r Method to do pairwise anosim comparisons, echo=FALSE, message=FALSE, warning=FALSE, include=FALSE, eval=FALSE}
+```{r Method to do pairwise anosim comparisons, message=FALSE, warning=FALSE, include=FALSE}
 library(rstatix)
 library(ggpubr)
 library(phyloseq)
@@ -347,7 +347,7 @@ pairwise_anosim_uni <- function(dat, column_of_int, weight){
 ```
 
 
-```{r echo=FALSE, fig.height=8, fig.width=10, message=FALSE, warning=FALSE, include=FALSE,eval=FALSE}
+```{r ANOSIM analysis, echo=FALSE, fig.height=8, fig.width=10, message=FALSE, warning=FALSE}
 library(rstatix)
 library(ggpubr)
 cycle_1 <- qza_to_phyloseq(table_dada2,rooted_tree,taxonomy_file,metadata_file)
@@ -451,7 +451,7 @@ ggsave("ANOSIM_jaccard_boxplot_no_bracket.png", plot=jaccard_plot_no_brac, path 
 
 ### 12.6 Multi-response permutation procedure (MRPP)
 
-```{r Methods to do pairwise MRPP comparisons, echo=FALSE, message=FALSE, warning=FALSE}
+```{r Methods to do pairwise MRPP comparisons, message=FALSE, warning=FALSE, include=FALSE}
 library(tidyverse)
 library(phyloseq)
 library(vegan)
@@ -571,7 +571,7 @@ kable(jaccard_res) %>%
 
 ### 12.7 AMOVA
 
-```{r Methods to do pairwise AMOVA comparisons, echo=FALSE, message=FALSE, warning=FALSE}
+```{r Methods to do pairwise AMOVA comparisons, message=FALSE, warning=FALSE, include=FALSE}
 library(pegas)
 library(phyloseq)
 library(rstatix)
