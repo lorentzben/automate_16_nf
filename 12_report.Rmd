@@ -395,12 +395,12 @@ uw_uni_pair %>%
 
 #Unweighted Unifrac ANOSIM plot
 #uw_uni_plot <- autoplot(res,notch = F) +theme_bw() + labs(title = "ANOSIM Unweighted Unifrac") +
-  stat_pvalue_manual(uw_uni_pair, label="p.signif.box", y.position = max(res$dis.rank)-(.5*median(res$dis.rank)),step.increase = .03, tip.length = 0.01, hide.ns=T)+ xlab(as.character(ioi)) + ylab("Rank Value")
+#stat_pvalue_manual(uw_uni_pair, label="p.signif.box", y.position = max(res$dis.rank)-(.5*median(res$dis.rank)),step.increase = .03, tip.length = 0.01, hide.ns=T)+ xlab(as.character(ioi)) + ylab("Rank Value")
 #uw_uni_plot
 #save to disk
 #ggsave("ANOSIM_unweighted_unifrac_boxplot.png", plot=uw_uni_plot, path=outdir)
 #Unweighted Unifrac ANOSIM plot No bracket
-uw_uni_plot_no_brac <- autoplot(res,notch = F) +theme_bw() +aes(fill=res$class.vec)+ labs(title = "ANOSIM Unweighted Unifrac", fill=ioi) + xlab(as.character(ioi)) + ylab("Rank Value")
+uw_uni_plot_no_brac <- autoplot(res,notch = F) + theme_bw() + aes(fill=res$class.vec)+ labs(title = "ANOSIM Unweighted Unifrac", fill=ioi) + xlab(as.character(ioi)) + ylab("Rank Value")
 uw_uni_plot_no_brac
 #save to disk
 ggsave("ANOSIM_unweighted_unifrac_boxplot_no_brackets.png", plot=uw_uni_plot_no_brac, path=outdir)
