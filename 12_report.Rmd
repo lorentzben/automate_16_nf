@@ -351,6 +351,8 @@ pairwise_anosim_uni <- function(dat, column_of_int, weight){
 ```{r ANOSIM analysis, echo=FALSE, fig.height=8, fig.width=10, message=FALSE, warning=FALSE}
 library(rstatix)
 library(ggpubr)
+library(ggvegan)
+
 cycle_1 <- qza_to_phyloseq(table_dada2,rooted_tree,taxonomy_file,metadata_file)
 sample_data(cycle_1)[[ioi]] <- factor(sample_data(cycle_1)[[ioi]], levels=ioi_ord)
 
