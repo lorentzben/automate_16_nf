@@ -917,8 +917,7 @@ process AlphaDiversityMeasure{
     if [[ !{user_depth} == 0 ]]
     then
         SAMP_DEPTH=$(head samp_depth_simple.txt)
-    elif [[ !{user_depth} != 0 ]]
-    then
+    else
         SAMP_DEPTH=!{user_depth}
     fi
 
@@ -1066,8 +1065,7 @@ process RareCurveCalc{
     if [[ !{user_rare_depth} == 0 ]]
     then
         DEPTH=$(head rare_depth.txt)
-    elif [[ !{user_rare_depth} != 0 ]]
-    then
+    else
         DEPTH=!{user_rare_depth}
     fi
 
