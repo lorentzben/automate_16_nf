@@ -1450,14 +1450,15 @@ process LefseFormat {
     cp -rf /renv_dev/renv .
     cp -rf /renv_dev/renv.lock .
     
-    Rscript -e ".libPaths('./r_lib/')"
-    Rscript -e "renv::activate()"
+    
+    #Rscript -e ".libPaths('./r_lib/')"
+    #Rscript -e "renv::activate()"
     #Rscript -e "renv::init()"
     #Rscript -e "renv::install('rmarkdown')"
-    Rscript -e "renv::restore(library='./renv/library/R-4.1/x86_64-pc-linux-gnu/', lockfile='./renv.lock')"
+    #Rscript -e "renv::restore(library='./renv/library/R-4.1/x86_64-pc-linux-gnu/', lockfile='./renv.lock')"
 
     mkdir combos
-    #Rscript init_and_refresh.R
+    Rscript init_and_refresh.R
     cp ${metadata} "metadata.tsv"
     Rscript qiime_to_lefse.R ${ioi}
     mv lefse_formatted.txt combos/

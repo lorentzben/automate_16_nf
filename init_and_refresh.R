@@ -1,33 +1,9 @@
 #! /usr/bin/env Rscript --vanilla
-if(!require(renv)) {install.packages("renv",repos="http://cran.us.r-project.org")}
-renv::isolate()
-renv::init(bioconductor = TRUE)
-install.packages("BiocManager")
-BiocManager::install(version = "3.12", ask=FALSE)
-renv::install("yaml")
-if(!require(rhdf5)) renv::install("bioc::rhdf5",version="3.12",force=TRUE)
-if(!require(Biostrings)) renv::install("bioc::Biostrings",version="3.12")
-if(!require(Biobase)) renv::install("bioc::Biobase",version="3.12")
-if(!require(dplyr)) renv::install("dplyr")
-if(!require(tibble)) renv::install("tibble")
-if(!require(phyloseq)) BiocManager::install("phyloseq", version="3.12", force=TRUE)
-if(!require(jamba)) renv::install("jmw86069/jamba@0.0.6.900")
-if(!require(qiime2R)) renv::install("jbisanz/qiime2R@d1ad96657ada993cf6c2841b29113a4f635c6b56") # current version is 0.99.20
-if(!require(ampvis2)) renv::install("MadsAlbertsen/ampvis2@eaef3f8df7e3fc90ef5c8c7f241f87fa05afb1b8")
-if(!require(ggdendro)) renv::install("ggdendro@0.1.22", type="source")
-if(!require(ggConvexHull)) renv::install("cmartin/ggConvexHull@e05904a2ea4747712c0733a85a1e645c308e24ae")
-if(!require(ggvegan)) renv::install("gavinsimpson/ggvegan@4bc6ee9945dd9229ed486409c0acab9413b8c9af")
-if(!require(qiime2R)) renv::install("jbisanz/qiime2R@d1ad96657ada993cf6c2841b29113a4f635c6b56")
-if(!require(pegas)) renv::install("pegas@1.0")
-if(!require(rmarkdown)) renv::install("rmarkdown@2.8")
-if(!require(rstatix)) renv::install("rstatix")
-if(!require(RcppEigen)) renv::install("RcppEigen@0.3.3.9.1")
-if(!require(biomformat)) BiocManager::install("biomformat",version="3.12",force=TRUE)
-renv::install("dbplyr@2.1.1")
-renv::install("lubridate@1.7.10")
-renv::install("reprex@2.0.0")
-renv::install("tidyverse@2.1.1")
-#renv::restore()
-#renv::snapshot()
+#Rscript -e ".libPaths('./r_lib/')"
+.libPaths('/renv_dev/r_lib/')
+Rscript -e "renv::activate()"
+#Rscript -e "renv::init()"
+#Rscript -e "renv::install('rmarkdown')"
+Rscript -e "renv::restore(library='./renv/library/R-4.1/x86_64-pc-linux-gnu/', lockfile='./renv.lock')"
 q()
 
