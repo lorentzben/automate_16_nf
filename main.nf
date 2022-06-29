@@ -1446,8 +1446,15 @@ process LefseFormat {
     script:
     """
     #!/usr/bin/env bash
+    cp -rf /renv_dev/renv .
+    cp -rf /renv_dev/renv.lock .
+
+    Rscript -e "renv::init()"
+    Rscript -e "renv::install('rmarkdown')"
+    Rscript -e "renv::restore()"
+
     mkdir combos
-    Rscript init_and_refresh.R
+    #Rscript init_and_refresh.R
     cp ${metadata} "metadata.tsv"
     Rscript qiime_to_lefse.R ${ioi}
     mv lefse_formatted.txt combos/
