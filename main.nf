@@ -199,6 +199,7 @@ process SetupRPackages{
     #Rscript -e "renv::install('rmarkdown')"
     Rscript -e "renv::restore(library='./renv/library/R-4.1/x86_64-pc-linux-gnu/', lockfile='./renv.lock')"
 
+
     #Sys.setenv(R_REMOTES_NO_ERRORS_FROM_WARNINGS="true")
     #if(!require(rmarkdown)) {install.packages("rmarkdown", repos="http://cran.us.r-project.org")}
     #if(!require(renv)) {install.packages("renv",repos="http://cran.us.r-project.org")}
@@ -215,7 +216,7 @@ process SetupRPackages{
 
 
     #cat('done',file='set.txt', sep='\n')
-    echo done > set.txt
+    echo "done" > set.txt
     """
 
 }
