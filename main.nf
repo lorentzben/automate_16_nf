@@ -1449,7 +1449,8 @@ process LefseFormat {
     #!/usr/bin/env bash
     cp -rf /renv_dev/renv .
     cp -rf /renv_dev/renv.lock .
-
+    
+    Rscript -e "renv::settings$use.cache(FALSE)"
     #Rscript -e "renv::init()"
     #Rscript -e "renv::install('rmarkdown')"
     Rscript -e "renv::restore(library='./renv/library/R-4.1/x86_64-pc-linux-gnu/', lockfile='./renv.lock')"
