@@ -215,8 +215,8 @@ process SetupRPackages{
     
 
 
-    #cat('done',file='set.txt', sep='\n')
-    echo "done" > set.txt
+    
+    echo 'done' > set.txt
     """
 
 }
