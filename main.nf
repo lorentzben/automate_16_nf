@@ -1449,6 +1449,7 @@ process LefseFormat {
     #!/usr/bin/env bash
     cp -rf /renv_dev/renv .
     cp -rf /renv_dev/renv.lock .
+    cp -rf /renv_dev/r_lib . 
     
     
     #Rscript -e ".libPaths('./r_lib/')"
