@@ -1450,7 +1450,7 @@ process LefseFormat {
     cp -rf /renv_dev/renv .
     cp -rf /renv_dev/renv.lock .
     
-    Rscript -e 'Sys.setenv(RENV_PATHS_CACHE = "./renv/cache")'
+    Rscript -e ".libPaths('./r_lib/')"
     Rscript -e "renv::activate()"
     #Rscript -e "renv::init()"
     #Rscript -e "renv::install('rmarkdown')"
