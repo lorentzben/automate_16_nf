@@ -197,7 +197,7 @@ process SetupRPackages{
 
     #Rscript -e "renv::init()"
     #Rscript -e "renv::install('rmarkdown')"
-    Rscript -e "renv::restore()"
+    Rscript -e "renv::restore(library='./renv/library/R-4.1/x86_64-pc-linux-gnu/', lockfile='./renv.lock')"
 
     #Sys.setenv(R_REMOTES_NO_ERRORS_FROM_WARNINGS="true")
     #if(!require(rmarkdown)) {install.packages("rmarkdown", repos="http://cran.us.r-project.org")}
@@ -1451,7 +1451,7 @@ process LefseFormat {
 
     #Rscript -e "renv::init()"
     #Rscript -e "renv::install('rmarkdown')"
-    Rscript -e "renv::restore()"
+    Rscript -e "renv::restore(library='./renv/library/R-4.1/x86_64-pc-linux-gnu/', lockfile='./renv.lock')"
 
     mkdir combos
     #Rscript init_and_refresh.R
