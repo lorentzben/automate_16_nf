@@ -1,9 +1,9 @@
 #! /usr/bin/env Rscript 
-.libPaths('/renv_dev/r_lib/')
+.libPaths('./r_lib/')
 library(renv)
-#Sys.setenv(RENV_DEFAULT_R_LIBS_SITE="/renv_dev/r_lib")
-#Sys.setenv(RENV_PATHS_LIBRARY="/renv_dev/r_lib")
-#Sys.setenv(R_LIBS_SITE="/renv_dev/r_lib")
+Sys.setenv(RENV_DEFAULT_R_LIBS_SITE="/renv_dev/r_lib")
+Sys.setenv(RENV_PATHS_LIBRARY="/renv_dev/r_lib")
+Sys.setenv(R_LIBS_SITE="/renv_dev/r_lib")
 #.libPaths('./r_lib/')
 #Sys.setenv(R_INSTALL_STAGED = "false")
 #options(install.opts = "--no-test-load")
