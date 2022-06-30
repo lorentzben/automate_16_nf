@@ -1,4 +1,4 @@
-#! /usr/bin/env Rscript --vanilla
+#! /usr/bin/env Rscript 
 #if(!require(renv)) {install.packages("renv",repos="http://cran.us.r-project.org")}
 #renv::init()
 #if(!require(dplyr)){install.packages("dplyr",repos="http://cran.us.r-project.org")}
