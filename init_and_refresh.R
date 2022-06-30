@@ -1,5 +1,6 @@
 #! /usr/bin/env Rscript 
-#Rscript -e ".libPaths('./r_lib/')"
+.libPaths('/renv_dev/r_lib/')
+library(renv)
 #Sys.setenv(RENV_DEFAULT_R_LIBS_SITE="/renv_dev/r_lib")
 #Sys.setenv(RENV_PATHS_LIBRARY="/renv_dev/r_lib")
 #Sys.setenv(R_LIBS_SITE="/renv_dev/r_lib")
@@ -10,7 +11,7 @@
 #RENV_DEFAULT_R_LIBS_SITE
 #RENV_PATHS_LIBRARY
 #renv::settings$use.cache(TRUE)
-#renv::activate()
+renv::activate()
 #Rscript -e "renv::init()"
 #Rscript -e "renv::install('rmarkdown')"
 renv::restore(library='./renv/library/R-4.1/x86_64-pc-linux-gnu/', lockfile='./renv.lock')
