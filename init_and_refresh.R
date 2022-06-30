@@ -10,7 +10,7 @@ options(install.opts = "--no-test-load")
 #RENV_DEFAULT_R_LIBS_SITE
 #RENV_PATHS_LIBRARY
 #renv::settings$use.cache(TRUE)
-renv::activate()
+#renv::activate()
 #Rscript -e "renv::init()"
 #Rscript -e "renv::install('rmarkdown')"
 renv::restore(library='./renv/library/R-4.1/x86_64-pc-linux-gnu/', lockfile='./renv.lock')
