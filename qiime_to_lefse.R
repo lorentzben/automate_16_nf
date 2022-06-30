@@ -1,9 +1,9 @@
 #! /usr/bin/env Rscript 
-.libPaths('./r_lib/')
+.libPaths('renv/library/R-4.1/x86_64-pc-linux-gnu/')
 library(renv)
-Sys.setenv(RENV_DEFAULT_R_LIBS_SITE="/renv_dev/r_lib")
-Sys.setenv(RENV_PATHS_LIBRARY="/renv_dev/r_lib")
-Sys.setenv(R_LIBS_SITE="/renv_dev/r_lib")
+Sys.setenv(RENV_DEFAULT_R_LIBS_SITE="renv/library/R-4.1/x86_64-pc-linux-gnu/")
+Sys.setenv(RENV_PATHS_LIBRARY="renv/library/R-4.1/x86_64-pc-linux-gnu/")
+Sys.setenv(R_LIBS_SITE="renv/library/R-4.1/x86_64-pc-linux-gnu/")
 #if(!require(renv)) {install.packages("renv",repos="http://cran.us.r-project.org")}
 #renv::init()
 #if(!require(dplyr)){install.packages("dplyr",repos="http://cran.us.r-project.org")}
