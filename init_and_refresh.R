@@ -1,4 +1,4 @@
-#! /usr/bin/env Rscript --vanilla
+#! /usr/bin/env Rscript 
 #Rscript -e ".libPaths('./r_lib/')"
 .libPaths('./r_lib/')
 Sys.setenv(R_INSTALL_STAGED = "false")
