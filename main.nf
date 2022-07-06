@@ -155,6 +155,10 @@ Channel
     .fromPath("${baseDir}/renv.lock")
     .set{ ch_r_lock }
 
+Channel
+    .fromPath("${baseDir}/setup_r.sh")
+    .set{ ch_setup_r_bash }
+
 
 /*
 process SetupPy2CondaEnv{
@@ -186,18 +190,25 @@ process SetupRPackages{
     //label 'r'
     container "docker://lorentzb/r_latest_2"
 
+    input:
+    file "setup_r.sh" from ch_setup_r_bash
+
     output:
     file "set.txt" into ch_r_wait
 
     script:
     """
     #!/usr/bin/env bash
-    cp -rf /renv_dev/renv .
-    cp -rf /renv_dev/renv.lock .
+
+    bash setup_r.sh
+
+    #cp -rf /renv_dev/renv .
+    #cp -rf /renv_dev/renv.lock .
 
     #Rscript -e "renv::init()"
     #Rscript -e "renv::install('rmarkdown')"
-    Rscript -e "renv::restore(library='./renv/library/R-4.1/x86_64-pc-linux-gnu/', lockfile='./renv.lock')"
+
+    #Rscript -e "renv::restore(library='./renv/library/R-4.1/x86_64-pc-linux-gnu/', lockfile='./renv.lock')"
 
 
     #Sys.setenv(R_REMOTES_NO_ERRORS_FROM_WARNINGS="true")
@@ -216,7 +227,7 @@ process SetupRPackages{
 
 
     
-    echo 'done' > set.txt
+    #echo 'done' > set.txt
     """
 
 }
