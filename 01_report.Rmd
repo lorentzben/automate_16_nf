@@ -280,7 +280,7 @@ if (length(as.vector(na.exclude(names(cycle_n_names)))) <= topN){
   cycle_n_glom <- tax_glom(cycle_n, taxrank = level)
 
   #calculate relative abundance based on sample
-  cycle_1_genus <- merged %>%
+  cycle_1_genus <- cycle_n %>%
     tax_glom(taxrank = level) %>%
     transform_sample_counts(function(x) {x/sum(x)}) %>%
     psmelt() %>%
