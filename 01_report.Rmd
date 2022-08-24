@@ -300,7 +300,7 @@ if (length(as.vector(na.exclude(names(cycle_n_names)))) <= topN){
   ggsave("stacked_bar_genus_by_sample.png", plot=by_sample, path=outdir)
 
   #calculate relative abundance based on treatment 
-  cy_genus <- merged %>%
+  cy_genus <- cycle_n %>%
     tax_glom(taxrank = level) %>%
     merge_samples(ioi,fun=sum) %>%
     transform_sample_counts(function(x) {x/sum(x)}) %>%
