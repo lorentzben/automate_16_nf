@@ -93,7 +93,7 @@ topN <- 10
 cycle_n_names <- sort(tapply(taxa_sums(cycle_1), tax_table(cycle_1)[,as.character(level)], sum), TRUE) [1:topN]
 
 
-if (length(as.vector(na.exclude(names(cycle_n_names)))) < topN){
+if (length(as.vector(na.exclude(names(cycle_n_names)))) <= topN){
   topN <- length(as.vector(na.exclude(names(cycle_n_names))))
   #selects top n taxa and creates phyloseq object
   cycle_n <- subset_taxa(cycle_1, get(level) %in% as.vector(na.exclude(names(cycle_n_names))))
@@ -268,84 +268,139 @@ tax.clean$Species[i] <- paste("Genus",tax.clean$Genus[i], sep = "_")
 
 tax_table(cycle_1) <- as.matrix(tax.clean)
 
+
 #Select number of taxa at genus level to plot
 topN <- 10
 
-#selects top n taxa and creates phyloseq object
 cycle_n_names <- sort(tapply(taxa_sums(cycle_1), tax_table(cycle_1)[,as.character(level)], sum), TRUE) [1:topN]
-cycle_n <- subset_taxa(cycle_1, get(level) %in% names(cycle_n_names))
-cycle_n_glom <- tax_glom(cycle_n, taxrank = level)
 
-#selects top n + 1 to the end of table
-rest_tax <- sort(tapply(taxa_sums(cycle_1), tax_table(cycle_1)[,as.character(level)], sum), TRUE) [topN+1:length(tax_table(cycle_1))]
-rest <- subset_taxa(cycle_1, get(level) %in% names(rest_tax))
-rest_glom <- tax_glom(rest, taxrank = level)
+if (length(as.vector(na.exclude(names(cycle_n_names)))) <= topN){
+  #selects top n taxa and creates phyloseq object
+  cycle_n <- subset_taxa(cycle_1, get(level) %in% as.vector(na.exclude(names(cycle_n_names))))
+  cycle_n_glom <- tax_glom(cycle_n, taxrank = level)
 
-#collapse all genera not in top 10 into one taxon
-rest_merge <- merge_taxa(rest, taxa_names(rest))
+  #calculate relative abundance based on sample
+  cycle_1_genus <- merged %>%
+    tax_glom(taxrank = level) %>%
+    transform_sample_counts(function(x) {x/sum(x)}) %>%
+    psmelt() %>%
+    arrange(Abundance)
 
-#create dummy taxonomy classificaiton for collapsed taxa
-taxvec <- c("Other","Other","Other","Other","Other", "Other","Other")
-taxlist <- list(OTU1=parse_taxonomy_default(taxvec))
-tax_tab <- build_tax_table(taxlist)
-colnames(tax_tab) <- c("Kingdom","Phylum","Class","Order","Family","Genus","Species")
-rownames(tax_tab) <- rownames(tax_table(rest_merge))
-tax_table(rest_merge) <- tax_tab
+  #ggplot of stacked bar chart separated by sample
+  by_sample <- ggplot(cycle_1_genus, aes(x=Sample, y=Abundance, fill=fct_relevel(fct_reorder(cycle_1_genus[[level]], Abundance),"Other"))) + 
+    geom_bar(stat= "identity") +
+    xlab("Sample ID") +
+    ylab(label="Relative Abundance") +
+    guides(fill=guide_legend(title=level))+
+    theme_minimal() +
+    theme(axis.text.x = element_text(angle = 90,vjust=0.5, hjust=1)) +
+    theme(text=element_text(size = 20))
 
-#attaches top n phyloseq object with the other phyloseq object
-merge_tax <- merge_phyloseq(tax_table(cycle_n), tax_table(rest_merge))
-merge_otu <- merge_phyloseq(otu_table(cycle_n), otu_table(rest_merge))
-merge_samp <- merge_phyloseq(sample_data(cycle_n), sample_data(rest_merge))
+  print(by_sample)
+  ggsave("stacked_bar_genus_by_sample.png", plot=by_sample, path=outdir)
 
-merged <- merge_phyloseq(merge_tax, merge_otu, merge_samp)
+  #calculate relative abundance based on treatment 
+  cy_genus <- merged %>%
+    tax_glom(taxrank = level) %>%
+    merge_samples(ioi,fun=sum) %>%
+    transform_sample_counts(function(x) {x/sum(x)}) %>%
+    psmelt() %>%
+    arrange(Abundance)
 
-#calculate relative abundance based on sample
-cycle_1_genus <- merged %>%
-  tax_glom(taxrank = level) %>%
-  transform_sample_counts(function(x) {x/sum(x)}) %>%
-  psmelt() %>%
-  arrange(Abundance)
+  cy_genus$Sample <- factor(cy_genus$Sample, levels=ioi_ord)
 
-#ggplot of stacked bar chart separated by sample
-by_sample <- ggplot(cycle_1_genus, aes(x=Sample, y=Abundance, fill=fct_relevel(fct_reorder(cycle_1_genus[[level]], Abundance),"Other"))) + 
-  geom_bar(stat= "identity") +
-  xlab("Sample ID") +
-  ylab(label="Relative Abundance") +
-  guides(fill=guide_legend(title=level))+
-  theme_minimal() +
-  theme(axis.text.x = element_text(angle = 90,vjust=0.5, hjust=1)) +
-  theme(text=element_text(size = 20))
+  #ggplot figure of stacked bar chart separated by treatment
+  by_treatment <- ggplot(cy_genus, aes(x=Sample, y=Abundance, fill=fct_relevel(fct_reorder(cy_genus[[level]],Abundance),"Other"))) + 
+    geom_bar(stat="identity") +
+    guides(fill=guide_legend(title=level)) + 
+    xlab(label = ioi) +
+    ylab(label="Relative Abundance") +
+    theme_minimal()+
+    theme(text=element_text(size = 20))
 
-print(by_sample)
-ggsave("stacked_bar_genus_by_sample.png", plot=by_sample, path=outdir)
+  #prints charts for rnotebook
 
-#calculate relative abundance based on treatment 
-cy_genus <- merged %>%
-  tax_glom(taxrank = level) %>%
-  merge_samples(ioi,fun=sum) %>%
-  transform_sample_counts(function(x) {x/sum(x)}) %>%
-  psmelt() %>%
-  arrange(Abundance)
+  print(by_treatment)
 
-cy_genus$Sample <- factor(cy_genus$Sample, levels=ioi_ord)
+  #saves copies of figures to outdir
 
-#ggplot figure of stacked bar chart separated by treatment
-by_treatment <- ggplot(cy_genus, aes(x=Sample, y=Abundance, fill=fct_relevel(fct_reorder(cy_genus[[level]],Abundance),"Other"))) + 
-  geom_bar(stat="identity") +
-  guides(fill=guide_legend(title=level)) + 
-  xlab(label = ioi) +
-  ylab(label="Relative Abundance") +
-  theme_minimal()+
-  theme(text=element_text(size = 20))
+  ggsave("stacked_bar_genus_by_treatment.png", plot = by_treatment, path=outdir)
 
-#prints charts for rnotebook
+}else{
+  #selects top n taxa and creates phyloseq object
+  cycle_n <- subset_taxa(cycle_1, get(level) %in% as.vector(na.exclude(names(cycle_n_names))))
+  cycle_n_glom <- tax_glom(cycle_n, taxrank = level)
 
-print(by_treatment)
+  #selects top n + 1 to the end of table
+  rest_tax <- sort(tapply(taxa_sums(cycle_1), tax_table(cycle_1)[,as.character(level)], sum), TRUE) [topN+1:length(tax_table(cycle_1))]
+  rest <- subset_taxa(cycle_1, get(level) %in% as.vector(na.exclude(names(rest_tax))))
+  rest_glom <- tax_glom(rest, taxrank = level)
 
-#saves copies of figures to outdir
+  #collapse all genera not in top 10 into one taxon
+  rest_merge <- merge_taxa(rest, taxa_names(rest))
 
-ggsave("stacked_bar_genus_by_treatment.png", plot = by_treatment, path=outdir)
+  #create dummy taxonomy classificaiton for collapsed taxa
+  taxvec <- c("Other","Other","Other","Other","Other", "Other","Other")
+  taxlist <- list(OTU1=parse_taxonomy_default(taxvec))
+  tax_tab <- build_tax_table(taxlist)
+  colnames(tax_tab) <- c("Kingdom","Phylum","Class","Order","Family","Genus","Species")
+  rownames(tax_tab) <- rownames(tax_table(rest_merge))
+  tax_table(rest_merge) <- tax_tab
 
+  #attaches top n phyloseq object with the other phyloseq object
+  merge_tax <- merge_phyloseq(tax_table(cycle_n), tax_table(rest_merge))
+  merge_otu <- merge_phyloseq(otu_table(cycle_n), otu_table(rest_merge))
+  merge_samp <- merge_phyloseq(sample_data(cycle_n), sample_data(rest_merge))
+
+  merged <- merge_phyloseq(merge_tax, merge_otu, merge_samp)
+
+    #calculate relative abundance based on sample
+  cycle_1_genus <- merged %>%
+    tax_glom(taxrank = level) %>%
+    transform_sample_counts(function(x) {x/sum(x)}) %>%
+    psmelt() %>%
+    arrange(Abundance)
+
+  #ggplot of stacked bar chart separated by sample
+  by_sample <- ggplot(cycle_1_genus, aes(x=Sample, y=Abundance, fill=fct_relevel(fct_reorder(cycle_1_genus[[level]], Abundance),"Other"))) + 
+    geom_bar(stat= "identity") +
+    xlab("Sample ID") +
+    ylab(label="Relative Abundance") +
+    guides(fill=guide_legend(title=level))+
+    theme_minimal() +
+    theme(axis.text.x = element_text(angle = 90,vjust=0.5, hjust=1)) +
+    theme(text=element_text(size = 20))
+
+  print(by_sample)
+  ggsave("stacked_bar_genus_by_sample.png", plot=by_sample, path=outdir)
+
+  #calculate relative abundance based on treatment 
+  cy_genus <- merged %>%
+    tax_glom(taxrank = level) %>%
+    merge_samples(ioi,fun=sum) %>%
+    transform_sample_counts(function(x) {x/sum(x)}) %>%
+    psmelt() %>%
+    arrange(Abundance)
+
+  cy_genus$Sample <- factor(cy_genus$Sample, levels=ioi_ord)
+
+  #ggplot figure of stacked bar chart separated by treatment
+  by_treatment <- ggplot(cy_genus, aes(x=Sample, y=Abundance, fill=fct_relevel(fct_reorder(cy_genus[[level]],Abundance),"Other"))) + 
+    geom_bar(stat="identity") +
+    guides(fill=guide_legend(title=level)) + 
+    xlab(label = ioi) +
+    ylab(label="Relative Abundance") +
+    theme_minimal()+
+    theme(text=element_text(size = 20))
+
+  #prints charts for rnotebook
+
+  print(by_treatment)
+
+  #saves copies of figures to outdir
+
+  ggsave("stacked_bar_genus_by_treatment.png", plot = by_treatment, path=outdir)
+}
 ```
 
 
@@ -398,7 +453,7 @@ topN <- 10
 cycle_n_names <- sort(tapply(taxa_sums(cycle_1), tax_table(cycle_1)[,as.character(level)], sum), TRUE) [1:topN]
 
 
-if (length(as.vector(na.exclude(names(cycle_n_names)))) < topN){
+if (length(as.vector(na.exclude(names(cycle_n_names)))) <= topN){
   topN <- length(as.vector(na.exclude(names(cycle_n_names))))
   #selects top n taxa and creates phyloseq object
   cycle_n <- subset_taxa(cycle_1, get(level) %in% as.vector(na.exclude(names(cycle_n_names))))
@@ -532,9 +587,3 @@ if (length(as.vector(na.exclude(names(cycle_n_names)))) < topN){
 
 ```
 
-
-```{r eval=FALSE, include=FALSE}
-counts_w_species <- merge(data.frame(taxa_sums(cycle_1)), tax_table(cycle_1)[,7])
-counts_w_species$Species <- counts_w_species$Species %>% replace_na("Bacteria")
-aggregate(. ~ Species, data=counts_w_species, FUN=sum)
-```
