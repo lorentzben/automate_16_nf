@@ -9,7 +9,7 @@ cp -rf /renv_dev/renv.lock .
 
 Rscript -e "renv::init()"
 Rscript -e "renv::install('rmarkdown')"
-Rscript -e "renv::instal('knitr@1.39')"
+Rscript -e "renv::install('knitr@1.39')"
 
 cp ../item_of_interest.csv .
 cp ../order_item_of_interest.csv .
