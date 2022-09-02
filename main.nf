@@ -187,7 +187,7 @@ process SetupPy2CondaEnv{
 process SetupRPackages{
     //conda "${projectDir}/r_env.yml"
     //conda "r_env.yml"
-    //label 'r'
+    label 'process_low'
     container "docker://lorentzb/r_latest_2"
 
     input:
@@ -250,6 +250,7 @@ process VerifyManifest{
     */
     //conda "${projectDir}/environment.yml"
     //conda "environment.yml"
+    label 'process_low'
     container "docker://lorentzb/automate_16_nf"
 
     script:
@@ -403,7 +404,7 @@ process CheckSinglePaired {
     file 'data_type.txt' into dataType
     file "item_of_interest.csv" into ch_ioi_file_out
 
-
+    label 'process_low'
     script:
     """
     #!/usr/bin/env python3
@@ -472,7 +473,7 @@ process GenerateSeqObject{
     file 'demux.qza' into ch_qiime_obj
     file manifest_format into ch_manifest_type
     
-
+    label 'process_medium'
     shell:
     '''
     DAT=$(head !{data_type})
@@ -501,6 +502,7 @@ process QualControl{
     //conda "environment.yml"
     container "docker://lorentzb/automate_16_nf"
 
+    label 'process_medium'
     script:
     """
     #!/usr/bin/env bash
@@ -533,6 +535,8 @@ process FindCutoffs{
     //conda "${projectDir}/environment.yml"
     //conda "environment.yml"
     container "docker://lorentzb/automate_16_nf"
+
+    label 'process_low'
 
     script:
     //TODO add a if block here that can grep a .txt to see if a user submitted cutoffs
@@ -705,6 +709,8 @@ process Denoise {
     //conda "environment.yml"
     container "docker://lorentzb/automate_16_nf"
 
+    label 'process_medium'
+
     script:
     """
     #!/usr/bin/env python3
@@ -773,6 +779,8 @@ process FeatureVisualization{
     //conda "environment.yml"
     container "docker://lorentzb/automate_16_nf"
 
+    label 'process_low'
+
     script:
     """
     #!/usr/bin/env bash
@@ -809,6 +817,8 @@ process TreeConstruction{
     file "rooted-tree.qza" into ch_rooted_tree
     file "rep-seqs-dada2.qza" into ch_rep_seq_classify
 
+    label 'process_medium'
+    
     script:
     """
     #!/usr/bin/env bash 
@@ -836,6 +846,8 @@ process ExportTable{
     path "table_viz/*" into ch_table_viz_dir
     path "table_viz/*" into ch_table_viz_dir_rare
 
+    label 'process_low'
+
     script:
     """
     #!/usr/bin/env bash
@@ -862,6 +874,7 @@ process DetermineDepth{
     file "sampling_depth.csv" into ch_sampling_depth_csv
     file "samp_depth_simple.txt" into ch_depth
 
+    label 'process_low'
 
     script:
     """
@@ -939,7 +952,7 @@ process AlphaDiversityMeasure{
     file "rooted-tree.qza" into ch_tree_rare_curve
     
 
-    
+    label 'process_medium'
 
     shell:
     '''
@@ -1014,6 +1027,7 @@ process AssignTaxonomy{
     file "taxonomy.qza" into ch_taxonomy_phylo_tree_run
     file "taxonomy.qzv" into ch_classified_qzv
     
+    label 'process_medium'
 
     script:
     """
@@ -1053,6 +1067,8 @@ process CalcRareDepth{
     output:
     file "rare_depth.txt" into ch_rare_curve_depth
 
+    label 'process_low'
+
     script:
     """
     #!/usr/bin/env python3
@@ -1090,6 +1106,7 @@ process RareCurveCalc{
     file "table-dada2.qza" into ch_table_phylo_tree_rare
     file "rooted-tree.qza" into ch_tree_lefse
     
+    label 'process_medium'
 
     shell:
     '''
@@ -1141,6 +1158,8 @@ process AlphaDiversitySignificance{
     path "ace/*" into ch_ace_path
     path "obs/*" into ch_obs_path
     path "faith_pd/*" into ch_faith_path
+
+    label 'process_medium'
 
     script:
     """
@@ -1218,6 +1237,8 @@ process BetaDiversitySignificance{
     path "unweighted-sig/*" into ch_u_unifrac_beta_path
     path "weighted-sig/*" into ch_w_unifrac_beta_path
 
+    label 'process_medium'
+    
     script:
     """
     #!/usr/bin/env bash
@@ -1269,7 +1290,7 @@ process GeneratePhylogeneticTrees{
     file "taxonomy.qza" into ch_tax_lefse
     path "biom_tabs/*" into ch_biom_tabs
 
-    
+    label 'process_medium'
 
     script:
     """
@@ -1395,6 +1416,8 @@ process runGraphlan{
     file "rarefied_table.qza" into ch_table_lefse
     //file "taxonomy.qza" into ch_tax_lefse
     
+    label 'process_low'
+
     script:
     """
     #!/usr/bin/env python2
@@ -1465,6 +1488,7 @@ process LefseFormat {
     file "taxonomy.qza" into ch_tax_report
     file "metadata.tsv" into ch_metadata_report
 
+    label 'process_medium'
 
     script:
     """
@@ -1504,6 +1528,8 @@ process LefseAnalysis{
     output:
     path "result/*" into ch_lefse_results
 
+    label 'process_medium'
+
     script:
     """
     #!/usr/bin/env bash
@@ -1527,6 +1553,8 @@ process ExportSetup{
     file "dada2_stats.tsv" into ch_dada_stats_file
     file "metadata.tsv" into ch_metadata_renamed
 
+    label 'process_medium'
+
     script:
     """
     #!/usr/bin/env bash
@@ -1548,7 +1576,7 @@ process GenerateReport{
     //conda "${projectDir}/r_env.yml"
     //conda "r_env.yml"
     container "docker://lorentzb/r_latest"
-    label 'r'
+    //label 'r'
 
     input:
     file "item_of_interest.csv" from ch_ioi_file_out
@@ -1579,7 +1607,9 @@ process GenerateReport{
 
     output:
     file "done.txt" into ch_done
-       
+
+    label 'process_medium'
+
     shell:
     '''
     #!/usr/bin/env bash
