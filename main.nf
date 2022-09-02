@@ -264,7 +264,7 @@ process VerifyManifest{
     cwd = os.getcwd()
     
     try:
-        read_metadata = pd.read_table(cwd+'/${metadata}', index_col=0, sep='\t')
+        read_metadata = pd.read_table(cwd+'/'+'${metadata}', index_col=0, sep='\t')
     except FileNotFoundError:
         exit(1)
 
@@ -279,7 +279,7 @@ process VerifyManifest{
 
     seq_dir = '${seqs_dir}'
     try:
-        read_manifest = pd.read_table(cwd+'/${manifest}', index_col=0, sep='\t')
+        read_manifest = pd.read_table(cwd+'/'+'${manifest}', index_col=0, sep='\t')
     except FileNotFoundError:
         exit(1)
 
