@@ -264,7 +264,7 @@ process VerifyManifest{
     cwd = os.getcwd()
     
     try:
-        metadata_path = str(${metadata}')
+        metadata_path = str('${metadata}')
         metadata_path = cwd+'/'+metadata_path
         read_metadata = pd.read_table(metadata_path, index_col=0, sep='\t')
     except FileNotFoundError:
