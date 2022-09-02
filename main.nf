@@ -264,10 +264,11 @@ process VerifyManifest{
     cwd = os.getcwd()
     
     try:
-        read_metadata = pd.read_table(str(cwd+'/'+'${metadata}'), index_col=0, sep='\t')
+        metadata_path = str(cwd+'/'+'${metadata}')
+        read_metadata = pd.read_table(metadata_path, index_col=0, sep='\t')
     except FileNotFoundError:
         print("Incorrect Path for Metadata!")
-        print("Path provided: " +str(cwd+'/'+'${metadata}'))
+        print("Path provided: "+metadata_path )
         exit(1)
 
     try:
@@ -281,10 +282,11 @@ process VerifyManifest{
 
     seq_dir = '${seqs_dir}'
     try:
-        read_manifest = pd.read_table(str(cwd+'/'+'${manifest}'), index_col=0, sep='\t')
+        manifest_path = str(cwd+'/'+'${manifest}')
+        read_manifest = pd.read_table(manifest_path, index_col=0, sep='\t')
     except FileNotFoundError:
         print("Incorrect Path for manifest!")
-        print("Path provided: " +str(cwd+'/'+'${manifest}'))
+        print("Path provided: " +manifest_path)
         exit(1)
 
     # sets current dir and finds the fastq and fastq.gz files in the current directory
