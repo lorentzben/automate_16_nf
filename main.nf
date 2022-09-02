@@ -736,6 +736,7 @@ process Denoise {
             --i-demultiplexed-seqs demux.qza \
             --p-trim-left " + str(left)+" \
             --p-trunc-len " + str(right) + " \
+            --p-n-threads 0 \
             --o-representative-sequences rep-seqs-dada2.qza \
             --o-table table-dada2.qza \
             --o-denoising-stats stats-dada2.qza"
@@ -750,6 +751,7 @@ process Denoise {
             --p-trunc-len-r " + str(rev_right) + " \
             --p-trim-left-f " + str(forward_left)+" \
             --p-trim-left-r " + str(rev_left) + " \
+            --p-n-threads 0 \
             --o-representative-sequences rep-seqs-dada2.qza \
             --o-table table-dada2.qza \
             --o-denoising-stats stats-dada2.qza"
