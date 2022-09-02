@@ -264,7 +264,8 @@ process VerifyManifest{
     cwd = os.getcwd()
     
     try:
-        metadata_path = str(cwd+'/'+'${metadata}')
+        metadata_path = str(${metadata}')
+        metadata_path = cwd+'/'+metadata_path
         read_metadata = pd.read_table(metadata_path, index_col=0, sep='\t')
     except FileNotFoundError:
         print("Incorrect Path for Metadata!")
@@ -282,7 +283,8 @@ process VerifyManifest{
 
     seq_dir = '${seqs_dir}'
     try:
-        manifest_path = str(cwd+'/'+'${manifest}')
+        manifest_path = str('${manifest}')
+        manifest_path = cwd+'/'+manifest_path
         read_manifest = pd.read_table(manifest_path, index_col=0, sep='\t')
     except FileNotFoundError:
         print("Incorrect Path for manifest!")
