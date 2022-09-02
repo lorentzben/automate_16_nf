@@ -262,7 +262,7 @@ process VerifyManifest{
     import csv 
 
     try:
-        read_metadata = pd.read_table('${metadata}', index_col=0, sep='\t')
+        read_metadata = pd.read_table('${workDir}/${metadata}', index_col=0, sep='\t')
     except FileNotFoundError:
         exit(1)
 
