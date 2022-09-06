@@ -1035,13 +1035,15 @@ process AssignTaxonomy{
     """
     #!/usr/bin/env bash
 
-    if [ ! -f "16s-whole-seq-classifier.qza" ]; then 
-    echo "Error, download the classifier from readme"
-    exit 1
+    if [ ! -f "16s-whole-seq-classifier.qza" ]
+    then 
+        echo "Error, download the classifier from readme"
+        exit 1
     fi
-    if [ ! -f "515-806-classifier.qza" ]; then 
-    echo "Error, download the classifier from readme"
-    exit 1
+    if [ ! -f "515-806-classifier.qza" ]
+    then 
+        echo "Error, download the classifier from readme"
+        exit 1
     fi
 
     qiime feature-classifier classify-sklearn \
