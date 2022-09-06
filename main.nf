@@ -17,7 +17,9 @@ def helpMessage(){
         --rareDepth [str]             Value of rarefaction depth derived from table.qzv
         --forward [str]               Value of the custom forward cutoff
         --rev [str]                   Value of the custom reverse cutoff
-        --classify [path/to/folder]      Folder containing 515 and whole 16s classifier qza files.
+        --classify [path/to/folder]   Folder containing 515 and whole 16s classifier qza files.
+        --classify_515 [path/to/file] Path to 515-806.qza classifier.
+        --classify_full [path/to/file] Path to full 16s.qza classifier. 
         --outdir [file]               The output directory where the results will be saved 
 
 
@@ -101,6 +103,8 @@ if(!params.rareDepth){
         .set{ ch_user_rarefaction_depth }
 }
 
+/*
+TODO remove if not needed
 if(params.classify){
     Channel
         .fromPath(params.classify)
@@ -111,6 +115,24 @@ if(params.classify){
         .ifEmpty {exit 1, log.info "Cannot find the classifier!"}
         .set{ ch_515_classifier }
 }
+*/
+
+if(params.classify_515){
+    515File = file(params.classify_515).getName()
+    Channel
+        .fromPath(params.classify_515)
+        .ifEmpty {exit 1, log.info "Cannot find the classifier!"}
+        .set{ ch_515_classifier }
+}
+
+if(params.classify_full){
+    fullFile = file(params.classify_full).getName()
+    Channel
+        .fromPath(params.classify_full)
+        .ifEmpty {exit 1, log.info "Cannot find the classifier!"}
+        .set{ ch_whole_classifier}
+}
+
 
 Channel
     .fromPath("${baseDir}/plot_cladogram.py")
