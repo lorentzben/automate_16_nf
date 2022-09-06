@@ -17,7 +17,7 @@ def helpMessage(){
         --rareDepth [str]             Value of rarefaction depth derived from table.qzv
         --forward [str]               Value of the custom forward cutoff
         --rev [str]                   Value of the custom reverse cutoff
-        --class [path/to/folder]      Folder containing 515 and whole 16s classifier qza files.
+        --classify [path/to/folder]      Folder containing 515 and whole 16s classifier qza files.
         --outdir [file]               The output directory where the results will be saved 
 
 
@@ -101,13 +101,13 @@ if(!params.rareDepth){
         .set{ ch_user_rarefaction_depth }
 }
 
-if(params.class){
+if(params.classify){
     Channel
-        .fromPath(params.class"/16s-whole-seq-classifier.qza")
+        .fromPath(params.classify"/16s-whole-seq-classifier.qza")
         .ifEmpty {exit 1, log.info "Cannot find the classifier!"}
         .set{ ch_whole_classifier}
     Channel
-        .fromPath(params.class"/515-806-classifier.qza")
+        .fromPath(params.classify"/515-806-classifier.qza")
         .ifEmpty {exit 1, log.info "Cannot find the classifier!"}
         .set{ ch_515_classifier }
 }
