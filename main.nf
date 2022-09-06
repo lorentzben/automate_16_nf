@@ -118,7 +118,7 @@ if(params.classify){
 */
 
 if(params.classify_515){
-    515File = file(params.classify_515).getName()
+    fiveFile = file(params.classify_515).getName()
     Channel
         .fromPath(params.classify_515)
         .ifEmpty {exit 1, log.info "Cannot find the classifier!"}
