@@ -103,11 +103,11 @@ if(!params.rareDepth){
 
 if(params.classify){
     Channel
-        .fromPath(params.classify"/16s-whole-seq-classifier.qza")
+        .fromPath(params.classify)
         .ifEmpty {exit 1, log.info "Cannot find the classifier!"}
         .set{ ch_whole_classifier}
     Channel
-        .fromPath(params.classify"/515-806-classifier.qza")
+        .fromPath(params.classify)
         .ifEmpty {exit 1, log.info "Cannot find the classifier!"}
         .set{ ch_515_classifier }
 }
