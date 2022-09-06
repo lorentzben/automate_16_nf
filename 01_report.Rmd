@@ -21,16 +21,16 @@ renv::restore()
 #this may be required for each file
 #item of interest, comes from bash and python script that orchestrates everything
 wd <- getwd()
-ioi <- read.csv("../item_of_interest.csv")
+ioi <- read.csv("item_of_interest.csv")
 ioi<-as.character(ioi)
 
-ioi_ord <- read.csv("../order_item_of_interest.csv")
+ioi_ord <- read.csv("order_item_of_interest.csv")
 colnames(ioi_ord) <- ioi
 ioi_ord <- as.list(ioi_ord)[[ioi]]
 
 outdir_name <- "Figures"
-if(!dir.exists(paste0("../",outdir_name))) {dir.create(paste0("../",outdir_name))}
-outdir <- paste0("../",outdir_name)
+if(!dir.exists(outdir_name)) {dir.create(outdir_name)}
+outdir <- outdir_name
 ```
 
 ## 1 Species Distribution 
@@ -47,11 +47,11 @@ library(tidyverse)
 options(bitmapType='cairo')
 level = "Phylum"
 
-#table_dada2 <- "../qiime/table-dada2.qza"
-table_dada2 <- "../qiime/core-metric-results/rarefied_table.qza"
-rooted_tree <- "../qiime/rooted-tree.qza"
-taxonomy_file <- "../qiime/taxonomy.qza"
-metadata_file <- "../metadata.tsv"
+#table_dada2 <- "table-dada2.qza"
+table_dada2 <- "core-metric-results/rarefied_table.qza"
+rooted_tree <- "rooted-tree.qza"
+taxonomy_file <- "taxonomy.qza"
+metadata_file <- "metadata.tsv"
 
 
 #Create phyloseq object from qiime objects

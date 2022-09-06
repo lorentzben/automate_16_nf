@@ -149,7 +149,7 @@ Channel
 Channel
     .from(params.itemOfInterest)
     .ifEmpty {exit 1, log.info "Cannot find Item of interest"}
-    .into{ ch_ioi_veri ; ch_ioi_beta_sig ; ch_ioi_phylo_tree ; ch_ioi_phylo_tree_run ; ch_ioi_lefse ; ch_ioi_denoise_to_file }
+    .into{ ch_ioi_veri ; ch_ioi_beta_sig ; ch_ioi_phylo_tree ; ch_ioi_phylo_tree_run ; ch_ioi_lefse ; ch_ioi_denoise_to_file ; ch_ioi_r01_csv }
 
 Channel
     .fromPath("${baseDir}/graph.sh")
@@ -186,6 +186,9 @@ Channel
     .fromPath("${baseDir}/setup_r.sh")
     .set{ ch_setup_r_bash }
 
+Channel
+    .fromPath("${baseDir}/ch_01_report_file")
+    .set{ ch_01_report_file }
 
 /*
 process SetupPy2CondaEnv{
@@ -270,7 +273,7 @@ process VerifyManifest{
 
     output:
 
-    file "order_item_of_interest.csv" into ch_format_ioi_order
+    file "order_item_of_interest.csv" into ( ch_format_ioi_order, ch_oioi_r01_csv )
 
     /*this is in place for local deployment, but the server does not give access to the dir for some reason
     The change is nessecary to do nextflow run -r main lorentzben/automate_16_nf
@@ -843,7 +846,7 @@ process TreeConstruction{
     file "aligned-rep-seqs.qza" into ch_aligned_rep_seqs
     file "masked-aligned-rep-seqs.qza" into ch_mask_align_rep_seq
     file "unrooted-tree.qza" into ch_unrooted_tree
-    file "rooted-tree.qza" into ch_rooted_tree
+    file "rooted-tree.qza" into (ch_rooted_tree, ch_rooted_tree_r01)
     file "rep-seqs-dada2.qza" into ch_rep_seq_classify
 
     label 'process_medium'
@@ -968,7 +971,7 @@ process AlphaDiversityMeasure{
 
     output:
     path "core-metric-results/*" into ch_core_beta_significance 
-    path "core-metric-results/*" into ch_core_report
+    path "core-metric-results/*" into ( ch_core_report , ch_rare_table_r01 )
     file "core-metric-results/rarefied_table.qza" into ch_phylo_tree_rare_table
     file "core-metric-results/rarefied_table.qza" into ch_phylo_tree_rare_table_run
     file "shannon.qza" into ch_shannon_qza
@@ -1052,7 +1055,7 @@ process AssignTaxonomy{
     file "515-806-classifier.qza" from ch_515_classifier
 
     output:
-    file "taxonomy.qza" into ch_taxonomy_phylo_tree
+    file "taxonomy.qza" into ( ch_taxonomy_phylo_tree, ch_taxonomy_r01)
     file "taxonomy.qza" into ch_taxonomy_phylo_tree_run
     file "taxonomy.qzv" into ch_classified_qzv
     
@@ -1517,7 +1520,7 @@ process LefseFormat {
     file "rarefied_table.qza" into ch_table_report_rare
     file "rooted-tree.qza" into ch_tree_report
     file "taxonomy.qza" into ch_tax_report
-    file "metadata.tsv" into ch_metadata_report
+    file "metadata.tsv" into ( ch_metadata_report, ch_metadata_r01 )
 
     label 'process_medium'
 
@@ -1600,9 +1603,59 @@ process ExportSetup{
     """
 }
 
+process Report01 {
+    publishDir "${params.outdir}", mode: 'move'
+
+    container "docker://lorentzb/r_01"
+
+    input:
+    file "01_report.Rmd" from ch_01_report_file
+    file "item_of_interest.csv" from ch_ioi_r01_csv
+    file "order_item_of_interest.csv" from ch_oioi_r01_csv
+    file "core-metric-results/rarefied_table.qza" from ch_rare_table_r01 
+    file "rooted-tree.qza" from ch_rooted_tree_r01  
+    file "taxonomy.qza" from ch_taxonomy_r01  
+    file "metadata.tsv" from ch_metadata_r01
+
+    output:
+    path "01_report" into ch_01_reports
+    path "Figures" into ch_01_figures
+
+    label 'process_medium'
+    script:
+    '''
+    #! /usr/bin/env bash
+
+    #Input: item_of_interest.csv order_item_of_interest.csv qiime/* metadata.tsv
+    #Output: ../Figures/* 01_report_$dt.html 01_report_$dt.pdf
+
+    mkdir 01_report
+
+    echo "I am Here:"
+    pwd
+    ls
+
+    cp -rf /renv_dev/renv .
+    cp -rf /renv_dev/renv.lock . 
+
+    Rscript -e "renv::init()"
+    Rscript -e "renv::install('rmarkdown')"
+
+    #cp ../item_of_interest.csv .
+    #cp ../order_item_of_interest.csv .
+
+    dt=$(date '+%d-%m-%Y_%H.%M.%S');
+
+    Rscript -e "rmarkdown::render('01_report.Rmd', output_file='01_report/01_report_$dt.html', output_format='html_document', clean=TRUE)"
+
+    Rscript -e "rmarkdown::render('01_report.Rmd', output_file='01_report/01_report_$dt.pdf', output_format='pdf_document', clean=TRUE)"
+    '''
+
+
+}
 
 process GenerateReport{
-     publishDir "${baseDir}", mode: 'move'
+    publishDir "${baseDir}", mode: 'move'
 
     //conda "${projectDir}/r_env.yml"
     //conda "r_env.yml"
