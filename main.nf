@@ -187,7 +187,7 @@ Channel
     .set{ ch_setup_r_bash }
 
 Channel
-    .fromPath("${baseDir}/ch_01_report_file")
+    .fromPath("${baseDir}/01_report.Rmd")
     .set{ ch_01_report_file }
 
 /*
