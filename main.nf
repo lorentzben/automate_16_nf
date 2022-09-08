@@ -1604,7 +1604,7 @@ process ExportSetup{
 }
 
 process Report01 {
-    publishDir "${params.outdir}", mode: 'move'
+    publishDir "${params.outdir}/reports", mode: 'move'
 
     container "docker://lorentzb/r_01"
 
