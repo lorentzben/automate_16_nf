@@ -21,7 +21,7 @@ output:
 #this may be required for each file
 #item of interest, comes from bash and python script that orchestrates everything
 wd <- getwd()
-ioi <- readLines("item_of_interest.csv")
+ioi <- readLines(paste0(wd,"/item_of_interest.csv"))
 ioi<-as.character(ioi)
 
 ioi_ord <- read.csv("order_item_of_interest.csv")
