@@ -1635,8 +1635,6 @@ process Report01 {
     pwd
     ls
     
-    mv 01_report.Rmd $PWD
-
     #cp -rf /renv_dev/renv .
     #cp -rf /renv_dev/renv.lock . 
 
