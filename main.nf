@@ -1634,9 +1634,7 @@ process Report01 {
     echo "I am Here:"
     pwd
     ls
-
-    cp 01_report.Rmd $PWD
-
+    echo $PWD > !{projectDir}/work_dir.txt 
     #cp -rf /renv_dev/renv .
     #cp -rf /renv_dev/renv.lock . 
 
