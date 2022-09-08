@@ -22,8 +22,9 @@ output:
 #item of interest, comes from bash and python script that orchestrates everything
 #wd <- readLines("work_dir.txt")
 #setwd(wd)
-#wd <- getwd()
-ioi <- readLines(paste0(wd/"item_of_interest.csv"))
+wd <- getwd()
+print(wd)
+ioi <- readLines(paste0("item_of_interest.csv"))
 ioi<-as.character(ioi)
 
 ioi_ord <- read.csv("order_item_of_interest.csv")
