@@ -1618,7 +1618,7 @@ process Report01 {
     file "metadata.tsv" from ch_metadata_r01
 
     output:
-    path "01_report" into ch_01_reports
+    path "01_report_*" into ch_01_reports
     path "Figures" into ch_01_figures
 
     label 'process_medium'
@@ -1629,7 +1629,7 @@ process Report01 {
     #Input: item_of_interest.csv order_item_of_interest.csv qiime/* metadata.tsv
     #Output: ../Figures/* 01_report_$dt.html 01_report_$dt.pdf
 
-    mkdir 01_report
+    #mkdir 01_report
 
     echo "I am Here:"
     pwd
@@ -1646,9 +1646,9 @@ process Report01 {
 
     dt=$(date '+%d-%m-%Y_%H.%M.%S');
 
-    Rscript -e "rmarkdown::render('01_report.Rmd', output_file='01_report/01_report_$dt.html', output_format='html_document', clean=TRUE)"
+    Rscript -e "rmarkdown::render('01_report.Rmd', output_file='01_report_$dt.html', output_format='html_document', clean=TRUE)"
 
-    Rscript -e "rmarkdown::render('01_report.Rmd', output_file='01_report/01_report_$dt.pdf', output_format='pdf_document', clean=TRUE)"
+    Rscript -e "rmarkdown::render('01_report.Rmd', output_file='01_report_$dt.pdf', output_format='pdf_document', clean=TRUE)"
     '''
 
 
