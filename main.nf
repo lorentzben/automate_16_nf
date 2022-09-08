@@ -1646,9 +1646,9 @@ process Report01 {
 
     dt=$(date '+%d-%m-%Y_%H.%M.%S');
 
-    Rscript -e "rmarkdown::render('01_report.Rmd', output_file='01_report_$dt.html', output_format='html_document', clean=TRUE, knit_root_dir='$PWD')"
+    Rscript -e "rmarkdown::render('01_report.Rmd', output_file=\$PWD'/01_report_$dt.html', output_format='html_document', clean=TRUE, knit_root_dir='$PWD')"
 
-    Rscript -e "rmarkdown::render('01_report.Rmd', output_file='01_report_$dt.pdf', output_format='pdf_document', clean=TRUE, knit_root_dir='$PWD')"
+    Rscript -e "rmarkdown::render('01_report.Rmd', output_file=\$PWD'/01_report_$dt.pdf', output_format='pdf_document', clean=TRUE, knit_root_dir='$PWD')"
     '''
 
 
