@@ -1635,11 +1635,11 @@ process Report01 {
     pwd
     ls
 
-    cp -rf /renv_dev/renv .
-    cp -rf /renv_dev/renv.lock . 
+    #cp -rf /renv_dev/renv .
+    #cp -rf /renv_dev/renv.lock . 
 
-    Rscript -e "renv::init()"
-    Rscript -e "renv::install('rmarkdown')"
+    #Rscript -e "renv::init()"
+    #Rscript -e "renv::install('rmarkdown')"
 
     #cp ../item_of_interest.csv .
     #cp ../order_item_of_interest.csv .
