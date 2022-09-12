@@ -149,7 +149,7 @@ Channel
 Channel
     .from(params.itemOfInterest)
     .ifEmpty {exit 1, log.info "Cannot find Item of interest"}
-    .into{ ch_ioi_veri ; ch_ioi_beta_sig ; ch_ioi_phylo_tree ; ch_ioi_phylo_tree_run ; ch_ioi_lefse ; ch_ioi_denoise_to_file ; ch_ioi_r01_csv }
+    .into{ ch_ioi_veri ; ch_ioi_beta_sig ; ch_ioi_phylo_tree ; ch_ioi_phylo_tree_run ; ch_ioi_lefse ; ch_ioi_denoise_to_file ; ch_ioi_r01_csv ; ch_ioi_r02_csv }
 
 Channel
     .fromPath("${baseDir}/graph.sh")
@@ -273,7 +273,7 @@ process VerifyManifest{
 
     output:
 
-    file "order_item_of_interest.csv" into ( ch_format_ioi_order, ch_oioi_r01_csv )
+    file "order_item_of_interest.csv" into ( ch_format_ioi_order, ch_oioi_r01_csv, ch_oioi_r02_csv )
 
     /*this is in place for local deployment, but the server does not give access to the dir for some reason
     The change is nessecary to do nextflow run -r main lorentzben/automate_16_nf
@@ -1445,7 +1445,7 @@ process runGraphlan{
     //file "filter_samples.py" from ch_filter_script
 
     output:
-    path "phylo_trees/*" into ch_png_phylo_tree
+    path "phylo_trees/*" into (ch_png_phylo_tree, ch_png_phylo_tree_r02)
     file "table-dada2.qza" into ch_table_lefse_graphlan
     file "rarefied_table.qza" into ch_table_lefse
     //file "taxonomy.qza" into ch_tax_lefse
@@ -1520,7 +1520,7 @@ process LefseFormat {
     file "rarefied_table.qza" into ch_table_report_rare
     file "rooted-tree.qza" into ch_tree_report
     file "taxonomy.qza" into ch_tax_report
-    file "metadata.tsv" into ( ch_metadata_report, ch_metadata_r01 )
+    file "metadata.tsv" into ( ch_metadata_report, ch_metadata_r01, ch_metadata_r02 )
 
     label 'process_medium'
 
@@ -1611,7 +1611,7 @@ process Report01 {
     input:
     file "01_report.Rmd" from ch_01_report_file
     file "item_of_interest.csv" from ch_ioi_r01_csv
-    file "order_item_of_interest.csv" from ch_oioi_r01_csv
+    file "order_item_of_interest.csv" from ch_oioi_r02_csv
     file "core-metric-results/*" from ch_rare_table_r01 
     file "rooted-tree.qza" from ch_rooted_tree_r01  
     file "taxonomy.qza" from ch_taxonomy_r01  
@@ -1635,15 +1635,6 @@ process Report01 {
     pwd
     ls
     
-    #cp -rf /renv_dev/renv .
-    #cp -rf /renv_dev/renv.lock . 
-
-    #Rscript -e "renv::init()"
-    #Rscript -e "renv::install('rmarkdown')"
-
-    #cp ../item_of_interest.csv .
-    #cp ../order_item_of_interest.csv .
-
     dt=$(date '+%d-%m-%Y_%H.%M.%S');
 
     Rscript -e "rmarkdown::render('01_report.Rmd', output_file='$PWD/01_report_$dt.html', output_format='html_document', clean=TRUE, knit_root_dir='$PWD')"
@@ -1651,6 +1642,40 @@ process Report01 {
     Rscript -e "rmarkdown::render('01_report.Rmd', output_file='$PWD/01_report_$dt.pdf', output_format='pdf_document', clean=TRUE, knit_root_dir='$PWD')"
     '''
 
+
+}
+
+process Report02{
+    publishDir "${params.outdir}/reports", mode: 'move'
+
+    container "docker://lorentzb/r_02"
+
+    input:
+    file "02_report.Rmd" from ch_01_report_file
+    file "item_of_interest.csv" from ch_ioi_r02_csv
+    file "order_item_of_interest.csv" from ch_oioi_r01_csv
+    file "metadata.tsv" from ch_metadata_r02
+    path "phylo_trees/*" from ch_png_phylo_tree_r02
+
+    output:
+    path "02_report_*" into ch_02_reports
+    path "Figures" into ch_02_figures
+
+    label 'process_medium'
+    script:
+    '''
+    #! /usr/bin/env bash
+
+    echo "I am Here:"
+    pwd
+    ls
+
+    dt=$(date '+%d-%m-%Y_%H.%M.%S');
+
+    Rscript -e "rmarkdown::render('02_report.Rmd', output_file='$PWD/02_report_$dt.html', output_format='html_document', clean=TRUE,knit_root_dir='$PWD')"
+
+    Rscript -e "rmarkdown::render('02_report.Rmd', output_file='$PWD/02_report_$dt.pdf', output_format='pdf_document', clean=TRUE,knit_root_dir='$PWD')"
+    '''
 
 }
 
