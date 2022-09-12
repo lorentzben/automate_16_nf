@@ -190,6 +190,10 @@ Channel
     .fromPath("${baseDir}/report_gen_files/01_report.Rmd")
     .set{ ch_01_report_file }
 
+Channel
+    .fromPath("${baseDir}/report_gen_files/02_report.Rmd")
+    .set{ ch_02_report_file }
+
 /*
 process SetupPy2CondaEnv{
     //conda "${projectDir}/python2_env.yml"
@@ -1651,7 +1655,7 @@ process Report02{
     container "docker://lorentzb/r_02"
 
     input:
-    file "02_report.Rmd" from ch_01_report_file
+    file "02_report.Rmd" from ch_02_report_file
     file "item_of_interest.csv" from ch_ioi_r02_csv
     file "order_item_of_interest.csv" from ch_oioi_r01_csv
     file "metadata.tsv" from ch_metadata_r02
