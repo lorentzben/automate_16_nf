@@ -567,7 +567,7 @@ process FindCutoffs{
     val reverse_val from ch_user_rev
     
     output: 
-    file("cutoffs.csv") into ch_cutoff_vals
+    file("cutoffs.csv") into (ch_cutoff_vals, ch_cutoff_r03)
     file("manifest_format.txt") into ch_manifest_type_denoise
 
     //conda "${projectDir}/environment.yml"
@@ -854,7 +854,7 @@ process TreeConstruction{
     file "aligned-rep-seqs.qza" into ch_aligned_rep_seqs
     file "masked-aligned-rep-seqs.qza" into ch_mask_align_rep_seq
     file "unrooted-tree.qza" into ch_unrooted_tree
-    file "rooted-tree.qza" into (ch_rooted_tree, ch_rooted_tree_r01)
+    file "rooted-tree.qza" into (ch_rooted_tree, ch_rooted_tree_r01 , ch_root_tree_r03)
     file "rep-seqs-dada2.qza" into ch_rep_seq_classify
 
     label 'process_medium'
@@ -911,7 +911,7 @@ process DetermineDepth{
     path "table_viz/*" from ch_table_viz_dir
 
     output:
-    file "sampling_depth.csv" into ch_sampling_depth_csv
+    file "sampling_depth.csv" into (ch_sampling_depth_csv, ch_samp_depth_r03)
     file "samp_depth_simple.txt" into ch_depth
 
     label 'process_low'
@@ -979,7 +979,7 @@ process AlphaDiversityMeasure{
 
     output:
     path "core-metric-results/*" into ch_core_beta_significance 
-    path "core-metric-results/*" into ( ch_core_report , ch_rare_table_r01 )
+    path "core-metric-results/*" into ( ch_core_report , ch_rare_table_r01 , ch_core_metric_r03 )
     file "core-metric-results/rarefied_table.qza" into ch_phylo_tree_rare_table
     file "core-metric-results/rarefied_table.qza" into ch_phylo_tree_rare_table_run
     file "shannon.qza" into ch_shannon_qza
@@ -1063,7 +1063,7 @@ process AssignTaxonomy{
     file "515-806-classifier.qza" from ch_515_classifier
 
     output:
-    file "taxonomy.qza" into ( ch_taxonomy_phylo_tree, ch_taxonomy_r01)
+    file "taxonomy.qza" into ( ch_taxonomy_phylo_tree, ch_taxonomy_r01, ch_taxonomy_r03)
     file "taxonomy.qza" into ch_taxonomy_phylo_tree_run
     file "taxonomy.qzv" into ch_classified_qzv
     
@@ -1592,7 +1592,7 @@ process ExportSetup{
     file metadata from ch_metadata_finalize 
 
     output:
-    file "dada2_stats.tsv" into ch_dada_stats_file
+    file "dada2_stats.tsv" into (ch_dada_stats_file, ch_dada_r03)
     file "metadata.tsv" into ch_metadata_renamed
 
     label 'process_medium'
@@ -1700,12 +1700,12 @@ process Report03{
     file "item_of_interest.csv" from ch_ioi_r03_csv
     file "order_item_of_interest.csv" from ch_oioi_r03_csv
     file "metadata.tsv" from ch_metadata_r03
-    path "core-metric-results/*" from ch_
-    file "rooted-tree.qza" from ch_
-    file "taxonomy.qza" from ch_
-    file "cutoffs.csv" from ch_
-    file "dada2_stats.tsv" from ch_ 
-    file "sampling_depth.csv" from ch_ 
+    path "core-metric-results/*" from ch_core_metric_r03
+    file "rooted-tree.qza" from ch_root_tree_r03
+    file "taxonomy.qza" from ch_taxonomy_r03
+    file "cutoffs.csv" from ch_cutoff_r03
+    file "dada2_stats.tsv" from ch_dada_r03
+    file "sampling_depth.csv" from ch_samp_depth_r03
     
 
     output:
