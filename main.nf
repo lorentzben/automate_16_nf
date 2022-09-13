@@ -1663,7 +1663,7 @@ process Report02{
 
     output:
     path "02_report_*" into ch_02_reports
-    path "Figures" into ch_02_figures
+    
 
     label 'process_medium'
     script:
