@@ -1449,7 +1449,7 @@ process runGraphlan{
     //file "filter_samples.py" from ch_filter_script
 
     output:
-    path "phylo_trees/*" into (ch_png_phylo_tree, ch_png_phylo_tree_r02)
+    path "phylo_trees/*" into (ch_png_phylo_tree,  ch_02_report_imgs) //ch_png_phylo_tree_r02)
     file "table-dada2.qza" into ch_table_lefse_graphlan
     file "rarefied_table.qza" into ch_table_lefse
     //file "taxonomy.qza" into ch_tax_lefse
@@ -1663,7 +1663,7 @@ process Report02{
 
     output:
     //path "02_report_*" into ch_02_reports
-    path "phylo_trees/*" into ch_02_report_imgs
+    //path "phylo_trees/*" into ch_02_report_imgs
     
 
     label 'process_medium'
