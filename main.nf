@@ -1659,7 +1659,7 @@ process Report02{
     file "item_of_interest.csv" from ch_ioi_r02_csv
     file "order_item_of_interest.csv" from ch_oioi_r01_csv
     file "metadata.tsv" from ch_metadata_r02
-    path "phylo_trees/*" from ch_png_phylo_tree_r02
+    path "phylo_trees/*" from ch_02_report_imgs //ch_png_phylo_tree_r02
 
     output:
     //path "02_report_*" into ch_02_reports
