@@ -1673,7 +1673,7 @@ process Report02{
 
     #echo "I am Here:"
     #pwd
-    #ls
+    ls
 
     #dt=$(date '+%d-%m-%Y_%H.%M.%S');
 
