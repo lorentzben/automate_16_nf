@@ -1700,6 +1700,12 @@ process Report03{
     file "item_of_interest.csv" from ch_ioi_r03_csv
     file "order_item_of_interest.csv" from ch_oioi_r03_csv
     file "metadata.tsv" from ch_metadata_r03
+    path "core-metric-results/*" from ch_
+    file "rooted-tree.qza" from ch_
+    file "taxonomy.qza" from ch_
+    file "cutoffs.csv" from ch_
+    file "dada2_stats.tsv" from ch_ 
+    file "sampling_depth.csv" from ch_ 
     
 
     output:
