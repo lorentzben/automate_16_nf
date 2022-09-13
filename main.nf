@@ -1619,7 +1619,7 @@ process Report01 {
     input:
     file "01_report.Rmd" from ch_01_report_file
     file "item_of_interest.csv" from ch_ioi_r01_csv
-    file "order_item_of_interest.csv" from ch_oioi_r02_csv
+    file "order_item_of_interest.csv" from ch_oioi_r01_csv
     file "core-metric-results/*" from ch_rare_table_r01 
     file "rooted-tree.qza" from ch_rooted_tree_r01  
     file "taxonomy.qza" from ch_taxonomy_r01  
