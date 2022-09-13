@@ -9,10 +9,10 @@ output:
 ---
 
 ```{r init renv, message=FALSE, warning=FALSE, include=FALSE}
-library(renv)
+#library(renv)
 #renv::isolate()
 #renv::settings$snapshot.type("all")
-renv::restore()
+#renv::restore()
 ```
 
 ```{r parse item of interest and make outdir for figures, echo=FALSE, message=FALSE, warning=FALSE}
@@ -27,8 +27,8 @@ colnames(ioi_ord) <- ioi
 ioi_ord <- as.list(ioi_ord)[[ioi]]
 
 outdir_name <- "Figures"
-if(!dir.exists(paste0("../",outdir_name))) {dir.create(paste0("../",outdir_name))}
-outdir <- paste0("../",outdir_name)
+if(!dir.exists(outdir_name)) {dir.create(outdir_name)}
+outdir <- outdir_name
 ```
 
 ## 2 Phylogentic Trees
@@ -37,7 +37,7 @@ outdir <- paste0("../",outdir_name)
 #if(getOutputFormat() == 'html_document') {
   library(knitr)
   library(gtools)
-  tree_filenames <- list.files("../graphlan/phylo_trees",pattern="*_image_graph.png",full.names=T)
+  tree_filenames <- list.files("phylo_trees",pattern="*_image_graph.png",full.names=T)
   tree_filenames <- mixedsort(tree_filenames)
 
   include_graphics(tree_filenames)
@@ -47,7 +47,7 @@ outdir <- paste0("../",outdir_name)
 # if(getOutputFormat() =='pdf_document'){
 #   
 #   print("see end of report")
-#   tree_filenames <- list.files("./graphlan/phylo_trees",pattern="*_image_pdf_g.png", full.names=T)
+#   tree_filenames <- list.files("phylo_trees",pattern="*_image_pdf_g.png", full.names=T)
 #   tree_filenames <- mixedsort(tree_filenames)
 # 
 #   include_graphics(tree_filenames)
