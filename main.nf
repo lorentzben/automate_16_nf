@@ -1662,7 +1662,7 @@ process Report02{
     path "phylo_trees/*" from ch_02_report_imgs //ch_png_phylo_tree_r02
 
     output:
-    //path "02_report_*" into ch_02_reports
+    path "02_report_*" into ch_02_reports
     //path "phylo_trees/*" into ch_02_report_imgs
     
 
@@ -1674,12 +1674,13 @@ process Report02{
     #echo "I am Here:"
     #pwd
     ls
+    #echo "check /$OUTDIR/graphlan/phylo_trees"
 
-    #dt=$(date '+%d-%m-%Y_%H.%M.%S');
+    dt=$(date '+%d-%m-%Y_%H.%M.%S');
 
-    #Rscript -e "rmarkdown::render('02_report.Rmd', output_file='$PWD/02_report_$dt.html', output_format='html_document', clean=TRUE,knit_root_dir='$PWD')"
+    Rscript -e "rmarkdown::render('02_report.Rmd', output_file='$PWD/02_report_$dt.html', output_format='html_document', clean=TRUE,knit_root_dir='$PWD',intermediates_dir ='$PWD')"
 
-    #Rscript -e "rmarkdown::render('02_report.Rmd', output_file='$PWD/02_report_$dt.pdf', output_format='pdf_document', clean=TRUE,knit_root_dir='$PWD')"
+    Rscript -e "rmarkdown::render('02_report.Rmd', output_file='$PWD/02_report_$dt.pdf', output_format='pdf_document', clean=TRUE,knit_root_dir='$PWD', intermediates_dir ='$PWD')"
     '''
 
 }
