@@ -1760,7 +1760,7 @@ process Report04{
     path "faith_pd/*" from ch_faith_r04
  
     output:
-    path "04_report_*" into ch_03_reports
+    path "04_report_*" into ch_04_reports
     
     
 
@@ -1804,7 +1804,7 @@ process Report05{
 
     
     output:
-    path "05_report_*" into ch_03_reports
+    path "05_report_*" into ch_05_reports
     
     
 
