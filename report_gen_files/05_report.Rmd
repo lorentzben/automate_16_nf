@@ -42,7 +42,7 @@ outdir <- outdir_name
 library(ggplot2)
 
 #subsets and plots observed features in a boxplot format
-ioi <- read.csv("item_of_interest.csv")
+ioi <- readLines("item_of_interest.csv")
 ioi<-as.character(ioi)
 obs_vals = read.csv("obs/metadata.tsv", sep='\t')
 dims = dim(obs_vals)
