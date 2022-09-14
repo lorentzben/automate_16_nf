@@ -150,7 +150,7 @@ Channel
     .from(params.itemOfInterest)
     .ifEmpty {exit 1, log.info "Cannot find Item of interest"}
     .into{ ch_ioi_veri ; ch_ioi_beta_sig ; ch_ioi_phylo_tree ; ch_ioi_phylo_tree_run ; ch_ioi_lefse ;\
-    ch_ioi_denoise_to_file ; ch_ioi_r01_csv ; ch_ioi_r02_csv ; ch_ioi_r03_csv ; ch_ioi_r04_csv ; }
+    ch_ioi_denoise_to_file ; ch_ioi_r01_csv ; ch_ioi_r02_csv ; ch_ioi_r03_csv ; ch_ioi_r04_csv ; ch_ioi_r05_csv }
 
 Channel
     .fromPath("${baseDir}/graph.sh")
@@ -202,6 +202,10 @@ Channel
 Channel
     .fromPath("${baseDir}/report_gen_files/04_report.Rmd")
     .set{ ch_04_report_file }
+
+Channel
+    .fromPath("${baseDir}/report_gen_files/05_report.Rmd")
+    .set{ ch_05_report_file }
 /*
 process SetupPy2CondaEnv{
     //conda "${projectDir}/python2_env.yml"
@@ -285,7 +289,7 @@ process VerifyManifest{
 
     output:
 
-    file "order_item_of_interest.csv" into ( ch_format_ioi_order, ch_oioi_r01_csv, ch_oioi_r02_csv, ch_oioi_r03_csv, ch_oioi_r04_csv )
+    file "order_item_of_interest.csv" into ( ch_format_ioi_order, ch_oioi_r01_csv, ch_oioi_r02_csv, ch_oioi_r03_csv, ch_oioi_r04_csv,  ch_oioi_r05_csv )
 
     /*this is in place for local deployment, but the server does not give access to the dir for some reason
     The change is nessecary to do nextflow run -r main lorentzben/automate_16_nf
@@ -1198,12 +1202,12 @@ process AlphaDiversitySignificance{
     file "faith_pd.qza" from ch_faith_qza
 
     output:
-    path "shannon/*" into ( ch_shannon_path, ch_shannon_r04 )
-    path "simpson/*" into ( ch_simpson_path, ch_simpson_r04 )
-    path "chao1/*" into ( ch_chao_path, ch_chao_r04 )
-    path "ace/*" into ( ch_ace_path, ch_ace_r04 ) 
-    path "obs/*" into ( ch_obs_path, ch_obs_r04 ) 
-    path "faith_pd/*" into ( ch_faith_path, ch_faith_r04 ) 
+    path "shannon/*" into ( ch_shannon_path, ch_shannon_r04, ch_shannon_r05 )
+    path "simpson/*" into ( ch_simpson_path, ch_simpson_r04, ch_simpson_r05 )
+    path "chao1/*" into ( ch_chao_path, ch_chao_r04, ch_chao_r05 )
+    path "ace/*" into ( ch_ace_path, ch_ace_r04, ch_ace_r05 ) 
+    path "obs/*" into ( ch_obs_path, ch_obs_r04, ch_obs_r_05 ) 
+    path "faith_pd/*" into ( ch_faith_path, ch_faith_r04, ch_faith_r05 ) 
 
     label 'process_medium'
 
@@ -1532,7 +1536,7 @@ process LefseFormat {
     file "rarefied_table.qza" into ch_table_report_rare
     file "rooted-tree.qza" into ch_tree_report
     file "taxonomy.qza" into ch_tax_report
-    file "metadata.tsv" into ( ch_metadata_report, ch_metadata_r01, ch_metadata_r02, ch_metadata_r03, ch_metadata_r04 )
+    file "metadata.tsv" into ( ch_metadata_report, ch_metadata_r01, ch_metadata_r02, ch_metadata_r03, ch_metadata_r04, ch_metadata_r05 )
 
     label 'process_medium'
 
@@ -1777,6 +1781,49 @@ process Report04{
     Rscript -e "rmarkdown::render('04_report.Rmd', output_file='$PWD/04_report_$dt.pdf', output_format='pdf_document', clean=TRUE,knit_root_dir='$PWD', intermediates_dir ='$PWD')"
     '''
 
+
+}
+
+process Report05{
+    publishDir "${params.outdir}/reports", mode: 'move'
+
+    container "docker://lorentzb/r_05"
+
+    input:
+    file "05_report.Rmd" from ch_05_report_file
+    file "item_of_interest.csv" from ch_ioi_r05_csv
+    file "order_item_of_interest.csv" from ch_oioi_r05_csv
+    file "metadata.tsv" from ch_metadata_r05
+
+    path "obs/*" from ch_obs_r_05
+    path "shannon/*" from ch_shannon_r05
+    path "simpson/*" from ch_simpson_r05
+    path "chao1/*" from ch_chao_r05
+    path "ace/*" from ch_ace_r05
+    path "faith_pd/*" from ch_faith_r05
+
+    
+    output:
+    path "05_report_*" into ch_03_reports
+    
+    
+
+    label 'process_medium'
+    script:
+    '''
+    #! /usr/bin/env bash
+
+    #echo "I am Here:"
+    #pwd
+    ls
+    #echo "check /$OUTDIR/graphlan/phylo_trees"
+
+    dt=$(date '+%d-%m-%Y_%H.%M.%S');
+
+    Rscript -e "rmarkdown::render('05_report.Rmd', output_file='$PWD/05_report_$dt.html', output_format='html_document', clean=TRUE,knit_root_dir='$PWD',intermediates_dir ='$PWD')"
+
+    Rscript -e "rmarkdown::render('05_report.Rmd', output_file='$PWD/05_report_$dt.pdf', output_format='pdf_document', clean=TRUE,knit_root_dir='$PWD', intermediates_dir ='$PWD')"
+    '''
 
 }
 
