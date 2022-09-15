@@ -39,14 +39,14 @@ outdir <- outdir_name
 library(kableExtra)
 library(tidyverse)
 
-obs <- read.table("metadata.tsv", header = TRUE)
+obs <- read.table("obs/metadata.tsv", header = TRUE)
 shannon <- read.table("shannon/metadata.tsv", header = TRUE)
 simpson <- read.table("simpson/metadata.tsv", header=TRUE)
 chao1 <- read.table("chao1/metadata.tsv", header=TRUE)
 ace <- read.table("ace/metadata.tsv", header=TRUE)
 faith_pd <- read.table("faith_pd/metadata.tsv", header=TRUE)
 
-obs <- data.frame(obs[c('sample.id','observed_features')])
+obs <- data.frame(obs[c('id','observed_features')])
 shannon <- data.frame(shannon[c('id','shannon_entropy')])
 simpson <- data.frame(simpson[c('id','simpson')])
 chao1 <- data.frame(chao1[c('id','chao1')])
