@@ -9,26 +9,26 @@ output:
 ---
 
 ```{r init renv, message=FALSE, warning=FALSE, include=FALSE}
-library(renv)
+#library(renv)
 #renv::isolate()
 #renv::settings$snapshot.type("all")
-renv::restore()
+#renv::restore()
 ```
 
 ```{r parse item of interest and make outdir for figures, echo=FALSE, message=FALSE, warning=FALSE}
 #this may be required for each file
 #item of interest, comes from bash and python script that orchestrates everything
 wd <- getwd()
-ioi <- read.csv("../item_of_interest.csv")
+ioi <- readLines("item_of_interest.csv")
 ioi<-as.character(ioi)
 
-ioi_ord <- read.csv("../order_item_of_interest.csv")
+ioi_ord <- read.csv("order_item_of_interest.csv")
 colnames(ioi_ord) <- ioi
 ioi_ord <- as.list(ioi_ord)[[ioi]]
 
 outdir_name <- "Figures"
-if(!dir.exists(paste0("../",outdir_name))) {dir.create(paste0("../",outdir_name))}
-outdir <- paste0("../",outdir_name)
+if(!dir.exists(outdir_name)) {dir.create(outdir_name)}
+outdir <- outdir_name
 ```
 
 ## 7 Rarefaction Curves
@@ -43,7 +43,7 @@ numextract <- function(string){
   str_extract(string, "\\-*\\d+\\.*\\d*")
 }
 
-obs_rarefy <- read.csv("../qiime/alpha-rareplot/observed_features.csv")
+obs_rarefy <- read.csv("alpha-rareplot/observed_features.csv")
 samples <- obs_rarefy[1]
 one <- obs_rarefy[2:11]
 two <- obs_rarefy[12:21]
