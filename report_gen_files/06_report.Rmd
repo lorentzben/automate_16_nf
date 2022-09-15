@@ -9,26 +9,26 @@ output:
 ---
 
 ```{r init renv, message=FALSE, warning=FALSE, include=FALSE}
-library(renv)
+#library(renv)
 #renv::isolate()
 #renv::settings$snapshot.type("all")
-renv::restore()
+#renv::restore()
 ```
 
 ```{r parse item of interest and make outdir for figures, echo=FALSE, message=FALSE, warning=FALSE}
 #this may be required for each file
 #item of interest, comes from bash and python script that orchestrates everything
 wd <- getwd()
-ioi <- read.csv("../item_of_interest.csv")
+ioi <- readLines("item_of_interest.csv")
 ioi<-as.character(ioi)
 
-ioi_ord <- read.csv("../order_item_of_interest.csv")
+ioi_ord <- read.csv("order_item_of_interest.csv")
 colnames(ioi_ord) <- ioi
 ioi_ord <- as.list(ioi_ord)[[ioi]]
 
 outdir_name <- "Figures"
-if(!dir.exists(paste0("../",outdir_name))) {dir.create(paste0("../",outdir_name))}
-outdir <- paste0("../",outdir_name)
+if(!dir.exists(outdir_name)) {dir.create(outdir_name)}
+outdir <- outdir_name
 ```
 
 ```{r ampvis code from github so we dont need to query, echo=FALSE, message=FALSE, warning=FALSE}
@@ -126,15 +126,15 @@ library(dplyr)
 library(ggplot2)
 library(ggConvexHull)
 
-table_dada2 <- "../qiime/core-metric-results/rarefied_table.qza"
-rooted_tree <- "../qiime/rooted-tree.qza"
-taxonomy_file <- "../qiime/taxonomy.qza"
-metadata_file <- "../metadata.tsv"
+table_dada2 <- "core-metric-results/rarefied_table.qza"
+rooted_tree <- "rooted-tree.qza"
+taxonomy_file <- "taxonomy.qza"
+metadata_file <- "metadata.tsv"
 
 metadata<-read_q2metadata(metadata_file)
 metadata[[ioi]] <- factor(metadata[[ioi]], levels=ioi_ord)
-bray_pcoa <- qiime2R::read_qza("../qiime/core-metric-results/bray_curtis_pcoa_results.qza")
-shannon<-qiime2R::read_qza("../qiime/core-metric-results/shannon_vector.qza")
+bray_pcoa <- qiime2R::read_qza("core-metric-results/bray_curtis_pcoa_results.qza")
+shannon<-qiime2R::read_qza("core-metric-results/shannon_vector.qza")
 shannon <- shannon$data %>% rownames_to_column("SampleID")
 
 
@@ -178,8 +178,8 @@ library(ggplot2)
 library(ggConvexHull)
 
 metadata<-read_q2metadata(metadata_file)
-jaccard <- qiime2R::read_qza("../qiime/core-metric-results/jaccard_pcoa_results.qza")
-shannon<-qiime2R::read_qza("../qiime/core-metric-results/shannon_vector.qza")
+jaccard <- qiime2R::read_qza("core-metric-results/jaccard_pcoa_results.qza")
+shannon<-qiime2R::read_qza("core-metric-results/shannon_vector.qza")
 shannon <- shannon$data %>% rownames_to_column("SampleID")
 
 metadata[[ioi]] <- factor(metadata[[ioi]], levels=ioi_ord)
@@ -229,8 +229,8 @@ library(ggConvexHull)
 
 metadata<-read_q2metadata(metadata_file)
 metadata[[ioi]] <- factor(metadata[[ioi]], levels=ioi_ord)
-jaccard <- qiime2R::read_qza("../qiime/core-metric-results/unweighted_unifrac_pcoa_results.qza")
-shannon<-qiime2R::read_qza("../qiime/core-metric-results/shannon_vector.qza")
+jaccard <- qiime2R::read_qza("core-metric-results/unweighted_unifrac_pcoa_results.qza")
+shannon<-qiime2R::read_qza("core-metric-results/shannon_vector.qza")
 shannon <- shannon$data %>% rownames_to_column("SampleID")
 
 
@@ -278,8 +278,8 @@ library(ggConvexHull)
 
 metadata<-read_q2metadata(metadata_file)
 metadata[[ioi]] <- factor(metadata[[ioi]], levels=ioi_ord)
-jaccard <- qiime2R::read_qza("../qiime/core-metric-results/weighted_unifrac_pcoa_results.qza")
-shannon<-qiime2R::read_qza("../qiime/core-metric-results/shannon_vector.qza")
+jaccard <- qiime2R::read_qza("core-metric-results/weighted_unifrac_pcoa_results.qza")
+shannon<-qiime2R::read_qza("core-metric-results/shannon_vector.qza")
 shannon <- shannon$data %>% rownames_to_column("SampleID")
 
 weighted_unifrac_pcoa <- jaccard$data$Vectors %>%
