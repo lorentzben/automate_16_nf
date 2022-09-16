@@ -9,26 +9,26 @@ output:
 ---
 
 ```{r init renv, message=FALSE, warning=FALSE, include=FALSE}
-library(renv)
+#library(renv)
 #renv::isolate()
 #renv::settings$snapshot.type("all")
-renv::restore()
+#renv::restore()
 ```
 
 ```{r parse item of interest and make outdir for figures, echo=FALSE, message=FALSE, warning=FALSE}
 #this may be required for each file
 #item of interest, comes from bash and python script that orchestrates everything
 wd <- getwd()
-ioi <- read.csv("../item_of_interest.csv")
+ioi <- read.csv("item_of_interest.csv")
 ioi<-as.character(ioi)
 
-ioi_ord <- read.csv("../order_item_of_interest.csv")
+ioi_ord <- read.csv("order_item_of_interest.csv")
 colnames(ioi_ord) <- ioi
 ioi_ord <- as.list(ioi_ord)[[ioi]]
 
 outdir_name <- "Figures"
-if(!dir.exists(paste0("../",outdir_name))) {dir.create(paste0("../",outdir_name))}
-outdir <- paste0("../",outdir_name)
+if(!dir.exists(outdir_name)) {dir.create(outdir_name)}
+outdir <- outdir_name
 ```
 
 ## 13 Lefse
@@ -37,7 +37,7 @@ outdir <- paste0("../",outdir_name)
 library(knitr)
 library(gtools)
 
-lefse_res_filenames <- list.files("../lefse/result",pattern="*_res.png",full.names = T)
+lefse_res_filenames <- list.files("result",pattern="*_res.png",full.names = T)
 
 lefse_filenames <- mixedsort(lefse_res_filenames)
 
@@ -50,7 +50,7 @@ include_graphics(lefse_filenames)
 library(gtools)
 library(knitr)
 
-lefse_res_filenames <- list.files("../lefse/result",pattern="*_pdf_r.png",full.names=T)
+lefse_res_filenames <- list.files("result",pattern="*_pdf_r.png",full.names=T)
 
 lefse_filenames <- mixedsort(lefse_res_filenames)
   
@@ -63,7 +63,7 @@ include_graphics(lefse_filenames)
 library(gtools)
 library(knitr)
 
-lefse_clado_filenames <- list.files("../lefse/result",pattern="*_cladogram.png",full.names=T)
+lefse_clado_filenames <- list.files("result",pattern="*_cladogram.png",full.names=T)
   
 lefse_filenames <- mixedsort(lefse_clado_filenames)
 
