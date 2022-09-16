@@ -151,7 +151,7 @@ Channel
     .ifEmpty {exit 1, log.info "Cannot find Item of interest"}
     .into{ ch_ioi_veri ; ch_ioi_beta_sig ; ch_ioi_phylo_tree ; ch_ioi_phylo_tree_run ; ch_ioi_lefse ;\
     ch_ioi_denoise_to_file ; ch_ioi_r01_csv ; ch_ioi_r02_csv ; ch_ioi_r03_csv ; ch_ioi_r04_csv ; ch_ioi_r05_csv ;
-    ch_ioi_r06_csv ; ch_ioi_r07_csv }
+    ch_ioi_r06_csv ; ch_ioi_r07_csv ; ch_ioi_r08_csv }
 
 Channel
     .fromPath("${baseDir}/graph.sh")
@@ -215,6 +215,10 @@ Channel
 Channel 
     .fromPath("${baseDir}/report_gen_files/07_report.Rmd")
     .set{ ch_07_report_file }
+
+Channel 
+    .fromPath("${baseDir}/report_gen_files/08_report.Rmd")
+    .set{ ch_08_report_file }
 
 
 /*
@@ -301,7 +305,7 @@ process VerifyManifest{
     output:
 
     file "order_item_of_interest.csv" into ( ch_format_ioi_order, ch_oioi_r01_csv, ch_oioi_r02_csv, ch_oioi_r03_csv, ch_oioi_r04_csv,  ch_oioi_r05_csv ,
-    ch_oioi_r06_csv, ch_oioi_r07_csv )
+    ch_oioi_r06_csv, ch_oioi_r07_csv, ch_oioi_r08_csv )
 
     /*this is in place for local deployment, but the server does not give access to the dir for some reason
     The change is nessecary to do nextflow run -r main lorentzben/automate_16_nf
@@ -874,7 +878,7 @@ process TreeConstruction{
     file "aligned-rep-seqs.qza" into ch_aligned_rep_seqs
     file "masked-aligned-rep-seqs.qza" into ch_mask_align_rep_seq
     file "unrooted-tree.qza" into ch_unrooted_tree
-    file "rooted-tree.qza" into (ch_rooted_tree, ch_rooted_tree_r01 , ch_root_tree_r03, ch_root_tree_r06)
+    file "rooted-tree.qza" into (ch_rooted_tree, ch_rooted_tree_r01 , ch_root_tree_r03, ch_root_tree_r06, ch_root_tree_r08)
     file "rep-seqs-dada2.qza" into ch_rep_seq_classify
 
     label 'process_medium'
@@ -999,7 +1003,7 @@ process AlphaDiversityMeasure{
 
     output:
     path "core-metric-results/*" into ch_core_beta_significance 
-    path "core-metric-results/*" into ( ch_core_report , ch_rare_table_r01 , ch_core_metric_r03, ch_core_metric_r06 )
+    path "core-metric-results/*" into ( ch_core_report , ch_rare_table_r01 , ch_core_metric_r03, ch_core_metric_r06, ch_core_metric_r08 )
     file "core-metric-results/rarefied_table.qza" into ch_phylo_tree_rare_table
     file "core-metric-results/rarefied_table.qza" into ch_phylo_tree_rare_table_run
     file "shannon.qza" into ch_shannon_qza
@@ -1083,7 +1087,7 @@ process AssignTaxonomy{
     file "515-806-classifier.qza" from ch_515_classifier
 
     output:
-    file "taxonomy.qza" into ( ch_taxonomy_phylo_tree, ch_taxonomy_r01, ch_taxonomy_r03, ch_taxonomy_r06)
+    file "taxonomy.qza" into ( ch_taxonomy_phylo_tree, ch_taxonomy_r01, ch_taxonomy_r03, ch_taxonomy_r06, ch_taxonomy_r08)
     file "taxonomy.qza" into ch_taxonomy_phylo_tree_run
     file "taxonomy.qzv" into ch_classified_qzv
     
@@ -1548,7 +1552,8 @@ process LefseFormat {
     file "rarefied_table.qza" into ch_table_report_rare
     file "rooted-tree.qza" into ch_tree_report
     file "taxonomy.qza" into ch_tax_report
-    file "metadata.tsv" into ( ch_metadata_report, ch_metadata_r01, ch_metadata_r02, ch_metadata_r03, ch_metadata_r04, ch_metadata_r05, ch_metadata_r06, ch_metadata_r07 )
+    file "metadata.tsv" into ( ch_metadata_report, ch_metadata_r01, ch_metadata_r02, ch_metadata_r03, 
+    ch_metadata_r04, ch_metadata_r05, ch_metadata_r06, ch_metadata_r07, ch_metadata_r08 )
 
     label 'process_medium'
 
@@ -1921,6 +1926,45 @@ process Report07{
     '''
 
 
+}
+
+process Report08 {
+    publishDir "${params.outdir}/reports", mode: 'move'
+
+    container "docker://lorentzb/r_08"
+
+    input:
+    file "08_report.Rmd" from ch_08_report_file
+    file "item_of_interest.csv" from ch_ioi_r08_csv
+    file "order_item_of_interest.csv" from ch_oioi_r08_csv
+    file "metadata.tsv" from ch_metadata_r08
+
+    path "core-metric-results/*" from ch_core_metric_r08
+    file "rooted-tree.qza" from ch_root_tree_r08
+    file "taxonomy.qza" from ch_taxonomy_r08
+        
+    output:
+    path "08_report_*" into ch_08_reports
+    path "Figures" into ch_08_figures
+    
+    
+
+    label 'process_medium'
+    script:
+    '''
+    #! /usr/bin/env bash
+
+    #echo "I am Here:"
+    #pwd
+    ls
+    #echo "check /$OUTDIR/graphlan/phylo_trees"
+
+    dt=$(date '+%d-%m-%Y_%H.%M.%S');
+
+    Rscript -e "rmarkdown::render('08_report.Rmd', output_file='$PWD/08_report_$dt.html', output_format='html_document', clean=TRUE,knit_root_dir='$PWD',intermediates_dir ='$PWD')"
+
+    Rscript -e "rmarkdown::render('08_report.Rmd', output_file='$PWD/08_report_$dt.pdf', output_format='pdf_document', clean=TRUE,knit_root_dir='$PWD', intermediates_dir ='$PWD')"
+    '''
 }
 
 process GenerateReport{
