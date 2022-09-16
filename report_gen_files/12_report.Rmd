@@ -11,26 +11,26 @@ output:
 ---
 
 ```{r init renv, message=FALSE, warning=FALSE, include=FALSE}
-library(renv)
+#library(renv)
 #renv::isolate()
 #renv::settings$snapshot.type("all")
-renv::restore()
+#renv::restore()
 ```
 
 ```{r parse item of interest and make outdir for figures, echo=FALSE, message=FALSE, warning=FALSE}
 #this may be required for each file
 #item of interest, comes from bash and python script that orchestrates everything
 wd <- getwd()
-ioi <- read.csv("../item_of_interest.csv")
+ioi <- readLines("item_of_interest.csv")
 ioi<-as.character(ioi)
 
-ioi_ord <- read.csv("../order_item_of_interest.csv")
+ioi_ord <- read.csv("order_item_of_interest.csv")
 colnames(ioi_ord) <- ioi
 ioi_ord <- as.list(ioi_ord)[[ioi]]
 
 outdir_name <- "Figures"
-if(!dir.exists(paste0("../",outdir_name))) {dir.create(paste0("../",outdir_name))}
-outdir <- paste0("../",outdir_name)
+if(!dir.exists(outdir_name)) {dir.create(outdir_name)}
+outdir <- outdir_name
 
 # #library(devtools)
 # #llibrary(remotes)
@@ -143,10 +143,10 @@ library(PERMANOVA)
 library(tidyverse)
 library(kableExtra)
 
-table_dada2 <- "../qiime/core-metric-results/rarefied_table.qza"
-rooted_tree <- "../qiime/rooted-tree.qza"
-taxonomy_file <- "../qiime/taxonomy.qza"
-metadata_file <- "../metadata.tsv"
+table_dada2 <- "core-metric-results/rarefied_table.qza"
+rooted_tree <- "rooted-tree.qza"
+taxonomy_file <- "taxonomy.qza"
+metadata_file <- "metadata.tsv"
 
 cycle_1 <- qza_to_phyloseq(table_dada2,rooted_tree,taxonomy_file,metadata_file)
 sample_data(cycle_1)[[ioi]] <- factor(sample_data(cycle_1)[[ioi]], levels=ioi_ord)
@@ -556,7 +556,7 @@ bray_res <- pairwise_MRPP(cycle_1, ioi, "bray")
 kable(bray_res) %>%
   kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
 
-jaccard <- qiime2R::read_qza("../qiime/core-metric-results/jaccard_distance_matrix.qza")
+jaccard <- qiime2R::read_qza("core-metric-results/jaccard_distance_matrix.qza")
 # Jaccard 
 print("MRPP based on Jaccard distance")
 grp <- get_variable(cycle_1, ioi)
