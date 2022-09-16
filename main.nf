@@ -273,7 +273,7 @@ process SetupRPackages{
     //conda "${projectDir}/r_env.yml"
     //conda "r_env.yml"
     label 'process_low'
-    container "docker://lorentzb/r_latest_2"
+    container "docker://lorentzb/r_latest_2:2.0"
 
     input:
     file "setup_r.sh" from ch_setup_r_bash
@@ -337,7 +337,7 @@ process VerifyManifest{
     //conda "${projectDir}/environment.yml"
     //conda "environment.yml"
     label 'process_low'
-    container "docker://lorentzb/automate_16_nf"
+    container "docker://lorentzb/automate_16_nf:2.0"
 
     script:
     """
@@ -479,7 +479,7 @@ process CheckSinglePaired {
     publishDir "${params.outdir}", mode: 'copy'
     //conda "${projectDir}/environment.yml"
     //conda "environment.yml"
-    container "docker://lorentzb/automate_16_nf"
+    container "docker://lorentzb/automate_16_nf:2.0"
     
     input: 
     file manifest from ch_single_pair
@@ -547,7 +547,7 @@ process GenerateSeqObject{
     publishDir "${params.outdir}/qiime", mode: 'copy'
     //conda "${projectDir}/environment.yml"
     //conda "environment.yml"
-    container "docker://lorentzb/automate_16_nf"
+    container "docker://lorentzb/automate_16_nf:2.0"
 
     input: 
     file manifest from ch_make_qiime
@@ -586,7 +586,7 @@ process QualControl{
 
     //conda "${projectDir}/environment.yml"
     //conda "environment.yml"
-    container "docker://lorentzb/automate_16_nf"
+    container "docker://lorentzb/automate_16_nf:2.0"
 
     label 'process_medium'
     script:
@@ -620,7 +620,7 @@ process FindCutoffs{
 
     //conda "${projectDir}/environment.yml"
     //conda "environment.yml"
-    container "docker://lorentzb/automate_16_nf"
+    container "docker://lorentzb/automate_16_nf:2.0"
 
     label 'process_low'
 
@@ -793,7 +793,7 @@ process Denoise {
 
     //conda "${projectDir}/environment.yml"
     //conda "environment.yml"
-    container "docker://lorentzb/automate_16_nf"
+    container "docker://lorentzb/automate_16_nf:2.0"
 
     label 'process_medium'
 
@@ -865,7 +865,7 @@ process FeatureVisualization{
 
     //conda "${projectDir}/environment.yml"
     //conda "environment.yml"
-    container "docker://lorentzb/automate_16_nf"
+    container "docker://lorentzb/automate_16_nf:2.0"
 
     label 'process_low'
 
@@ -893,7 +893,7 @@ process TreeConstruction{
 
     //conda "${projectDir}/environment.yml"
     //conda "environment.yml"
-    container "docker://lorentzb/automate_16_nf"
+    container "docker://lorentzb/automate_16_nf:2.0"
     
     input:
     file "rep-seqs-dada2.qza" from ch_rep_seq_tree_gen
@@ -926,7 +926,7 @@ process ExportTable{
 
     //conda "${projectDir}/environment.yml"
     //conda "environment.yml"
-    container "docker://lorentzb/automate_16_nf"
+    container "docker://lorentzb/automate_16_nf:2.0"
     
     input:
     file "table.qzv" from ch_table_viz_obj
@@ -954,7 +954,7 @@ process DetermineDepth{
 
     //conda "${projectDir}/environment.yml"
     //conda "environment.yml"
-    container "docker://lorentzb/automate_16_nf"
+    container "docker://lorentzb/automate_16_nf:2.0"
 
     input:
     path "table_viz/*" from ch_table_viz_dir
@@ -1017,7 +1017,7 @@ process AlphaDiversityMeasure{
 
     //conda "${projectDir}/environment.yml"
     //conda "environment.yml"
-    container "docker://lorentzb/automate_16_nf"
+    container "docker://lorentzb/automate_16_nf:2.0"
 
     input:
     file metadata from ch_alpha_metadata
@@ -1105,7 +1105,7 @@ process AssignTaxonomy{
 
     //conda "${projectDir}/environment.yml"
     //conda "environment.yml"
-    container "docker://lorentzb/automate_16_nf"
+    container "docker://lorentzb/automate_16_nf:2.0"
 
     input:
     file "rep-seqs-dada2.qza" from ch_rep_seq_classify
@@ -1152,7 +1152,7 @@ process CalcRareDepth{
 
     //conda "${projectDir}/environment.yml"
     //conda "environment.yml"
-    container "docker://lorentzb/automate_16_nf"
+    container "docker://lorentzb/automate_16_nf:2.0"
 
     input:
     path "table_viz/*" from ch_table_viz_dir_rare
@@ -1183,7 +1183,7 @@ process RareCurveCalc{
 
     //conda "${projectDir}/environment.yml"
     //conda "environment.yml"
-    container "docker://lorentzb/automate_16_nf"
+    container "docker://lorentzb/automate_16_nf:2.0"
 
     input:
     file "rare_depth.txt" from ch_rare_curve_depth
@@ -1233,7 +1233,7 @@ process AlphaDiversitySignificance{
 
     //conda "${projectDir}/environment.yml"
     //conda "environment.yml"
-    container "docker://lorentzb/automate_16_nf"
+    container "docker://lorentzb/automate_16_nf:2.0"
 
     input:
     file metadata from ch_metadata_alpha_sig
@@ -1319,7 +1319,7 @@ process BetaDiversitySignificance{
 
     //conda "${projectDir}/environment.yml"
     //conda "environment.yml"
-    container "docker://lorentzb/automate_16_nf"
+    container "docker://lorentzb/automate_16_nf:2.0"
 
     input:
     val ioi from ch_ioi_beta_sig
@@ -1365,7 +1365,7 @@ process GeneratePhylogeneticTrees{
 
     //conda "${projectDir}/environment.yml"
     //conda "environment.yml"
-    container "docker://lorentzb/automate_16_nf"
+    container "docker://lorentzb/automate_16_nf:2.0"
 
     input:
     file metadata from ch_metadata_phylo_tree
@@ -1490,7 +1490,7 @@ process runGraphlan{
 
     //conda "${projectDir}/environment.yml"
     //conda "environment.yml"
-    container "docker://lorentzb/py2_test"
+    container "docker://lorentzb/py2_test:2.0"
 
     input:
     file metadata from ch_metadata_phylo_tree_run
@@ -1558,7 +1558,7 @@ process LefseFormat {
 
     //conda "${projectDir}/r_env.yml"
     //conda "r_env.yml"
-    container "docker://lorentzb/r_latest_2"
+    container "docker://lorentzb/r_latest_2:2.0"
 
     input:
     val ioi from ch_ioi_lefse
@@ -1612,7 +1612,7 @@ process LefseAnalysis{
 
     //conda "${projectDir}/python2_env.yml"
     //conda "python2_env.yml"
-    container "docker://lorentzb/py2_env"
+    container "docker://lorentzb/py2_env:2.0"
 
     input:
     path "combos/*" from ch_paired_lefse_format
@@ -1638,7 +1638,7 @@ process ExportSetup{
 
     //conda "${projectDir}/environment.yml"
     //conda "environment.yml"
-    container "docker://lorentzb/automate_16_nf"
+    container "docker://lorentzb/automate_16_nf:2.0"
 
     input:
     file "stats-dada2.qzv" from ch_dada_stats_export
@@ -1667,7 +1667,7 @@ process ExportSetup{
 process Report01 {
     publishDir "${params.outdir}/reports", mode: 'move'
 
-    container "docker://lorentzb/r_01"
+    container "docker://lorentzb/r_01:2.0"
 
     input:
     file "01_report.Rmd" from ch_01_report_file
@@ -1709,7 +1709,7 @@ process Report01 {
 process Report02{
     publishDir "${params.outdir}/reports", mode: 'move'
 
-    container "docker://lorentzb/r_02"
+    container "docker://lorentzb/r_02:2.0"
 
     input:
     file "02_report.Rmd" from ch_02_report_file
@@ -1746,7 +1746,7 @@ process Report03{
 
     publishDir "${params.outdir}/reports", mode: 'move'
 
-    container "docker://lorentzb/r_03"
+    container "docker://lorentzb/r_03:2.0"
 
     input:
     file "03_report.Rmd" from ch_03_report_file
@@ -1791,7 +1791,7 @@ process Report03{
 process Report04{
     publishDir "${params.outdir}/reports", mode: 'move'
 
-    container "docker://lorentzb/r_04"
+    container "docker://lorentzb/r_04:2.0"
 
     input:
     file "04_report.Rmd" from ch_04_report_file
@@ -1835,7 +1835,7 @@ process Report04{
 process Report05{
     publishDir "${params.outdir}/reports", mode: 'move'
 
-    container "docker://lorentzb/r_05"
+    container "docker://lorentzb/r_05:2.0"
 
     input:
     file "05_report.Rmd" from ch_05_report_file
@@ -1878,7 +1878,7 @@ process Report05{
 process Report06{
     publishDir "${params.outdir}/reports", mode: 'move'
 
-    container "docker://lorentzb/r_06"
+    container "docker://lorentzb/r_06:2.0"
 
     input:
     file "06_report.Rmd" from ch_06_report_file
@@ -1918,7 +1918,7 @@ process Report06{
 process Report07{
     publishDir "${params.outdir}/reports", mode: 'move'
 
-    container "docker://lorentzb/r_07"
+    container "docker://lorentzb/r_07:2.0"
 
     input:
     file "07_report.Rmd" from ch_07_report_file
@@ -1959,7 +1959,7 @@ process Report07{
 process Report08 {
     publishDir "${params.outdir}/reports", mode: 'move'
 
-    container "docker://lorentzb/r_08"
+    container "docker://lorentzb/r_08:2.0"
 
     input:
     file "08_report.Rmd" from ch_08_report_file
@@ -1998,7 +1998,7 @@ process Report08 {
 process Report09 {
     publishDir "${params.outdir}/reports", mode: 'move'
 
-    container "docker://lorentzb/r_09"
+    container "docker://lorentzb/r_09:2.0"
 
     input:
     file "09_report.Rmd" from ch_09_report_file
@@ -2036,7 +2036,7 @@ process Report09 {
 process Report10 {
     publishDir "${params.outdir}/reports", mode: 'move'
 
-    container "docker://lorentzb/r_10"
+    container "docker://lorentzb/r_10:2.0"
 
     input:
     file "10_report.Rmd" from ch_10_report_file
@@ -2074,7 +2074,7 @@ process Report10 {
 process Report11 {
     publishDir "${params.outdir}/reports", mode: 'move'
 
-    container "docker://lorentzb/r_11"
+    container "docker://lorentzb/r_11:2.0"
 
     input:
     file "11_report.Rmd" from ch_11_report_file
@@ -2113,7 +2113,7 @@ process Report11 {
 process Report12 {
     publishDir "${params.outdir}/reports", mode: 'move'
 
-    container "docker://lorentzb/r_12"
+    container "docker://lorentzb/r_12:2.0"
 
     input:
     file "12_report.Rmd" from ch_12_report_file
@@ -2151,7 +2151,7 @@ process Report12 {
 process Report13 {
     publishDir "${params.outdir}/reports", mode: 'move'
 
-    container "docker://lorentzb/r_13"
+    container "docker://lorentzb/r_13:2.0"
 
     input:
     file "13_report.Rmd" from ch_13_report_file
@@ -2189,7 +2189,7 @@ process Report13 {
 process Report14{
     publishDir "${params.outdir}/reports", mode: 'move'
 
-    container "docker://lorentzb/r_14"
+    container "docker://lorentzb/r_14:2.0"
 
     input:
     file "14_report.Rmd" from ch_14_report_file
@@ -2221,7 +2221,7 @@ process GenerateReport{
 
     //conda "${projectDir}/r_env.yml"
     //conda "r_env.yml"
-    container "docker://lorentzb/r_latest"
+    container "docker://lorentzb/r_latest:2.0"
     //label 'r'
 
     input:
