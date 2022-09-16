@@ -240,6 +240,10 @@ Channel
     .fromPath("${baseDir}/report_gen_files/13_report.Rmd")
     .set{ ch_13_report_file }
 
+Channel 
+    .fromPath("${baseDir}/report_gen_files/14_report.Rmd")
+    .set{ ch_14_report_file }
+
 
 /*
 process SetupPy2CondaEnv{
@@ -2179,6 +2183,36 @@ process Report13 {
     Rscript -e "rmarkdown::render('13_report.Rmd', output_file='$PWD/13_report_$dt.pdf', output_format='pdf_document', clean=TRUE,knit_root_dir='$PWD', intermediates_dir ='$PWD')"
     '''
 
+
+}
+
+process Report14{
+    publishDir "${params.outdir}/reports", mode: 'move'
+
+    container "docker://lorentzb/r_14"
+
+    input:
+    file "14_report.Rmd" from ch_14_report_file
+
+    output:
+    path "14_report_*" into ch_14_reports
+       
+    label 'process_medium'
+    script:
+    '''
+    #! /usr/bin/env bash
+
+    #echo "I am Here:"
+    #pwd
+    ls
+    #echo "check /$OUTDIR/graphlan/phylo_trees"
+
+    dt=$(date '+%d-%m-%Y_%H.%M.%S');
+
+    Rscript -e "rmarkdown::render('14_report.Rmd', output_file='$PWD/14_report_$dt.html', output_format='html_document', clean=TRUE,knit_root_dir='$PWD',intermediates_dir ='$PWD')"
+
+    Rscript -e "rmarkdown::render('14_report.Rmd', output_file='$PWD/14_report_$dt.pdf', output_format='pdf_document', clean=TRUE,knit_root_dir='$PWD', intermediates_dir ='$PWD')"
+    '''
 
 }
 
