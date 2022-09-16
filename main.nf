@@ -1328,7 +1328,7 @@ process BetaDiversitySignificance{
 
     output:
     path "unweighted-sig/*" into ( ch_u_unifrac_beta_path, ch_u_uni_r10 )
-    path "weighted-sig/*" into ( ch_w_unifrac_beta_path, ch_u_uni_r10 )
+    path "weighted-sig/*" into ( ch_w_unifrac_beta_path, ch_w_uni_r10 )
 
     label 'process_medium'
     
@@ -2045,7 +2045,7 @@ process Report10 {
     file "metadata.tsv" from ch_metadata_r10
 
     path "unweighted-sig/*" from ch_u_uni_r10 
-    path "weighted-sig/*" from ch_u_uni_r10
+    path "weighted-sig/*" from ch_w_uni_r10
         
     output:
     path "10_report_*" into ch_10_reports
