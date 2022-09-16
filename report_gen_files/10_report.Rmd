@@ -9,26 +9,26 @@ output:
 ---
 
 ```{r init renv, message=FALSE, warning=FALSE, include=FALSE}
-library(renv)
+#library(renv)
 #renv::isolate()
 #renv::settings$snapshot.type("all")
-renv::restore()
+#renv::restore()
 ```
 
 ```{r parse item of interest and make outdir for figures, echo=FALSE, message=FALSE, warning=FALSE}
 #this may be required for each file
 #item of interest, comes from bash and python script that orchestrates everything
 wd <- getwd()
-ioi <- read.csv("../item_of_interest.csv")
+ioi <- read.csv("item_of_interest.csv")
 ioi<-as.character(ioi)
 
-ioi_ord <- read.csv("../order_item_of_interest.csv")
+ioi_ord <- read.csv("order_item_of_interest.csv")
 colnames(ioi_ord) <- ioi
 ioi_ord <- as.list(ioi_ord)[[ioi]]
 
 outdir_name <- "Figures"
-if(!dir.exists(paste0("../",outdir_name))) {dir.create(paste0("../",outdir_name))}
-outdir <- paste0("../",outdir_name)
+if(!dir.exists(outdir_name)) {dir.create(outdir_name)}
+outdir <- outdir_name
 ```
 
 ## 10 Beta Diversity Between Groups
@@ -38,7 +38,7 @@ outdir <- paste0("../",outdir_name)
 ```{r generated Weighted boxplots, echo=FALSE, message=FALSE, warning=FALSE}
 library(ggplot2)
 
-weighted_measurements <- read.csv("../qiime/weighted-sig/raw_data.tsv", sep="\t")
+weighted_measurements <- read.csv("weighted-sig/raw_data.tsv", sep="\t")
 
 split_weighted_measure <- split(weighted_measurements, weighted_measurements$Group1)
 
@@ -61,7 +61,7 @@ for(frame in split_weighted_measure){
 
 ```{r generated Unweighted boxplots, echo=FALSE, message=FALSE, warning=FALSE}
 library(ggplot2)
-unweighted_measurements <- read.csv("../qiime/unweighted-sig/raw_data.tsv", sep="\t")
+unweighted_measurements <- read.csv("unweighted-sig/raw_data.tsv", sep="\t")
 
 split_data_frames <- split(unweighted_measurements, unweighted_measurements$Group1)
 
