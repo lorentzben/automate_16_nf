@@ -6,4 +6,6 @@ RUN echo "options(renv.config.pak.enabled = TRUE, repos = c(CRAN = 'https://cran
 RUN R -e 'install.packages(c("renv","remotes"))'
 COPY renv.lock renv.lock
 RUN R -e 'renv::restore()'
+RUN R -e 'tinytex::tlmgr_update()'
+RUN R -e 'tinytex::install_tinytex()'
 CMD ["bash"]
