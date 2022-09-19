@@ -1808,9 +1808,7 @@ process Report04{
  
     output:
     path "04_report_*" into ch_04_reports
-    path "Figures/*" into ch_04_figures
-    
-    
+  
 
     label 'process_medium'
     script:
