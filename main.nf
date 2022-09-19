@@ -1680,7 +1680,7 @@ process Report01 {
 
     output:
     path "01_report_*" into ch_01_reports
-    path "Figures" into ch_01_figures
+    path "Figures/*" into ch_01_figures
 
     label 'process_medium'
     script:
@@ -1764,7 +1764,7 @@ process Report03{
 
     output:
     path "03_report_*" into ch_03_reports
-    path "Figures" into ch_03_figures
+    path "Figures/*" into ch_03_figures
     
     
 
@@ -1808,7 +1808,7 @@ process Report04{
  
     output:
     path "04_report_*" into ch_04_reports
-    path "Figures" into ch_04_figures
+    path "Figures/*" into ch_04_figures
     
     
 
@@ -1853,7 +1853,7 @@ process Report05{
     
     output:
     path "05_report_*" into ch_05_reports
-    path "Figures" into ch_05_figures
+    path "Figures/*" into ch_05_figures
     
 
     label 'process_medium'
@@ -1892,7 +1892,7 @@ process Report06{
         
     output:
     path "06_report_*" into ch_06_reports
-    path "Figures" into ch_06_figures
+    path "Figures/*" into ch_06_figures
     
     
 
@@ -1932,7 +1932,7 @@ process Report07{
         
     output:
     path "07_report_*" into ch_07_reports
-    path "Figures" into ch_07_figures
+    path "Figures/*" into ch_07_figures
     
     
 
@@ -1973,7 +1973,7 @@ process Report08 {
         
     output:
     path "08_report_*" into ch_08_reports
-    path "Figures" into ch_08_figures
+    path "Figures/*" into ch_08_figures
     
     
 
@@ -2010,7 +2010,7 @@ process Report09 {
         
     output:
     path "09_report_*" into ch_09_reports
-    path "Figures" into ch_09_figures
+    path "Figures/*" into ch_09_figures
     
     
 
@@ -2049,7 +2049,7 @@ process Report10 {
         
     output:
     path "10_report_*" into ch_10_reports
-    path "Figures" into ch_10_figures
+    path "Figures/*" into ch_10_figures
     
     
 
@@ -2088,7 +2088,7 @@ process Report11 {
         
     output:
     path "11_report_*" into ch_11_reports
-    path "Figures" into ch_11_figures
+    path "Figures/*" into ch_11_figures
     
     
 
@@ -2127,7 +2127,7 @@ process Report12 {
         
     output:
     path "12_report_*" into ch_12_reports
-    path "Figures" into ch_12_figures
+    path "Figures/*" into ch_12_figures
     
     
     label 'process_medium'
@@ -2163,7 +2163,7 @@ process Report13 {
 
     output:
     path "13_report_*" into ch_13_reports
-    path "Figures" into ch_13_figures
+    path "Figures/*" into ch_13_figures
     
     
     label 'process_medium'
