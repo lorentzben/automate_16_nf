@@ -2161,7 +2161,7 @@ process Report13 {
 
     output:
     path "13_report_*" into ch_13_reports
-    path "Figures/*" into ch_13_figures
+    
     
     
     label 'process_medium'
@@ -2178,7 +2178,7 @@ process Report13 {
 
     Rscript -e "rmarkdown::render('13_report.Rmd', output_file='$PWD/13_report_$dt.html', output_format='html_document', clean=TRUE,knit_root_dir='$PWD',intermediates_dir ='$PWD')"
 
-    cp result/* Figures/*
+    
     #Rscript -e "rmarkdown::render('13_report.Rmd', output_file='$PWD/13_report_$dt.pdf', output_format='pdf_document', clean=TRUE,knit_root_dir='$PWD', intermediates_dir ='$PWD')"
     '''
 
