@@ -135,12 +135,12 @@ if(params.classify_full){
 
 
 Channel
-    .fromPath("${baseDir}/plot_cladogram.py")
+    .fromPath("${baseDir}/python_scripts/plot_cladogram.py")
     .ifEmpty {exit 1, log.info "Cannot find file plot_cladogram.py!"}
     .set{ ch_clado_file }
 
 Channel
-    .fromPath("${baseDir}/plot_res.py")
+    .fromPath("${baseDir}/python_scripts/plot_res.py")
     .ifEmpty {exit 1, log.info "Cannot find file plot_res.py!"}
     .set{ ch_plot_res }
 
@@ -154,20 +154,22 @@ Channel
     ch_ioi_r06_csv ; ch_ioi_r07_csv ; ch_ioi_r08_csv; ch_ioi_r09_csv; ch_ioi_r10_csv; ch_ioi_r11_csv; ch_ioi_r12_csv; ch_ioi_r13_csv}
 
 Channel
-    .fromPath("${baseDir}/graph.sh")
+    .fromPath("${baseDir}/bash_scripts/graph.sh")
     .set{ ch_graph_script } 
 
 Channel
-    .fromPath("${baseDir}/qiime_to_lefse.R")
+    .fromPath("${baseDir}/r_scripts/qiime_to_lefse.R")
     .set { ch_lefse_format_script }
 
 Channel
-    .fromPath("${baseDir}/filter_samples.py")
+    .fromPath("${baseDir}/python_scripts/filter_samples.py")
     .set{ ch_filter_script }
 
 Channel 
-    .fromPath("${baseDir}/lefse_analysis.sh")
+    .fromPath("${baseDir}/bash_scripts/lefse_analysis.sh")
     .set{ ch_lefse_analysis_script }
+
+/*
 Channel
     .fromPath("${baseDir}/report.Rmd")
     .set{ ch_report_outline }
@@ -175,18 +177,24 @@ Channel
 Channel
     .fromPath("${baseDir}/make_report.sh")
     .set{ ch_report_bash_script }
+*/
 
+//TODO see if we can remove this area/ first process
+/*
 Channel
-    .fromPath("${baseDir}/init_and_refresh.R")
+    .fromPath("${baseDir}/r_scripts/init_and_refresh.R")
     .set{ ch_r_init }
+*/
 
 Channel
     .fromPath("${baseDir}/renv.lock")
     .set{ ch_r_lock }
-
+    
+/*
 Channel
     .fromPath("${baseDir}/setup_r.sh")
     .set{ ch_setup_r_bash }
+*/
 
 Channel
     .fromPath("${baseDir}/report_gen_files/01_report.Rmd")
@@ -268,6 +276,7 @@ process SetupPy2CondaEnv{
 }
 */
 
+/*
 //I removed Biocmanager and Microbiome, so if a function breaks, thats why. 
 process SetupRPackages{
     //conda "${projectDir}/r_env.yml"
@@ -316,7 +325,7 @@ process SetupRPackages{
     """
 
 }
-
+*/
 //TODO write item of interest into csv/txt for r script
 process VerifyManifest{
     publishDir "${params.outdir}", mode: 'copy'
