@@ -53,7 +53,8 @@ if(params.metadata) {
     Channel
         .fromPath(params.metadata)
         .ifEmpty { exit 1, log.info "Cannot find path file ${tsvFile}"}
-        .into{ ch_meta_veri ; ch_meta_feature_viz; ch_alpha_metadata ; ch_metadata_rare_curve ; ch_metadata_alpha_sig ; ch_metadata_beta_sig ; ch_metadata_phylo_tree ; ch_metadata_phylo_tree_run ; ch_metadata_lefse ; ch_metadata_finalize}
+        .into{ ch_meta_veri ; ch_meta_feature_viz; ch_alpha_metadata ; ch_metadata_rare_curve ; ch_metadata_alpha_sig ; 
+        ch_metadata_beta_sig ; ch_metadata_phylo_tree ; ch_metadata_phylo_tree_run ; ch_metadata_lefse ; ch_metadata_finalize}
 }
 //TODO add a channel that will pull in cutoffs in a txt if the user submits them
 if(params.sampDepth){
@@ -180,16 +181,15 @@ Channel
 */
 
 //TODO see if we can remove this area/ first process
-/*
+
 Channel
     .fromPath("${baseDir}/r_scripts/init_and_refresh.R")
     .set{ ch_r_init }
-*/
 
 Channel
-    .fromPath("${baseDir}/renv.lock")
+    .fromPath("${baseDir}/r_scripts/renv.lock")
     .set{ ch_r_lock }
-    
+
 /*
 Channel
     .fromPath("${baseDir}/setup_r.sh")
@@ -2251,8 +2251,8 @@ process GenerateReport{
     path "unweighted-sig/*" from ch_u_unifrac_beta_path
     path "weighted-sig/*" from ch_w_unifrac_beta_path
     path "result/*" from ch_lefse_results
-    file "report.Rmd" from ch_report_outline
-    file "make_report.sh" from ch_report_bash_script
+    //file "report.Rmd" from ch_report_outline
+    //file "make_report.sh" from ch_report_bash_script
     file "order_item_of_interest.csv" from ch_format_ioi_order
     file "table.qzv" from ch_table_viz_export
     file 'demux_summary.qzv' from ch_demux_export
