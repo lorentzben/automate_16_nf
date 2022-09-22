@@ -56,7 +56,8 @@ if(params.metadata) {
         .into{ ch_meta_veri ; ch_meta_feature_viz; ch_alpha_metadata ; ch_metadata_rare_curve ; ch_metadata_alpha_sig ; 
         ch_metadata_beta_sig ; ch_metadata_phylo_tree ; ch_metadata_phylo_tree_run ; ch_metadata_lefse ; ch_metadata_finalize}
 }
-//TODO add a channel that will pull in cutoffs in a txt if the user submits them
+
+
 if(params.sampDepth){
     Channel
         .from(params.sampDepth)
@@ -103,20 +104,6 @@ if(!params.rareDepth){
         .from(0)
         .set{ ch_user_rarefaction_depth }
 }
-
-/*
-TODO remove if not needed
-if(params.classify){
-    Channel
-        .fromPath(params.classify)
-        .ifEmpty {exit 1, log.info "Cannot find the classifier!"}
-        .set{ ch_whole_classifier}
-    Channel
-        .fromPath(params.classify)
-        .ifEmpty {exit 1, log.info "Cannot find the classifier!"}
-        .set{ ch_515_classifier }
-}
-*/
 
 if(params.classify_515){
     fiveFile = file(params.classify_515).getName()
@@ -170,18 +157,6 @@ Channel
     .fromPath("${baseDir}/bash_scripts/lefse_analysis.sh")
     .set{ ch_lefse_analysis_script }
 
-/*
-Channel
-    .fromPath("${baseDir}/report.Rmd")
-    .set{ ch_report_outline }
-
-Channel
-    .fromPath("${baseDir}/make_report.sh")
-    .set{ ch_report_bash_script }
-*/
-
-//TODO see if we can remove this area/ first process
-
 Channel
     .fromPath("${baseDir}/r_scripts/init_and_refresh.R")
     .set{ ch_r_init }
@@ -189,12 +164,6 @@ Channel
 Channel
     .fromPath("${baseDir}/r_scripts/renv.lock")
     .set{ ch_r_lock }
-
-/*
-Channel
-    .fromPath("${baseDir}/setup_r.sh")
-    .set{ ch_setup_r_bash }
-*/
 
 Channel
     .fromPath("${baseDir}/report_gen_files/01_report.Rmd")
@@ -253,80 +222,6 @@ Channel
     .set{ ch_14_report_file }
 
 
-/*
-process SetupPy2CondaEnv{
-    //conda "${projectDir}/python2_env.yml"
-    //conda "python2_env.yml"
-    container "lorentzb/py2_env"
-
-    input:
-    file plot_clado from ch_clado_file
-    file plot_res from ch_plot_res
-    
-
-    shell:
-    '''
-    #!/usr/bin/env bash
-    LEFSE=$(which lefse.py)
-    LEFSE_DIR=${LEFSE::-8}
-    cp plot_res.py $LEFSE_DIR
-    cp plot_cladogram.py $LEFSE_DIR
-    '''
-
-}
-*/
-
-/*
-//I removed Biocmanager and Microbiome, so if a function breaks, thats why. 
-process SetupRPackages{
-    //conda "${projectDir}/r_env.yml"
-    //conda "r_env.yml"
-    label 'process_low'
-    container "docker://lorentzb/r_latest_2:2.0"
-
-    input:
-    file "setup_r.sh" from ch_setup_r_bash
-
-    output:
-    file "set.txt" into ch_r_wait
-
-    script:
-    """
-    #!/usr/bin/env bash
-
-    bash setup_r.sh
-
-    #cp -rf /renv_dev/renv .
-    #cp -rf /renv_dev/renv.lock .
-
-    #Rscript -e "renv::init()"
-    #Rscript -e "renv::install('rmarkdown')"
-
-    #Rscript -e "renv::restore(library='./renv/library/R-4.1/x86_64-pc-linux-gnu/', lockfile='./renv.lock')"
-
-
-    #Sys.setenv(R_REMOTES_NO_ERRORS_FROM_WARNINGS="true")
-    #if(!require(rmarkdown)) {install.packages("rmarkdown", repos="http://cran.us.r-project.org")}
-    #if(!require(renv)) {install.packages("renv",repos="http://cran.us.r-project.org")}
-    #renv::init()
-    #if(!require(remotes)){install.packages("remotes",repos="http://cran.us.r-project.org")}
-    #if(!require(devtools)){install.packages("devtools",repos="http://cran.us.r-project.org")}
-    #if(!require(jamba)){remotes::install_github("jmw86069/jamba@0.0.6.900")}
-    #remotes::install_github("tidyverse/ggplot2@v3.3.2")
-    #remotes::install_github("vegandevs/vegan@v2.5-7")
-    #if(!require(ampvis2)){remotes::install_github("MadsAlbertsen/ampvis2@2.6.8")}
-    #if(!require(ggvegan)){remotes::install_github("gavinsimpson/ggvegan@4bc6ee9945dd9229ed486409c0acab9413b8c9af")}
-    #if(!require(ggConvexHull)){remotes::install_github("cmartin/ggConvexHull@660f4094da44dd500c3c0684b9c5c20c21ee823a")}
-    
-
-
-    
-    #echo 'done' > set.txt
-    """
-
-}
-*/
-//TODO write item of interest into csv/txt for r script
 process VerifyManifest{
     publishDir "${params.outdir}", mode: 'copy'
     input:
@@ -340,11 +235,6 @@ process VerifyManifest{
     file "order_item_of_interest.csv" into ( ch_format_ioi_order, ch_oioi_r01_csv, ch_oioi_r02_csv, ch_oioi_r03_csv, ch_oioi_r04_csv,  ch_oioi_r05_csv ,
     ch_oioi_r06_csv, ch_oioi_r07_csv, ch_oioi_r08_csv, ch_oioi_r09_csv, ch_oioi_r10_csv, ch_oioi_r11_csv, ch_oioi_r12_csv, ch_oioi_r13_csv )
 
-    /*this is in place for local deployment, but the server does not give access to the dir for some reason
-    The change is nessecary to do nextflow run -r main lorentzben/automate_16_nf
-    */
-    //conda "${projectDir}/environment.yml"
-    //conda "environment.yml"
     label 'process_low'
     container "docker://lorentzb/automate_16_nf:2.0"
 
@@ -486,8 +376,7 @@ process VerifyManifest{
 process CheckSinglePaired { 
 
     publishDir "${params.outdir}", mode: 'copy'
-    //conda "${projectDir}/environment.yml"
-    //conda "environment.yml"
+
     container "docker://lorentzb/automate_16_nf:2.0"
     
     input: 
@@ -554,8 +443,7 @@ process CheckSinglePaired {
 process GenerateSeqObject{
 
     publishDir "${params.outdir}/qiime", mode: 'copy'
-    //conda "${projectDir}/environment.yml"
-    //conda "environment.yml"
+    
     container "docker://lorentzb/automate_16_nf:2.0"
 
     input: 
@@ -593,8 +481,6 @@ process QualControl{
     file seq_obj into ch_qiime_denoise
     file 'demux_summary.qzv' into ch_demux_export
 
-    //conda "${projectDir}/environment.yml"
-    //conda "environment.yml"
     container "docker://lorentzb/automate_16_nf:2.0"
 
     label 'process_medium'
@@ -614,7 +500,7 @@ process QualControl{
 }
 
 process FindCutoffs{
-    //TODO Remove this call after debugging
+    
     publishDir "${params.outdir}/qiime", mode: 'copy'
 
     input:
@@ -627,14 +513,12 @@ process FindCutoffs{
     file("cutoffs.csv") into (ch_cutoff_vals, ch_cutoff_r03)
     file("manifest_format.txt") into ch_manifest_type_denoise
 
-    //conda "${projectDir}/environment.yml"
-    //conda "environment.yml"
     container "docker://lorentzb/automate_16_nf:2.0"
 
     label 'process_low'
 
     script:
-    //TODO add a if block here that can grep a .txt to see if a user submitted cutoffs
+    
     if(forward_val != 0)
         """
         #!/usr/bin/env python3
@@ -798,10 +682,6 @@ process Denoise {
     file "table-dada2.qza" into ch_table
     file "stats-dada2.qza" into ch_dada2_stats
     
-    
-
-    //conda "${projectDir}/environment.yml"
-    //conda "environment.yml"
     container "docker://lorentzb/automate_16_nf:2.0"
 
     label 'process_medium'
@@ -872,8 +752,6 @@ process FeatureVisualization{
     file "rep-seqs-dada2.qza" into ch_rep_seq_tree_gen
     file "table-dada2.qza" into ch_alpha_div_table
 
-    //conda "${projectDir}/environment.yml"
-    //conda "environment.yml"
     container "docker://lorentzb/automate_16_nf:2.0"
 
     label 'process_low'
@@ -900,8 +778,6 @@ process FeatureVisualization{
 process TreeConstruction{
     publishDir "${params.outdir}/qiime", mode: 'copy'
 
-    //conda "${projectDir}/environment.yml"
-    //conda "environment.yml"
     container "docker://lorentzb/automate_16_nf:2.0"
     
     input:
@@ -933,8 +809,6 @@ process TreeConstruction{
 process ExportTable{
     publishDir "${params.outdir}/qiime", mode: 'copy'
 
-    //conda "${projectDir}/environment.yml"
-    //conda "environment.yml"
     container "docker://lorentzb/automate_16_nf:2.0"
     
     input:
@@ -961,8 +835,6 @@ process ExportTable{
 process DetermineDepth{
     publishDir "${params.outdir}/qiime", mode: 'copy'
 
-    //conda "${projectDir}/environment.yml"
-    //conda "environment.yml"
     container "docker://lorentzb/automate_16_nf:2.0"
 
     input:
@@ -1024,8 +896,6 @@ process DetermineDepth{
 process AlphaDiversityMeasure{
     publishDir "${params.outdir}/qiime", mode: 'copy'
 
-    //conda "${projectDir}/environment.yml"
-    //conda "environment.yml"
     container "docker://lorentzb/automate_16_nf:2.0"
 
     input:
@@ -1039,7 +909,6 @@ process AlphaDiversityMeasure{
     path "core-metric-results/*" into ch_core_beta_significance 
     path "core-metric-results/*" into ( ch_core_report , ch_rare_table_r01 , ch_core_metric_r03, ch_core_metric_r06, ch_core_metric_r08, 
     ch_core_metric_r09, ch_core_metric_r11, ch_core_metric_r12 )
-    file "core-metric-results/rarefied_table.qza" into ch_phylo_tree_rare_table
     file "core-metric-results/rarefied_table.qza" into ch_phylo_tree_rare_table_run
     file "shannon.qza" into ch_shannon_qza
     file "simpson.qza" into ch_simpson_qza 
@@ -1109,11 +978,10 @@ process AlphaDiversityMeasure{
 }
 
 process AssignTaxonomy{
-    //TODO change out the classifier for the 515 only one 
+    //TODO change out the classifier for the 515 only one
+    //TODO check a different classifier out
     publishDir "${params.outdir}/qiime", mode: 'copy'
 
-    //conda "${projectDir}/environment.yml"
-    //conda "environment.yml"
     container "docker://lorentzb/automate_16_nf:2.0"
 
     input:
@@ -1159,8 +1027,6 @@ process AssignTaxonomy{
 process CalcRareDepth{
     publishDir "${params.outdir}/qiime", mode: 'copy'
 
-    //conda "${projectDir}/environment.yml"
-    //conda "environment.yml"
     container "docker://lorentzb/automate_16_nf:2.0"
 
     input:
@@ -1190,8 +1056,6 @@ process CalcRareDepth{
 process RareCurveCalc{
     publishDir "${params.outdir}/qiime", mode: 'copy'
 
-    //conda "${projectDir}/environment.yml"
-    //conda "environment.yml"
     container "docker://lorentzb/automate_16_nf:2.0"
 
     input:
@@ -1240,8 +1104,6 @@ process RareCurveCalc{
 process AlphaDiversitySignificance{
     publishDir "${params.outdir}/qiime", mode: 'copy'
 
-    //conda "${projectDir}/environment.yml"
-    //conda "environment.yml"
     container "docker://lorentzb/automate_16_nf:2.0"
 
     input:
@@ -1326,8 +1188,6 @@ process AlphaDiversitySignificance{
 process BetaDiversitySignificance{
     publishDir "${params.outdir}/qiime", mode: 'copy'
 
-    //conda "${projectDir}/environment.yml"
-    //conda "environment.yml"
     container "docker://lorentzb/automate_16_nf:2.0"
 
     input:
@@ -1372,23 +1232,18 @@ process BetaDiversitySignificance{
 process GeneratePhylogeneticTrees{
     publishDir "${params.outdir}/graphlan", mode: 'copy'
 
-    //conda "${projectDir}/environment.yml"
-    //conda "environment.yml"
     container "docker://lorentzb/automate_16_nf:2.0"
 
     input:
     file metadata from ch_metadata_phylo_tree
     val ioi from ch_ioi_phylo_tree
     file "table-dada2.qza" from ch_table_phylo_tree_rare
-    //file "rarefied_table.qza" from ch_phylo_tree_rare_table
     file "taxonomy.qza" from ch_taxonomy_phylo_tree
-    //file "graph.sh" from ch_graph_script
     file "filter_samples.py" from ch_filter_script
 
     output:
-    //path "phylo_trees/*" into ch_png_phylo_tree
+    
     file "table-dada2.qza" into ch_table_graphlan2
-    //file "rarefied_table.qza" into ch_table_lefse
     file "taxonomy.qza" into ch_tax_lefse
     path "biom_tabs/*" into ch_biom_tabs
 
@@ -1461,35 +1316,6 @@ process GeneratePhylogeneticTrees{
         result = subprocess.run([biom_format_command], shell=True)
 
         result = subprocess.run(['cp '+str(item)+'-otu-table-mod.biom biom_tabs'],shell=True)
-
-        #TODO remove these lines if the next process works
-
-        # Outputs the current ioi so that it can be annotated in the graphlan image
-        with open('current.txt', 'w') as file:
-            file.write(item)
-
-        # bash script call to handle the steps within a conda python 2.7.17 envionment
-        #generate_image_command = 'bash graph.sh'
-
-        #result = subprocess.run([generate_image_command], shell=True)
-
-        # renaming otu tables so they have meaning
-        #rename_table = 'cp otu-table-mod.biom phylo_trees/otu-table-'+str(item)+'-mod.biom'
-        
-        #result = subprocess.run([rename_table],shell=True)
-
-        # This will be handled outside of the for loop
-        # renaming the output of the graping bash script so that it has meaning
-        #rename_image = 'cp image_graph.png phylo_trees/image_'+str(item)+'_graph.png'
-
-        #result = subprocess.run([rename_image], shell=True)
-
-        # rename pdf quality image so that it has meaning
-        #rename_pdf_image = 'cp image_pdf_graph.png phylo_trees/image_'+str(item)+'_pdf_g.png'
-
-        #result = subprocess.run([rename_pdf_image], shell=True)
-
-    
     """
 
 }
@@ -1497,8 +1323,6 @@ process GeneratePhylogeneticTrees{
 process runGraphlan{
     publishDir "${params.outdir}/graphlan", mode: 'copy'
 
-    //conda "${projectDir}/environment.yml"
-    //conda "environment.yml"
     container "docker://lorentzb/py2_test:2.0"
 
     input:
@@ -1509,14 +1333,11 @@ process runGraphlan{
     file "taxonomy.qza" from ch_taxonomy_phylo_tree_run
     file "graph.sh" from ch_graph_script
     path "biom_tabs/*" from ch_biom_tabs
-    //path "phylo_trees/*" from ch_png_phylo_tree
-    //file "filter_samples.py" from ch_filter_script
-
+    
     output:
-    path "phylo_trees/*" into (ch_png_phylo_tree,  ch_02_report_imgs) //ch_png_phylo_tree_r02)
+    path "phylo_trees/*" into (ch_png_phylo_tree,  ch_02_report_imgs) 
     file "table-dada2.qza" into ch_table_lefse_graphlan
     file "rarefied_table.qza" into ch_table_lefse
-    //file "taxonomy.qza" into ch_tax_lefse
     
     label 'process_low'
 
@@ -1565,9 +1386,6 @@ process runGraphlan{
 process LefseFormat {
     publishDir "${params.outdir}/lefse", mode: 'copy'
 
-    //conda "${projectDir}/r_env.yml"
-    //conda "r_env.yml"
-    //container "docker://lorentzb/r_latest_2:2.0"
     container "docker://lorentzb/qiime2lefse:1.0"
 
     input:
@@ -1578,7 +1396,6 @@ process LefseFormat {
     file "taxonomy.qza" from ch_tax_lefse
     file metadata from ch_metadata_lefse
     file "qiime_to_lefse.R" from ch_lefse_format_script
-    //file "set.txt" from ch_r_wait
     file "init_and_refresh.R" from ch_r_init
     file "renv.lock" from ch_r_lock
     
@@ -1598,19 +1415,7 @@ process LefseFormat {
     script:
     """
     #!/usr/bin/env bash
-    #cp -rf /renv_dev/renv .
-    #cp -rf /renv_dev/renv.lock .
-    #cp -rf /renv_dev/r_lib . 
-    
-    
-    #Rscript -e ".libPaths('./r_lib/')"
-    #Rscript -e "renv::activate()"
-    #Rscript -e "renv::init()"
-    #Rscript -e "renv::install('rmarkdown')"
-    #Rscript -e "renv::restore(library='./renv/library/R-4.1/x86_64-pc-linux-gnu/', lockfile='./renv.lock')"
-
     mkdir combos
-    #Rscript init_and_refresh.R
     cp ${metadata} "metadata.tsv"
     Rscript qiime_to_lefse.R ${ioi}
     mv lefse_formatted.txt combos/
@@ -1620,8 +1425,6 @@ process LefseFormat {
 process LefseAnalysis{
     publishDir "${params.outdir}/lefse", mode: 'copy'
 
-    //conda "${projectDir}/python2_env.yml"
-    //conda "python2_env.yml"
     container "docker://lorentzb/py2_env:2.0"
 
     input:
@@ -1646,8 +1449,6 @@ process LefseAnalysis{
 process ExportSetup{
     publishDir "${params.outdir}", mode: 'copy'
 
-    //conda "${projectDir}/environment.yml"
-    //conda "environment.yml"
     container "docker://lorentzb/automate_16_nf:2.0"
 
     input:
@@ -1700,8 +1501,6 @@ process Report01 {
     #Input: item_of_interest.csv order_item_of_interest.csv qiime/* metadata.tsv
     #Output: ../Figures/* 01_report_$dt.html 01_report_$dt.pdf
 
-    #mkdir 01_report
-
     echo "I am Here:"
     pwd
     ls
@@ -1726,11 +1525,10 @@ process Report02{
     file "item_of_interest.csv" from ch_ioi_r02_csv
     file "order_item_of_interest.csv" from ch_oioi_r02_csv
     file "metadata.tsv" from ch_metadata_r02
-    path "phylo_trees/*" from ch_02_report_imgs //ch_png_phylo_tree_r02
+    path "phylo_trees/*" from ch_02_report_imgs
 
     output:
     path "02_report_*" into ch_02_reports
-    //path "phylo_trees/*" into ch_02_report_imgs
     
 
     label 'process_medium'
@@ -1738,11 +1536,7 @@ process Report02{
     '''
     #! /usr/bin/env bash
 
-    #echo "I am Here:"
-    #pwd
     ls
-    #echo "check /$OUTDIR/graphlan/phylo_trees"
-
     dt=$(date '+%d-%m-%Y_%H.%M.%S');
 
     Rscript -e "rmarkdown::render('02_report.Rmd', output_file='$PWD/02_report_$dt.html', output_format='html_document', clean=TRUE,knit_root_dir='$PWD',intermediates_dir ='$PWD')"
@@ -1783,11 +1577,7 @@ process Report03{
     '''
     #! /usr/bin/env bash
 
-    #echo "I am Here:"
-    #pwd
     ls
-    #echo "check /$OUTDIR/graphlan/phylo_trees"
-
     dt=$(date '+%d-%m-%Y_%H.%M.%S');
 
     Rscript -e "rmarkdown::render('03_report.Rmd', output_file='$PWD/03_report_$dt.html', output_format='html_document', clean=TRUE,knit_root_dir='$PWD',intermediates_dir ='$PWD')"
@@ -1825,10 +1615,9 @@ process Report04{
     '''
     #! /usr/bin/env bash
 
-    #echo "I am Here:"
-    #pwd
+    
     ls
-    #echo "check /$OUTDIR/graphlan/phylo_trees"
+    
 
     dt=$(date '+%d-%m-%Y_%H.%M.%S');
 
@@ -1869,11 +1658,8 @@ process Report05{
     '''
     #! /usr/bin/env bash
 
-    #echo "I am Here:"
-    #pwd
     ls
-    #echo "check /$OUTDIR/graphlan/phylo_trees"
-
+    
     dt=$(date '+%d-%m-%Y_%H.%M.%S');
 
     Rscript -e "rmarkdown::render('05_report.Rmd', output_file='$PWD/05_report_$dt.html', output_format='html_document', clean=TRUE,knit_root_dir='$PWD',intermediates_dir ='$PWD')"
@@ -1909,11 +1695,8 @@ process Report06{
     '''
     #! /usr/bin/env bash
 
-    #echo "I am Here:"
-    #pwd
     ls
-    #echo "check /$OUTDIR/graphlan/phylo_trees"
-
+    
     dt=$(date '+%d-%m-%Y_%H.%M.%S');
 
     Rscript -e "rmarkdown::render('06_report.Rmd', output_file='$PWD/06_report_$dt.html', output_format='html_document', clean=TRUE,knit_root_dir='$PWD',intermediates_dir ='$PWD')"
@@ -1949,11 +1732,8 @@ process Report07{
     '''
     #! /usr/bin/env bash
 
-    #echo "I am Here:"
-    #pwd
     ls
-    #echo "check /$OUTDIR/graphlan/phylo_trees"
-
+    
     dt=$(date '+%d-%m-%Y_%H.%M.%S');
 
     Rscript -e "rmarkdown::render('07_report.Rmd', output_file='$PWD/07_report_$dt.html', output_format='html_document', clean=TRUE,knit_root_dir='$PWD',intermediates_dir ='$PWD')"
@@ -1990,11 +1770,8 @@ process Report08 {
     '''
     #! /usr/bin/env bash
 
-    #echo "I am Here:"
-    #pwd
     ls
-    #echo "check /$OUTDIR/graphlan/phylo_trees"
-
+    
     dt=$(date '+%d-%m-%Y_%H.%M.%S');
 
     Rscript -e "rmarkdown::render('08_report.Rmd', output_file='$PWD/08_report_$dt.html', output_format='html_document', clean=TRUE,knit_root_dir='$PWD',intermediates_dir ='$PWD')"
@@ -2027,10 +1804,8 @@ process Report09 {
     '''
     #! /usr/bin/env bash
 
-    #echo "I am Here:"
-    #pwd
     ls
-    #echo "check /$OUTDIR/graphlan/phylo_trees"
+   
 
     dt=$(date '+%d-%m-%Y_%H.%M.%S');
 
@@ -2066,10 +1841,7 @@ process Report10 {
     '''
     #! /usr/bin/env bash
 
-    #echo "I am Here:"
-    #pwd
     ls
-    #echo "check /$OUTDIR/graphlan/phylo_trees"
 
     dt=$(date '+%d-%m-%Y_%H.%M.%S');
 
@@ -2105,11 +1877,8 @@ process Report11 {
     '''
     #! /usr/bin/env bash
 
-    #echo "I am Here:"
-    #pwd
     ls
-    #echo "check /$OUTDIR/graphlan/phylo_trees"
-
+    
     dt=$(date '+%d-%m-%Y_%H.%M.%S');
 
     Rscript -e "rmarkdown::render('11_report.Rmd', output_file='$PWD/11_report_$dt.html', output_format='html_document', clean=TRUE,knit_root_dir='$PWD',intermediates_dir ='$PWD')"
@@ -2143,10 +1912,7 @@ process Report12 {
     '''
     #! /usr/bin/env bash
 
-    #echo "I am Here:"
-    #pwd
     ls
-    #echo "check /$OUTDIR/graphlan/phylo_trees"
 
     dt=$(date '+%d-%m-%Y_%H.%M.%S');
 
@@ -2179,11 +1945,8 @@ process Report13 {
     '''
     #! /usr/bin/env bash
 
-    #echo "I am Here:"
-    #pwd
     ls
-    #echo "check /$OUTDIR/graphlan/phylo_trees"
-
+   
     dt=$(date '+%d-%m-%Y_%H.%M.%S');
 
     Rscript -e "rmarkdown::render('13_report.Rmd', output_file='$PWD/13_report_$dt.html', output_format='html_document', clean=TRUE,knit_root_dir='$PWD',intermediates_dir ='$PWD')"
@@ -2211,11 +1974,8 @@ process Report14{
     '''
     #! /usr/bin/env bash
 
-    #echo "I am Here:"
-    #pwd
     ls
-    #echo "check /$OUTDIR/graphlan/phylo_trees"
-
+   
     dt=$(date '+%d-%m-%Y_%H.%M.%S');
 
     Rscript -e "rmarkdown::render('14_report.Rmd', output_file='$PWD/14_report_$dt.html', output_format='html_document', clean=TRUE,knit_root_dir='$PWD',intermediates_dir ='$PWD')"
@@ -2226,6 +1986,7 @@ process Report14{
 }
 
 /*
+TODO Determine if we still want to publish this dir so we have the intermediate files for diagnositcs
 process GenerateReport{
     publishDir "${baseDir}", mode: 'move'
 
