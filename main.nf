@@ -1567,7 +1567,8 @@ process LefseFormat {
 
     //conda "${projectDir}/r_env.yml"
     //conda "r_env.yml"
-    container "docker://lorentzb/r_latest_2:2.0"
+    //container "docker://lorentzb/r_latest_2:2.0"
+    container "docker://lorentzb/qiime2lefse:1.0"
 
     input:
     val ioi from ch_ioi_lefse
@@ -2224,6 +2225,7 @@ process Report14{
 
 }
 
+/*
 process GenerateReport{
     publishDir "${baseDir}", mode: 'move'
 
@@ -2274,5 +2276,5 @@ process GenerateReport{
     echo ' !{baseDir}/!{params.outdir} ' > out.txt
     '''
 }
-
+*/
 
