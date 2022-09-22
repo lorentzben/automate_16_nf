@@ -158,14 +158,6 @@ Channel
     .set{ ch_lefse_analysis_script }
 
 Channel
-    .fromPath("${baseDir}/r_scripts/init_and_refresh.R")
-    .set{ ch_r_init }
-
-Channel
-    .fromPath("${baseDir}/r_scripts/renv.lock")
-    .set{ ch_r_lock }
-
-Channel
     .fromPath("${baseDir}/report_gen_files/01_report.Rmd")
     .set{ ch_01_report_file }
 
@@ -1396,9 +1388,7 @@ process LefseFormat {
     file "taxonomy.qza" from ch_tax_lefse
     file metadata from ch_metadata_lefse
     file "qiime_to_lefse.R" from ch_lefse_format_script
-    file "init_and_refresh.R" from ch_r_init
-    file "renv.lock" from ch_r_lock
-    
+      
 
     output:
     path "combos/*" into ch_paired_lefse_format
