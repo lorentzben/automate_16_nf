@@ -671,7 +671,8 @@ process Denoise {
     
     output:
     file "rep-seqs-dada2.qza" into ch_rep_seqs
-    file "table-dada2.qza" into ch_table
+    file "table-dada2.qza" into (ch_table, ch_alpha_div_table, 
+    ch_table_rare_curve, ch_table_graphlan2, ch_table_phylo_tree_rare ,ch_table_lefse_graphlan)
     file "stats-dada2.qza" into ch_dada2_stats
     
     container "docker://lorentzb/automate_16_nf:2.0"
@@ -742,7 +743,7 @@ process FeatureVisualization{
     file "table.qzv" into ch_table_viz_export
     file "rep-seqs.qzv" into ch_req_seq_vis_obj
     file "rep-seqs-dada2.qza" into ch_rep_seq_tree_gen
-    file "table-dada2.qza" into ch_alpha_div_table
+    
 
     container "docker://lorentzb/automate_16_nf:2.0"
 
@@ -779,7 +780,8 @@ process TreeConstruction{
     file "aligned-rep-seqs.qza" into ch_aligned_rep_seqs
     file "masked-aligned-rep-seqs.qza" into ch_mask_align_rep_seq
     file "unrooted-tree.qza" into ch_unrooted_tree
-    file "rooted-tree.qza" into (ch_rooted_tree, ch_rooted_tree_r01 , ch_root_tree_r03, ch_root_tree_r06, 
+    file "rooted-tree.qza" into (ch_rooted_tree, ch_tree_rare_curve, ch_tree_lefse, 
+    ch_rooted_tree_r01 , ch_root_tree_r03, ch_root_tree_r06, 
     ch_root_tree_r08, ch_root_tree_r11, ch_root_tree_r12)
     file "rep-seqs-dada2.qza" into ch_rep_seq_classify
 
@@ -901,15 +903,14 @@ process AlphaDiversityMeasure{
     path "core-metric-results/*" into ch_core_beta_significance 
     path "core-metric-results/*" into ( ch_core_report , ch_rare_table_r01 , ch_core_metric_r03, ch_core_metric_r06, ch_core_metric_r08, 
     ch_core_metric_r09, ch_core_metric_r11, ch_core_metric_r12 )
-    file "core-metric-results/rarefied_table.qza" into ch_phylo_tree_rare_table_run
+    file "core-metric-results/rarefied_table.qza" into ( ch_phylo_tree_rare_table_run, ch_table_lefse)
     file "shannon.qza" into ch_shannon_qza
     file "simpson.qza" into ch_simpson_qza 
     file "chao1.qza" into ch_chao_qza
     file "ace.qza" into ch_ace_qza
     file "obs.qza" into ch_obs_qza
     file "faith_pd.qza" into ch_faith_qza
-    file "table-dada2.qza" into ch_table_rare_curve
-    file "rooted-tree.qza" into ch_tree_rare_curve
+    
     
 
     label 'process_medium'
@@ -982,7 +983,7 @@ process AssignTaxonomy{
     file "515-806-classifier.qza" from ch_515_classifier
 
     output:
-    file "taxonomy.qza" into ( ch_taxonomy_phylo_tree, ch_taxonomy_r01, ch_taxonomy_r03, 
+    file "taxonomy.qza" into ( ch_taxonomy_phylo_tree, ch_tax_lefse, ch_taxonomy_r01, ch_taxonomy_r03, 
     ch_taxonomy_r06, ch_taxonomy_r08, ch_taxonomy_r11, ch_taxonomy_r12)
     file "taxonomy.qza" into ch_taxonomy_phylo_tree_run
     file "taxonomy.qzv" into ch_classified_qzv
@@ -1061,8 +1062,7 @@ process RareCurveCalc{
     output:
     file "alpha-rarefaction.qzv" into ch_alpha_rare_obj
     path "alpha-rareplot/*" into (ch_alpha_rare_viz, ch_alpha_rare_r07)
-    file "table-dada2.qza" into ch_table_phylo_tree_rare
-    file "rooted-tree.qza" into ch_tree_lefse
+    
     
     label 'process_medium'
 
@@ -1235,8 +1235,6 @@ process GeneratePhylogeneticTrees{
 
     output:
     
-    file "table-dada2.qza" into ch_table_graphlan2
-    file "taxonomy.qza" into ch_tax_lefse
     path "biom_tabs/*" into ch_biom_tabs
 
     label 'process_medium'
@@ -1328,8 +1326,6 @@ process runGraphlan{
     
     output:
     path "phylo_trees/*" into (ch_png_phylo_tree,  ch_02_report_imgs) 
-    file "table-dada2.qza" into ch_table_lefse_graphlan
-    file "rarefied_table.qza" into ch_table_lefse
     
     label 'process_low'
 
@@ -1393,8 +1389,6 @@ process LefseFormat {
     output:
     path "combos/*" into ch_paired_lefse_format
     file "table-dada2.qza" into ch_table_report_raw
-    file "rarefied_table.qza" into ch_table_report_rare
-    file "rooted-tree.qza" into ch_tree_report
     file "taxonomy.qza" into ch_tax_report
     file "metadata.tsv" into ( ch_metadata_report, ch_metadata_r01, ch_metadata_r02, ch_metadata_r03, 
     ch_metadata_r04, ch_metadata_r05, ch_metadata_r06, ch_metadata_r07, ch_metadata_r08, ch_metadata_r09, 
@@ -1411,7 +1405,7 @@ process LefseFormat {
     mv lefse_formatted.txt combos/
     """
 }
-
+ch_table_lefse_graphlan
 process LefseAnalysis{
     publishDir "${params.outdir}/lefse", mode: 'copy'
 
