@@ -16,7 +16,9 @@ $ python3 -m pip install PySimpleGUI
 ## Slurm Scripts
 
 I have included two slurm scripts: 
+
 [One pulls all singularity images since nextflow can time out](slurm_pull_singularity.sh)
+
 [One sets up work directory and then starts the analysis](slurm_nf_sub.sh)
 
 The nextflow run command can look like this:
