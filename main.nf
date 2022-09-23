@@ -1415,7 +1415,7 @@ process LefseFormat {
 process LefseAnalysis{
     publishDir "${params.outdir}/lefse", mode: 'copy'
 
-    container "docker://lorentzb/py2_env:2.0"
+    container "docker://lorentzb/py2_env:1.0"
 
     input:
     path "combos/*" from ch_paired_lefse_format
