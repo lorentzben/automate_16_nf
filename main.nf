@@ -57,6 +57,8 @@ if(params.metadata) {
         ch_metadata_beta_sig ; ch_metadata_phylo_tree ; ch_metadata_phylo_tree_run ; ch_metadata_lefse ; ch_metadata_finalize}
 }
 
+// Give the User option to submit Sampling depth, forward cutoffs , reverse cutoffs and rarefaction depth.
+// Defaults are given too if user does not submit any. 
 
 if(params.sampDepth){
     Channel
@@ -105,6 +107,7 @@ if(!params.rareDepth){
         .set{ ch_user_rarefaction_depth }
 }
 
+// classifier location for 515 and full 16s, these can be user supplied but must match qiime2-2020.8
 if(params.classify_515){
     fiveFile = file(params.classify_515).getName()
     Channel
@@ -121,7 +124,7 @@ if(params.classify_full){
         .set{ ch_whole_classifier}
 }
 
-
+// Load helper scripts to replace lefse default scripts
 Channel
     .fromPath("${baseDir}/python_scripts/plot_cladogram.py")
     .ifEmpty {exit 1, log.info "Cannot find file plot_cladogram.py!"}
@@ -132,8 +135,7 @@ Channel
     .ifEmpty {exit 1, log.info "Cannot find file plot_res.py!"}
     .set{ ch_plot_res }
 
-
-
+// item of interest or item that will be used to compare categories in alpha diversity 
 Channel
     .from(params.itemOfInterest)
     .ifEmpty {exit 1, log.info "Cannot find Item of interest"}
@@ -141,6 +143,7 @@ Channel
     ch_ioi_denoise_to_file ; ch_ioi_r01_csv ; ch_ioi_r02_csv ; ch_ioi_r03_csv ; ch_ioi_r04_csv ; ch_ioi_r05_csv ;
     ch_ioi_r06_csv ; ch_ioi_r07_csv ; ch_ioi_r08_csv; ch_ioi_r09_csv; ch_ioi_r10_csv; ch_ioi_r11_csv; ch_ioi_r12_csv; ch_ioi_r13_csv}
 
+//helper scripts to make graphlan and lefse analysis
 Channel
     .fromPath("${baseDir}/bash_scripts/graph.sh")
     .set{ ch_graph_script } 
@@ -156,6 +159,8 @@ Channel
 Channel 
     .fromPath("${baseDir}/bash_scripts/lefse_analysis.sh")
     .set{ ch_lefse_analysis_script }
+
+//import individual report files for report generation
 
 Channel
     .fromPath("${baseDir}/report_gen_files/01_report.Rmd")
@@ -240,7 +245,7 @@ process VerifyManifest{
     import csv 
 
     cwd = os.getcwd()
-    
+    # Try to read metadata file and exit gracefully if unable to 
     try:
         metadata_path = str('${metadata}')
         metadata_path = cwd+'/'+metadata_path
@@ -249,7 +254,7 @@ process VerifyManifest{
         print("Incorrect Path for Metadata!")
         print("Path provided: "+metadata_path )
         exit(1)
-
+    #try to read ordered item of interest, if not found generate it and save to file
     try:
         read_order = pd.read_table('${baseDir}/order_item_of_interest.csv', sep=',')
         pd.DataFrame.to_csv(read_order, 'order_item_of_interest.csv', index=False)
@@ -259,6 +264,7 @@ process VerifyManifest{
         ioisdf.columns = ['${ioi}']
         pd.DataFrame.to_csv(ioisdf, 'order_item_of_interest.csv', index=False)
 
+    #try to read in manifest
     seq_dir = '${seqs_dir}'
     try:
         manifest_path = str('${manifest}')
@@ -389,7 +395,7 @@ process CheckSinglePaired {
     import os 
     import csv
 
-    
+    #save item of interest to csv file
     with open('item_of_interest.csv', 'w', newline='') as csvfile:
         fieldnames = ['item name']
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
@@ -398,7 +404,7 @@ process CheckSinglePaired {
         writer.writerow({'item name': '${ioi}'})
 
     read_manifest = pd.read_table('${manifest}', index_col=0, sep='\t+', engine='python')
-
+    #read in manifest and determine if it is a single end or paired end analysis based on col header
     if read_manifest.columns[0] == 'absolute-filepath':
         print("single end analysis")
         format = "SingleEndFastqManifestPhred33V2"
@@ -453,7 +459,7 @@ process GenerateSeqObject{
     '''
     DAT=$(head !{data_type})
     MANI=$(head !{manifest_format})
-    #module load  QIIME2/2020.11
+    #turn fastq.gz files into .qza object
     qiime tools import \
     --type $DAT\
     --input-path !{manifest} \
@@ -480,6 +486,7 @@ process QualControl{
     """
     #!/usr/bin/env bash
 
+    # generate seq viz object and export to folder
     qiime demux summarize \
     --i-data ${seq_obj} \
     --o-visualization demux_summary.qzv
@@ -518,7 +525,8 @@ process FindCutoffs{
         from pathlib import Path
         import numpy as np 
         import csv 
-        
+
+        # if forward value is provided write it out 
         forward = [0,${forward_val}]
         reverse =[0, ${reverse_val}]
         with open('cutoffs.csv', 'w', newline='') as csvfile:
@@ -544,11 +552,12 @@ process FindCutoffs{
         wd = Path.cwd()
 
         seq_file = pd.read_table("manifest_format.txt")
+        #check if file is single or paired end
         if seq_file.columns[0] == "SingleEndFastqManifestPhred33V2":
             seq_format = "single"
         else:
             seq_format = "paired"
-
+        
         def find_cutoffs(dataframe):
             mean_qual = dataframe[4:5]
             mean_count = dataframe[0:1]
@@ -558,17 +567,18 @@ process FindCutoffs{
 
             mean_qual_vals = np.array(mean_qual)[0]
             mean_count_vals = np.array(mean_count)[0]
-
+            #check for poor quality seqs
             if int(average_qual) < 30:
                 print(
                     "The Average Quality of these sequences may be a concern would you like to continue?")
                 exit(0)
-
+            # if quality falls below average of the average qualities set left cutoff
             for i in range(0, len(mean_qual_vals)):
                 if mean_qual_vals[i] >= int(average_qual):
                     if mean_count_vals[i] >= int(average_count):
                         left_cutoff = i+1
                         break
+            # if quality falls below average of the average qualities set right cutoff
             for i in range(0, len(mean_qual_vals)):
                 if mean_qual_vals[len(mean_qual_vals)-1-i] >= int(average_qual):
                     if mean_count_vals[len(mean_count_vals)-1-i] >= int(average_count):
@@ -593,13 +603,13 @@ process FindCutoffs{
 
             left_cutoff = 0
             right_cutoff = len(mean_qual_vals)-1
-
+            # if quality falls below average of the average qualities set left cutoff
             for i in range(0, len(mean_qual_vals)):
                 if mean_qual_vals[i] >= int(average_qual):
                     if mean_count_vals[i] >= int(average_count):
                         left_cutoff = i+1
                         break
-
+            # if quality falls below average of the average qualities set right cutoff
             for i in range(0, len(mean_qual_vals)):
                 if mean_qual_vals[len(mean_qual_vals)-1-i] >= int(average_qual):
                     if mean_count_vals[len(mean_count_vals)-1-i] >= int(average_count):
@@ -690,6 +700,7 @@ process Denoise {
 
     wd = Path.cwd()
 
+    #denoise single or paired end seqs using dada2 and cutoffs provided
 
     seq_file = pd.read_table("manifest_format.txt")
     if seq_file.columns[0] == "SingleEndFastqManifestPhred33V2":
@@ -753,6 +764,7 @@ process FeatureVisualization{
     """
     #!/usr/bin/env bash
 
+    #visualizes the denoising stats and rep sequences
     qiime metadata tabulate \
     --m-input-file stats-dada2.qza \
     --o-visualization stats-dada2.qzv
@@ -791,6 +803,7 @@ process TreeConstruction{
     """
     #!/usr/bin/env bash 
 
+    #generate phylogenetic tree from representative sequences
     qiime phylogeny align-to-tree-mafft-fasttree \
     --i-sequences rep-seqs-dada2.qza \
     --o-alignment aligned-rep-seqs.qza \
@@ -818,6 +831,7 @@ process ExportTable{
     """
     #!/usr/bin/env bash
 
+    #visualize the dada2 table
     qiime tools export \
     --input-path table.qzv \
     --output-path table_viz
@@ -859,6 +873,9 @@ process DetermineDepth{
 
     feature_array = np.array(features)
 
+    # move up per sample of features and if the percent of features retained is greater than 22% 
+    # then write sampling depth out. 
+    # TODO compare this 22% to something like 50%
     for i in range(len(feature_array)-1, -1, -1):
         sampling_depth = feature_array[i][0]
         perc_features_retain = ((sampling_depth * (i+1))/total_count)
@@ -921,6 +938,7 @@ process AlphaDiversityMeasure{
 
     echo !{user_depth} > test_samp_depth.txt
 
+    #if the user hasn't provided a sampling depth, read it in from file 
     if [[ !{user_depth} == 0 ]]
     then
         SAMP_DEPTH=$(head samp_depth_simple.txt)
@@ -929,7 +947,7 @@ process AlphaDiversityMeasure{
     fi
 
     echo !{user_depth} > used_samp_depth.txt
-  
+    #perform the core-metrics analysis using sampling depth
     qiime diversity core-metrics-phylogenetic \
     --i-phylogeny rooted-tree.qza \
     --i-table table-dada2.qza \
@@ -994,6 +1012,8 @@ process AssignTaxonomy{
     """
     #!/usr/bin/env bash
 
+    #check for classifier and exit gracefully if it's missing.
+
     if [ ! -f "16s-whole-seq-classifier.qza" ]
     then 
         echo "Error, download the classifier from readme"
@@ -1036,6 +1056,8 @@ process CalcRareDepth{
     import pandas as pd
     import numpy as np 
 
+    #use mean number of features as rarefaction depth
+
     sample_freq = pd.read_csv("table_viz/sample-frequency-detail.csv")
     depth = sample_freq.median()[0]
 
@@ -1070,6 +1092,7 @@ process RareCurveCalc{
     '''
     #!/usr/bin/env bash
 
+    #user provided rarefaction depth
     if [[ !{user_rare_depth} == 0 ]]
     then
         DEPTH=$(head rare_depth.txt)
@@ -1077,7 +1100,7 @@ process RareCurveCalc{
         DEPTH=!{user_rare_depth}
     fi
 
-    
+    #generate rarefaction curves 
     
     qiime diversity alpha-rarefaction \
     --i-table table-dada2.qza \
@@ -1120,6 +1143,8 @@ process AlphaDiversitySignificance{
     script:
     """
     #!/usr/bin/env bash
+
+    #generate visualizations of each alpha diversity analysis
 
     qiime diversity alpha-group-significance \
     --i-alpha-diversity shannon.qza \
@@ -1197,6 +1222,8 @@ process BetaDiversitySignificance{
     """
     #!/usr/bin/env bash
 
+    #generate visualizations of each alpha diversity analysis
+    
     qiime diversity beta-group-significance \
     --i-distance-matrix core-metric-results/unweighted_unifrac_distance_matrix.qza \
     --m-metadata-file ${metadata} \
