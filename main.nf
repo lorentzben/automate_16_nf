@@ -687,7 +687,7 @@ process Denoise {
     
     container "docker://lorentzb/automate_16_nf:2.0"
 
-    label 'process_medium'
+    label 'process_high'
 
     script:
     """
