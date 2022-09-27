@@ -1025,8 +1025,15 @@ process AssignTaxonomy{
         exit 1
     fi
 
+
+    #qiime feature-classifier classify-sklearn \
+    #--i-classifier 515-806-classifier.qza \
+    #--i-reads rep-seqs-dada2.qza \
+    #--p-confidence 0.6 \
+    #--o-classification taxonomy.qza
+
     qiime feature-classifier classify-sklearn \
-    --i-classifier 515-806-classifier.qza \
+    --i-classifier 16s-whole-seq-classifier.qza \
     --i-reads rep-seqs-dada2.qza \
     --p-confidence 0.6 \
     --o-classification taxonomy.qza
